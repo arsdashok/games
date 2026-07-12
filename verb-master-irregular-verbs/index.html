@@ -1598,7 +1598,14 @@ let currentGame = null;
 // cloud and localStorage becomes a fast local cache / offline fallback.
 // With config = null the game behaves exactly as before (local-only).
 // ===============================================
-const FIREBASE_CONFIG = null; /* paste the Firebase web-app config object here to enable sync */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDTnVILBxYWpSzOb1LZH1AoXoHybML4t80",
+  authDomain: "verb-master-5e1f5.firebaseapp.com",
+  projectId: "verb-master-5e1f5",
+  storageBucket: "verb-master-5e1f5.firebasestorage.app",
+  messagingSenderId: "852704075844",
+  appId: "1:852704075844:web:1c5e326e12a9ebeef59c11"
+};
 
 let _db = null, _cloudReady = false, _cloudInit = null, _sessionPassHash = null;
 
