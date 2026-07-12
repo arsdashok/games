@@ -146,7 +146,6 @@
     <div class="sign"><span class="cart">🛒</span> The Emerald Shop</div>
     <div class="tools">
       <div class="wallet"><span id="emIcon"></span><span id="emCount">20</span></div>
-      <button class="iconbtn" id="muteBtn" title="Sound">🔊</button>
       <button class="iconbtn" id="resetBtn" title="Restock">↺</button>
     </div>
   </header>
@@ -210,28 +209,12 @@ const plural = n => n==='shoes'||n==='trousers' ? n : (n==='milk'||n==='water' ?
 const START=20;
 let emeralds=START;
 let basket={};       // name -> count
-let muted=false;
 
 const emIconHTML='<svg class="em" viewBox="0 0 100 100"><use href="#emerald"/></svg>';
 const emTag='<svg class="em" viewBox="0 0 100 100"><use href="#emerald"/></svg>';
 
-// ---------- speech ----------
-let voice=null;
-function pickVoice(){
-  const vs=speechSynthesis.getVoices();
-  voice = vs.find(v=>/en-GB/i.test(v.lang)&&/female|Kate|Serena|Libby|Sonia/i.test(v.name))
-       || vs.find(v=>/en-GB/i.test(v.lang))
-       || vs.find(v=>/en[-_]/i.test(v.lang)) || vs[0]||null;
-}
-if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-function say(text){
-  if(muted || !('speechSynthesis' in window)) return;
-  try{ speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    if(voice)u.voice=voice; u.lang='en-GB'; u.rate=.85; u.pitch=1.05;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
+// ---------- sound removed (silent game) ----------
+function say(){}
 
 // ---------- render ----------
 function itemTile(name){
@@ -374,10 +357,6 @@ function reset(){
 document.getElementById('emIcon').innerHTML=emIconHTML;
 document.getElementById('howManyBtn').onclick=howMany;
 document.getElementById('resetBtn').onclick=reset;
-document.getElementById('muteBtn').onclick=function(){
-  muted=!muted; this.textContent=muted?'🔇':'🔊';
-  if(muted && 'speechSynthesis' in window) speechSynthesis.cancel();
-};
 document.getElementById('veil').onclick=e=>{ if(e.target.id==='veil') closeVeil(); };
 window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeVeil(); });
 
