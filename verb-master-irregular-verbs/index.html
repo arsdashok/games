@@ -1593,6 +1593,88 @@ let currentUser = null;
 let currentGame = null;
 
 // ===============================================
+// CLOUD SYNC (Firestore) — cross-device accounts
+// When FIREBASE_CONFIG is filled in, accounts + progress live in the
+// cloud and localStorage becomes a fast local cache / offline fallback.
+// With config = null the game behaves exactly as before (local-only).
+// ===============================================
+const FIREBASE_CONFIG = null; /* paste the Firebase web-app config object here to enable sync */
+
+let _db = null, _cloudReady = false, _cloudInit = null, _sessionPassHash = null;
+
+function _loadScript(src) {
+  return new Promise((ok, fail) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = ok; s.onerror = fail;
+    document.head.appendChild(s);
+  });
+}
+
+async function _sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Stable doc id per account: role + sanitised lower-case name
+function _userDocId(name, role) {
+  return role + '_' + name.toLowerCase().trim().replace(/[^a-z0-9а-яё_-]/gi, '_');
+}
+
+function initCloud() {
+  if (_cloudInit) return _cloudInit;
+  _cloudInit = (async () => {
+    if (!FIREBASE_CONFIG) return;
+    try {
+      const v = '10.12.2';
+      await _loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`);
+      await _loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-auth-compat.js`);
+      await _loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`);
+      firebase.initializeApp(FIREBASE_CONFIG);
+      await firebase.auth().signInAnonymously();
+      _db = firebase.firestore();
+      _cloudReady = true;
+      console.log('[cloud] sync enabled');
+    } catch (e) {
+      console.warn('[cloud] unavailable, running local-only:', e && e.message);
+    }
+  })();
+  return _cloudInit;
+}
+
+async function cloudFetchUser(name, role) {
+  if (!_cloudReady) return null;
+  try {
+    const snap = await _db.collection('vm_users').doc(_userDocId(name, role)).get();
+    return snap.exists ? snap.data() : null;
+  } catch (e) { console.warn('[cloud] fetch failed:', e && e.message); return null; }
+}
+
+// Debounced push of the current user to the cloud (plaintext password never leaves the device)
+let _cloudPushTimer = null;
+function cloudPushUser() {
+  if (!_cloudReady || !currentUser || !_sessionPassHash) return;
+  clearTimeout(_cloudPushTimer);
+  _cloudPushTimer = setTimeout(async () => {
+    try {
+      const u = JSON.parse(JSON.stringify(currentUser)); // strips undefined for Firestore
+      delete u.password;
+      u.passHash = _sessionPassHash;
+      await _db.collection('vm_users').doc(_userDocId(u.name, u.role)).set(u);
+    } catch (e) { console.warn('[cloud] push failed:', e && e.message); }
+  }, 1500);
+}
+
+// Adopt a cloud copy into local storage, replacing any same-name local twin
+function adoptCloudUser(cloudUser) {
+  const data = loadData();
+  data.users = data.users.filter(x =>
+    !(x.name.toLowerCase() === cloudUser.name.toLowerCase() && x.role === cloudUser.role && x.id !== cloudUser.id));
+  const idx = data.users.findIndex(x => x.id === cloudUser.id);
+  if (idx >= 0) data.users[idx] = cloudUser; else data.users.push(cloudUser);
+  saveData(data);
+}
+
+// ===============================================
 // AUTH SYSTEM
 // ===============================================
 let selectedRole = 'student';
@@ -1604,11 +1686,38 @@ function setRole(role) {
   document.getElementById('classCodeGroup').classList.toggle('hidden', role === 'teacher');
 }
 
-function doLogin() {
+async function doLogin() {
   const name = document.getElementById('loginName').value.trim();
   const pass = document.getElementById('loginPass').value;
   if (!name || !pass) { showError('Please fill in all fields'); return; }
 
+  showError('Signing in…');
+  await initCloud();
+
+  // Cloud first: the account may have been created on another device
+  if (_cloudReady) {
+    const cloudUser = await cloudFetchUser(name, selectedRole);
+    if (cloudUser) {
+      const hash = await _sha256(pass);
+      if (cloudUser.passHash !== hash) { showError('User not found or wrong password'); return; }
+      cloudUser.password = pass; // keep offline login working on this device
+      ensureUserShape(cloudUser);
+      // If this device has a NEWER copy of the same account (played offline), keep it
+      const data = loadData();
+      const local = data.users.find(u => u.id === cloudUser.id);
+      const use = (local && new Date(local.lastActive || 0) > new Date(cloudUser.lastActive || 0)) ? local : cloudUser;
+      ensureUserShape(use);
+      adoptCloudUser(use);
+      _sessionPassHash = hash;
+      currentUser = use;
+      showError('');
+      showDashboard();
+      cloudPushUser();
+      return;
+    }
+  }
+
+  // Local fallback (offline, cloud disabled, or a pre-cloud account)
   const data = loadData();
   const user = data.users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.password === pass && u.role === selectedRole);
   if (!user) { showError('User not found or wrong password'); return; }
@@ -1616,7 +1725,10 @@ function doLogin() {
   // Migration for older accounts (add new fields if missing)
   ensureUserShape(user);
   currentUser = user;
+  _sessionPassHash = _cloudReady ? await _sha256(pass) : null;
+  showError('');
   showDashboard();
+  cloudPushUser(); // migrates a local-only account into the cloud
 }
 
 function ensureUserShape(user) {
@@ -1631,13 +1743,19 @@ function ensureUserShape(user) {
   if (!user.sets) user.sets = [];
 }
 
-function doRegister() {
+async function doRegister() {
   const name = document.getElementById('loginName').value.trim();
   const pass = document.getElementById('loginPass').value;
   if (!name || !pass) { showError('Please fill in all fields'); return; }
 
+  showError('Creating account…');
+  await initCloud();
+
   const data = loadData();
   if (data.users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.role === selectedRole)) {
+    showError('This name is already taken'); return;
+  }
+  if (_cloudReady && await cloudFetchUser(name, selectedRole)) {
     showError('This name is already taken'); return;
   }
 
@@ -1658,7 +1776,12 @@ function doRegister() {
   if (selectedRole === 'student') {
     const code = document.getElementById('loginClassCode').value.trim().toUpperCase();
     if (code) {
-      if (!data.classes[code]) { showError('Invalid class code'); return; }
+      let valid = !!data.classes[code];
+      if (!valid && _cloudReady) {
+        try { valid = (await _db.collection('vm_classes').doc(code).get()).exists; }
+        catch (e) { console.warn('[cloud] class check failed:', e && e.message); }
+      }
+      if (!valid) { showError('Invalid class code'); return; }
       user.classCode = code;
     }
   }
@@ -1667,12 +1790,19 @@ function doRegister() {
     const classCode = generateClassCode();
     user.classCode = classCode;
     data.classes[classCode] = { teacherId: user.id, created: new Date().toISOString() };
+    if (_cloudReady) {
+      try { await _db.collection('vm_classes').doc(classCode).set({ teacherId: user.id, created: new Date().toISOString() }); }
+      catch (e) { console.warn('[cloud] class create failed:', e && e.message); }
+    }
   }
 
   data.users.push(user);
   saveData(data);
   currentUser = user;
+  _sessionPassHash = _cloudReady ? await _sha256(pass) : null;
+  showError('');
   showDashboard();
+  cloudPushUser();
 }
 
 function generateClassCode() {
@@ -1684,7 +1814,7 @@ function generateClassCode() {
 
 function showError(msg) { document.getElementById('loginError').textContent = msg; }
 
-function logout() { currentUser = null; localStorage.removeItem('verbmaster_lastuser'); showScreen('loginScreen'); }
+function logout() { currentUser = null; _sessionPassHash = null; _cloudStudents = null; localStorage.removeItem('verbmaster_lastuser'); showScreen('loginScreen'); }
 
 function resetAllData() {
   if (!confirm('This will delete ALL accounts, sets, and progress. Continue?')) return;
@@ -1824,16 +1954,32 @@ function setDashTier(tier, btn) {
 // ===============================================
 // TEACHER DASHBOARD
 // ===============================================
+let _cloudStudents = null; // last cloud-fetched class list (teacher view)
+
 function renderTeacherDashboard() {
   const u = currentUser;
   document.getElementById('teacherAvatar').textContent = u.name[0].toUpperCase();
   document.getElementById('teacherName').textContent = u.name;
   document.getElementById('teacherClassCode').textContent = u.classCode || '------';
 
+  // Render local data instantly, then refresh from the cloud (students on OTHER devices)
   const data = loadData();
-  const students = data.users.filter(s => s.role === 'student' && s.classCode === u.classCode);
-  const tbody = document.getElementById('studentsTableBody');
+  const localStudents = data.users.filter(s => s.role === 'student' && s.classCode === u.classCode);
+  renderStudentsTable(localStudents);
 
+  initCloud().then(async () => {
+    if (!_cloudReady || !u.classCode) return;
+    try {
+      const q = await _db.collection('vm_users')
+        .where('role', '==', 'student').where('classCode', '==', u.classCode).get();
+      _cloudStudents = q.docs.map(d => d.data());
+      if (currentUser === u) renderStudentsTable(_cloudStudents); // still on this dashboard
+    } catch (e) { console.warn('[cloud] class fetch failed:', e && e.message); }
+  });
+}
+
+function renderStudentsTable(students) {
+  const tbody = document.getElementById('studentsTableBody');
   if (students.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:40px;">No students linked yet. Share your class code!</td></tr>';
   } else {
@@ -1843,8 +1989,8 @@ function renderTeacherDashboard() {
       const studied = (s.studied || []).length;
       const mastered = Object.values(s.verbStats).filter(v => v.correct >= 5 && v.total > 0 && (v.correct/v.total) >= 0.8).length;
       const lastActive = s.lastActive ? new Date(s.lastActive).toLocaleDateString() : 'Never';
-      return `<tr onclick="showStudentDetail('${s.id}')" style="cursor:pointer">
-        <td><strong>${s.name}</strong></td>
+      return `<tr onclick="showStudentDetail('${escapeHtml(s.id)}')" style="cursor:pointer">
+        <td><strong>${escapeHtml(s.name)}</strong></td>
         <td>Lvl ${s.level}</td>
         <td>${s.xp} XP</td>
         <td>${studied}/${VERBS.length}</td>
@@ -1859,8 +2005,12 @@ function renderTeacherDashboard() {
 }
 
 function showStudentDetail(studentId) {
-  const data = loadData();
-  const student = data.users.find(u => u.id === studentId);
+  // Prefer the cloud-fetched class list (students from other devices), fall back to local
+  let student = (_cloudStudents || []).find(u => u.id === studentId);
+  if (!student) {
+    const data = loadData();
+    student = data.users.find(u => u.id === studentId);
+  }
   if (!student) return;
   ensureUserShape(student);
 
@@ -1908,7 +2058,7 @@ function showTeacherTab(tab, btn) {
 
 function exportClassData() {
   const data = loadData();
-  const students = data.users.filter(s => s.role === 'student' && s.classCode === currentUser.classCode);
+  const students = _cloudStudents || data.users.filter(s => s.role === 'student' && s.classCode === currentUser.classCode);
   const blob = new Blob([JSON.stringify(students, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1951,6 +2101,7 @@ function saveProgress() {
     data.users[idx] = currentUser;
     saveData(data);
   }
+  cloudPushUser(); // debounced; no-op when cloud is off
 }
 
 function addXp(amount) {
@@ -3117,9 +3268,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastUser = localStorage.getItem('verbmaster_lastuser');
   if (lastUser) {
     const user = data.users.find(u => u.id === lastUser);
-    if (user) { ensureUserShape(user); currentUser = user; showDashboard(); return; }
+    if (user) { ensureUserShape(user); currentUser = user; showDashboard(); }
   }
-  showScreen('loginScreen');
+  if (!currentUser) showScreen('loginScreen');
+
+  // Cloud: connect in the background; if the cloud copy of the auto-logged-in
+  // account is newer (played on another device), adopt it and re-render.
+  initCloud().then(async () => {
+    if (!_cloudReady || !currentUser) return;
+    if (currentUser.password) _sessionPassHash = await _sha256(currentUser.password);
+    const me = currentUser;
+    const cloudUser = await cloudFetchUser(me.name, me.role);
+    if (currentUser !== me) return; // user switched accounts while we fetched
+    if (cloudUser && new Date(cloudUser.lastActive || 0) > new Date(me.lastActive || 0)) {
+      cloudUser.password = me.password;
+      ensureUserShape(cloudUser);
+      adoptCloudUser(cloudUser);
+      currentUser = cloudUser;
+      showDashboard();
+    } else {
+      cloudPushUser(); // local copy is newer (or cloud missing) — sync it up
+    }
+  });
 });
 </script>
 
