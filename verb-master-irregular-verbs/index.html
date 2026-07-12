@@ -225,7 +225,7 @@ input:focus { border-color: var(--purple); }
 .flashcard:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
 .flashcard .fc-tier { position: absolute; top: 16px; left: 16px; }
 .flashcard .fc-flip-hint { position: absolute; bottom: 12px; right: 16px; font-size: 12px; color: var(--text-dim); }
-.flashcard .fc-v1 { font-size: 56px; font-weight: 800; background: linear-gradient(135deg, var(--purple-light), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+.flashcard .fc-v1 { font-size: 56px; font-weight: 800; background: linear-gradient(135deg, var(--purple-light), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; word-break: break-word; }
 .flashcard .fc-audio { margin-top: 8px; }
 .flashcard .fc-back { display: none; }
 .flashcard.flipped .fc-front { display: none; }
@@ -249,7 +249,7 @@ input:focus { border-color: var(--purple); }
 .hangman-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; }
 .hangman-prompt { text-align: center; }
 .hangman-prompt .hp-base { font-size: 14px; color: var(--text-dim); margin-bottom: 6px; }
-.hangman-prompt .hp-v1 { font-size: 44px; font-weight: 800; color: var(--purple-light); margin-bottom: 6px; display: inline-flex; align-items: center; gap: 12px; }
+.hangman-prompt .hp-v1 { font-size: 44px; font-weight: 800; color: var(--purple-light); margin-bottom: 6px; display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; word-break: break-word; }
 .hangman-prompt .hp-form { font-size: 18px; color: var(--yellow); font-weight: 700; }
 
 .hangman-stage { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; justify-content: center; }
@@ -413,6 +413,8 @@ input:focus { border-color: var(--purple); }
   .battle-vs { font-size: 24px; }
   .dash-header { flex-direction: column; gap: 12px; align-items: flex-start; }
   .hangman-keyboard { grid-template-columns: repeat(7, 1fr); }
+  .hangman-key { padding: 13px 4px; min-height: 44px; font-size: 16px; } /* 44px touch target */
+  .icon-btn.small { width: 40px; height: 40px; }
   .flashcard .fc-v1 { font-size: 42px; }
 }
 </style>
@@ -1131,7 +1133,7 @@ const VERBS = [
     {s:'We ___ to London last summer.', form:'v2', answer:'flew', options:['flew','flown','fly','flying']},
     {s:'She has ___ around the world.', form:'v3', answer:'flown', options:['flown','flew','fly','flying']}
   ]},
-  {v1:'forget', v2:'forgot', v3:'forgotten', ru:'забывать', tier:'medium', altV3:['forgot'], sentences:[
+  {v1:'forget', v2:'forgot', v3:'forgotten', ru:'забывать', tier:'medium', sentences:[
     {s:'I ___ my keys at home.', form:'v2', answer:'forgot', options:['forgot','forgotten','forget','forgetting']},
     {s:'He has ___ her birthday again.', form:'v3', answer:'forgotten', options:['forgotten','forgot','forget','forgetting']}
   ]},
@@ -1262,9 +1264,9 @@ const VERBS = [
   ]},
   {v1:'show', v2:'showed', v3:'shown', ru:'показывать', tier:'easy', altV3:['showed'], sentences:[
     {s:'He ___ me his new phone.', form:'v2', answer:'showed', options:['showed','shown','show','showing']},
-    {s:'The film has been ___ many times.', form:'v3', answer:'shown', options:['shown','showed','show','showing']}
+    {s:'The film has been ___ many times.', form:'v3', answer:'shown', options:['shown','shows','show','showing']}
   ]},
-  {v1:'lie', v2:'lay', v3:'lain', ru:'лежать', tier:'easy', sentences:[
+  {v1:'lie', v2:'lay', v3:'lain', ru:'лежать (о человеке или предмете)', tier:'hard', sentences:[
     {s:'The cat ___ on the sofa all day.', form:'v2', answer:'lay', options:['lay','laid','lied','lying']},
     {s:'She has ___ in bed for hours.', form:'v3', answer:'lain', options:['lain','laid','lay','lying']}
   ]},
@@ -1355,8 +1357,8 @@ const VERBS = [
     {s:'The book has been ___ to a friend.', form:'v3', answer:'lent', options:['lent','lended','lend','lending']}
   ]},
   {v1:'light', v2:'lit', v3:'lit', ru:'зажигать / освещать', tier:'medium', altV2:['lighted'], altV3:['lighted'], sentences:[
-    {s:'She ___ the candles on the cake.', form:'v2', answer:'lit', options:['lit','lighted','light','lighting']},
-    {s:'The street has been ___ all night.', form:'v3', answer:'lit', options:['lit','lighted','light','lighting']}
+    {s:'She ___ the candles on the cake.', form:'v2', answer:'lit', options:['lit','lights','light','lighting']},
+    {s:'The street has been ___ all night.', form:'v3', answer:'lit', options:['lit','lights','light','lighting']}
   ]},
   {v1:'smell', v2:'smelt', v3:'smelt', ru:'пахнуть / нюхать', tier:'medium', altV2:['smelled'], altV3:['smelled'], sentences:[
     {s:'I ___ smoke in the kitchen.', form:'v2', answer:'smelt', options:['smelt','smelling','smell','smells']},
@@ -1371,14 +1373,14 @@ const VERBS = [
     {s:'The leaves have been ___ away.', form:'v3', answer:'swept', options:['swept','sweeped','sweep','sweeping']}
   ]},
   {v1:'burn', v2:'burnt', v3:'burnt', ru:'гореть / жечь', tier:'medium', altV2:['burned'], altV3:['burned'], sentences:[
-    {s:'The toast ___ in the toaster.', form:'v2', answer:'burnt', options:['burnt','burned','burn','burning']},
-    {s:'The candle has ___ down completely.', form:'v3', answer:'burnt', options:['burnt','burned','burn','burning']}
+    {s:'The toast ___ in the toaster.', form:'v2', answer:'burnt', options:['burnt','burns','burn','burning']},
+    {s:'The candle has ___ down completely.', form:'v3', answer:'burnt', options:['burnt','burns','burn','burning']}
   ]},
 
   // --- HARD additions ---
   {v1:'speed', v2:'sped', v3:'sped', ru:'мчаться / ускоряться', tier:'hard', altV2:['speeded'], altV3:['speeded'], sentences:[
-    {s:'The car ___ past us on the motorway.', form:'v2', answer:'sped', options:['sped','speeded','speed','speeding']},
-    {s:'Time has ___ by since then.', form:'v3', answer:'sped', options:['sped','speeded','speed','speeding']}
+    {s:'The car ___ past us on the motorway.', form:'v2', answer:'sped', options:['sped','speeds','speed','speeding']},
+    {s:'Time has ___ by since then.', form:'v3', answer:'sped', options:['sped','speeds','speed','speeding']}
   ]},
   {v1:'stink', v2:'stank', v3:'stunk', ru:'вонять', tier:'hard', sentences:[
     {s:'The bin ___ of rotten food.', form:'v2', answer:'stank', options:['stank','stunk','stink','stinking']},
@@ -1394,7 +1396,7 @@ const VERBS = [
   ]},
   {v1:'prove', v2:'proved', v3:'proven', ru:'доказывать', tier:'hard', altV3:['proved'], sentences:[
     {s:'She ___ that the theory was wrong.', form:'v2', answer:'proved', options:['proved','proven','prove','proving']},
-    {s:'The point has been ___ many times.', form:'v3', answer:'proven', options:['proven','proved','prove','proving']}
+    {s:'The point has been ___ many times.', form:'v3', answer:'proven', options:['proven','proves','prove','proving']}
   ]},
 ];
 
@@ -2128,8 +2130,8 @@ function openSetPlay(setId) {
   const verbObjs = s.verbs.map(v1 => VERBS.find(v => v.v1 === v1)).filter(Boolean);
   const hasStoryHits = verbObjs.some(v => v.sentences.some(sn => s.forms.includes(sn.form)));
   document.getElementById('setPlayStoryBtn').disabled = !hasStoryHits;
-  // Disable Sort if all verbs are all-same OR if only one form is selected (nothing to categorise)
-  const sortable = verbObjs.some(v => dupPattern(v) !== 'all-same') && s.forms.length >= 2;
+  // Disable Sort unless ≥3 usable (non-identical-form) verbs AND both forms selected — matches initSort's own minimum
+  const sortable = verbObjs.filter(v => dupPattern(v) !== 'all-same').length >= 3 && s.forms.length >= 2;
   document.getElementById('setPlaySortBtn').disabled = !sortable;
   // Disable Battle if too few verbs for distractors / fights
   document.getElementById('setPlayBattleBtn').disabled = verbObjs.length < 4;
@@ -2237,6 +2239,19 @@ function startGame(type) {
   if (studied < MIN_STUDIED_TO_PLAY) {
     alert(`Study at least ${MIN_STUDIED_TO_PLAY} verbs first using the 📖 Study card.`);
     return;
+  }
+  // gate: the selected tier filter must actually contain enough studied verbs
+  // (the .locked card style is visual only — this is the real check)
+  if (type !== 'weak') {
+    const tier = (currentUser.settings && currentUser.settings.tier) || 'all';
+    const inTier = getStudiedVerbs(tier).length;
+    const need = (type === 'battle') ? 4 : 1;
+    if (inTier < need) {
+      alert(tier === 'all'
+        ? `This game needs at least ${need} studied verbs.`
+        : `This game needs at least ${need} studied "${tier}" verbs. Change the tier filter or study more.`);
+      return;
+    }
   }
   switch(type) {
     case 'hangman': initHangman(); break;
@@ -2453,6 +2468,7 @@ function loadHangmanRound() {
   hs.wrong = [];
   hs.lives = 6;
   hs.ruShown = false;
+  hs.roundOver = false; // unlocks the keyboard for the new round
 
   // Pick one variant per round (e.g. learnt vs learned). Length acts as the implicit hint.
   const col = round.form === 'v2' ? 1 : 2;
@@ -2508,7 +2524,7 @@ function renderHangmanWord() {
 
 function guessLetter(ch, btn) {
   const hs = hangmanState;
-  if (hs.guessed.has(ch) || hs.wrong.includes(ch) || hs.lives <= 0) return;
+  if (hs.roundOver || hs.guessed.has(ch) || hs.wrong.includes(ch) || hs.lives <= 0) return;
   if (hs.target.includes(ch)) {
     hs.guessed.add(ch);
     btn.classList.add('correct');
@@ -2521,8 +2537,9 @@ function guessLetter(ch, btn) {
       document.getElementById('hangmanScore').textContent = hs.score;
       document.getElementById('hangmanFeedback').innerHTML = `<span style="color:var(--green)">✓ Solved! +${hs.lives * 10 + 30}</span>`;
       recordVerbAttempt(hs.round.verb.v1, true);
+      hs.roundOver = true; // lock the keyboard until the next round loads
       hs.current++;
-      setTimeout(loadHangmanRound, 1600);
+      setTimeout(() => { if (hangmanState === hs && currentGame === hs) loadHangmanRound(); }, 1600);
     }
   } else {
     hs.wrong.push(ch);
@@ -2541,8 +2558,9 @@ function guessLetter(ch, btn) {
       hs.guessed = new Set([...hs.target].filter(c => /[a-z]/.test(c)));
       renderHangmanWord();
       recordVerbAttempt(hs.round.verb.v1, false);
+      hs.roundOver = true;
       hs.current++;
-      setTimeout(loadHangmanRound, 2200);
+      setTimeout(() => { if (hangmanState === hs && currentGame === hs) loadHangmanRound(); }, 2200);
     }
   }
 }
@@ -2584,8 +2602,20 @@ function initSpeed(opts) {
     }
     let shownForm, shownWord;
     if (askForm === 'v1') {
-      shownForm = Math.random() < 0.5 ? 'v2' : 'v3';
-      shownWord = pickDisplayForm(shownForm === 'v2' ? v.v2 : v.v3);
+      // Only show a form that DIFFERS from V1 — otherwise the prompt is its own answer
+      // (come/came/come, put/put/put ...). If neither differs, fall back to a normal question.
+      const differing = ['v2', 'v3'].filter(f => {
+        const w = f === 'v2' ? v.v2 : v.v3;
+        return w && w.toLowerCase() !== v.v1.toLowerCase();
+      });
+      if (differing.length) {
+        shownForm = differing[Math.floor(Math.random() * differing.length)];
+        shownWord = pickDisplayForm(shownForm === 'v2' ? v.v2 : v.v3);
+      } else {
+        askForm = allowedForms[Math.floor(Math.random() * allowedForms.length)];
+        shownForm = 'v1';
+        shownWord = v.v1;
+      }
     } else {
       shownForm = 'v1';
       shownWord = v.v1;
@@ -2618,10 +2648,12 @@ function loadSpeedRound() {
   document.getElementById('speedFormLabel').textContent = '→ ' + formLabel(round.askForm);
   document.getElementById('speedFeedback').textContent = '';
 
+  ss.answered = false; // per-round lock (double-Enter guard)
   const input = document.getElementById('speedInput');
   input.value = '';
   input.className = 'speed-input';
   input.focus();
+  input.scrollIntoView({ block: 'center' }); // keep the input above the mobile keyboard
   input.onkeydown = function(e) { if (e.key === 'Enter') checkSpeedAnswer(); };
 
   ss.timeLeft = ss.timerSec;
@@ -2639,6 +2671,8 @@ function loadSpeedRound() {
 
 function checkSpeedAnswer() {
   const ss = speedState;
+  if (ss.answered) return; // already resolved this round — ignore extra Enters
+  ss.answered = true;
   const round = ss.round;
   const input = document.getElementById('speedInput');
   clearInterval(ss.timer);
@@ -2659,11 +2693,14 @@ function checkSpeedAnswer() {
   document.getElementById('speedScore').textContent = ss.score;
   document.getElementById('speedStreak').textContent = ss.streak;
   ss.current++;
-  setTimeout(loadSpeedRound, 1200);
+  // Guarded resume: don't advance a game the student already left or restarted
+  setTimeout(() => { if (speedState === ss && currentGame === ss) loadSpeedRound(); }, 1200);
 }
 
 function speedTimeout() {
   const ss = speedState;
+  if (ss.answered) return; // answer already submitted at the same instant
+  ss.answered = true;
   const round = ss.round;
   document.getElementById('speedInput').className = 'speed-input wrong';
   ss.streak = 0;
@@ -2671,7 +2708,7 @@ function speedTimeout() {
   document.getElementById('speedStreak').textContent = '0';
   recordVerbAttempt(round.verb.v1, false);
   ss.current++;
-  setTimeout(loadSpeedRound, 1500);
+  setTimeout(() => { if (speedState === ss && currentGame === ss) loadSpeedRound(); }, 1500);
 }
 
 function toggleSpeedRu() {
@@ -2737,6 +2774,7 @@ function loadSortRound() {
   if (ss.current >= ss.items.length) { finishSort(); return; }
   const item = ss.items[ss.current];
   ss.item = item;
+  ss.answered = false; // per-round lock (double-click guard)
   document.getElementById('sortRound').textContent = (ss.current + 1) + '/' + ss.items.length;
   document.getElementById('sortWord').textContent = item.word;
   document.getElementById('sortFeedback').textContent = '';
@@ -2755,6 +2793,8 @@ function loadSortRound() {
 function sortAnswer(col) {
   const ss = sortState;
   if (ss.current >= ss.items.length) return;
+  if (ss.answered) return; // already resolved this item — ignore extra clicks during feedback
+  ss.answered = true;
   clearInterval(ss.timer);
   const item = ss.item;
   const btns = document.querySelectorAll('.sort-btn');
@@ -2778,7 +2818,7 @@ function sortAnswer(col) {
   }
   document.getElementById('sortScore').textContent = ss.score;
   ss.current++;
-  setTimeout(loadSortRound, 1900);
+  setTimeout(() => { if (sortState === ss && currentGame === ss) loadSortRound(); }, 1900);
 }
 
 function finishSort() {
@@ -2866,7 +2906,7 @@ function storyAnswer(btn, chosen, correct) {
   }
   document.getElementById('storyScore').textContent = ss.score;
   ss.current++;
-  setTimeout(loadStoryRound, 2000);
+  setTimeout(() => { if (storyState === ss && currentGame === ss) loadStoryRound(); }, 2000);
 }
 
 function finishStory() {
@@ -3000,6 +3040,7 @@ function battleAnswer(btn, chosen, correct, verbV1) {
   }, 600);
 
   setTimeout(() => {
+    if (battleState !== bs || currentGame !== bs) return; // player left the game
     if (bs.playerHp <= 0) {
       finishBattle('defeat');
     } else if (bs.enemyHp <= 0) {
@@ -3012,7 +3053,7 @@ function battleAnswer(btn, chosen, correct, verbV1) {
       bs.playerHp = Math.min(bs.playerMaxHp, bs.playerHp + 20);
       document.getElementById('battleLog').innerHTML = `<span style="color:var(--green)">🎉 Enemy defeated! +20 HP!</span>`;
       updateBattleHp();
-      setTimeout(spawnEnemy, 1400);
+      setTimeout(() => { if (battleState === bs && currentGame === bs) spawnEnemy(); }, 1400);
     } else {
       loadBattleQuestion();
     }
@@ -3027,7 +3068,7 @@ function toggleBattleRu() {
 function finishBattle(outcome) {
   const bs = battleState;
   if (bs.defeated > currentUser.gameScores.battle) currentUser.gameScores.battle = bs.defeated;
-  if (bs.defeated > currentUser.bestStreak) currentUser.bestStreak = bs.defeated;
+  // NOTE: bestStreak is the answer-streak stat (set by Speed Quiz) — battle wins live in gameScores.battle
   const tag = bs.fromSet ? `Set: ${bs.setName} · ` : '';
   if (outcome === 'victory') {
     showResults('🏆 Victory!', bs.defeated + ' enemies', `${tag}Defeated ${BATTLE_TARGET} monsters with ${bs.playerHp}/${bs.playerMaxHp} HP left!`, bs.defeated * 15, () => initBattle(bs._opts));
@@ -3042,8 +3083,11 @@ function finishBattle(outcome) {
 function initWeakDrill() {
   const weak = getWeakVerbs(20);
   if (weak.length < 3) { alert('Play a few games first so we know which verbs you struggle with.'); return; }
-  // Pick a random format
-  const formats = ['speed', 'sort', 'story', 'battle'];
+  // Pick a random format — but only formats this weak-pool can actually support
+  // (Battle needs ≥4 verbs, Sort needs ≥3 with non-identical forms; otherwise they abort)
+  const formats = ['speed', 'story'];
+  if (weak.filter(v => dupPattern(v) !== 'all-same').length >= 3) formats.push('sort');
+  if (weak.length >= 4) formats.push('battle');
   const choice = formats[Math.floor(Math.random() * formats.length)];
   const opts = { weakOnly: true };
   if (choice === 'speed') initSpeed(opts);
@@ -3055,6 +3099,19 @@ function initWeakDrill() {
 // ===============================================
 // INIT
 // ===============================================
+
+// Physical-keyboard support for Hangman (desktop / tablets with a keyboard)
+document.addEventListener('keydown', (e) => {
+  const screen = document.getElementById('gameHangman');
+  if (!screen || !screen.classList.contains('active')) return;
+  if (currentGame !== hangmanState || !hangmanState.rounds) return;
+  const ch = (e.key || '').toLowerCase();
+  if (!/^[a-z]$/.test(ch)) return;
+  const btn = [...document.querySelectorAll('#hangmanKeyboard .hangman-key')]
+    .find(b => b.textContent === ch && !b.disabled);
+  if (btn) guessLetter(ch, btn);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const data = loadData();
   const lastUser = localStorage.getItem('verbmaster_lastuser');
@@ -3066,8 +3123,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- PWA bootstrap: registers service worker for offline + install support.
-     Doesn't interfere with the legacy code above — just adds PWA capability. -->
-<script type="module" src="src/main.js"></script>
+<!-- PWA module layer removed (2026-07-12): it tried to register a service worker at
+     the absolute path /sw.js, which 404s on this GitHub Pages subdirectory deploy and
+     logged an error on every load; its LocalStore duplicated state the inline game
+     never used. The game is fully self-contained in this file. -->
 </body>
 </html>
