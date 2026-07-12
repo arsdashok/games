@@ -1,531 +1,598 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Tree Quest 🎄</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-grad-start: #0f172a;
+            --bg-grad-end: #1e1b4b;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --accent-green: #16a34a;
+            --accent-red: #ef4444;
+            --accent-gold: #fbbf24;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(to bottom, var(--bg-grad-start), var(--bg-grad-end));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden; user-select: none;
+        }
+
+        /* Snow */
+        .snowflake {
+            position: fixed; top: -10px; color: white; opacity: 0.8;
+            pointer-events: none; z-index: 1; animation: fall linear forwards;
+        }
+        @keyframes fall { to { transform: translateY(105vh); } }
+
+        /* Main Container */
+        #app {
+            width: 100%; max-width: 900px;
+            min-height: 90vh;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 24px; padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 10; border: 1px solid #475569;
+            box-sizing: border-box;
+        }
+
+        h1, h2 { margin: 0 0 15px 0; text-align: center; color: var(--accent-gold); }
+        p { text-align: center; font-size: 1.1em; line-height: 1.5; margin-bottom: 20px;}
+
+        /* Buttons */
+        .btn {
+            background-color: var(--accent-green); color: white; border: none;
+            padding: 14px 20px; border-radius: 12px; font-size: 1.1em; font-weight: 800;
+            cursor: pointer; width: 100%; margin-top: 10px;
+            box-shadow: 0 4px 0 #14532d; transition: transform 0.1s;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+        .btn-secondary { background-color: #3b82f6; box-shadow: 0 4px 0 #1d4ed8; }
+        .btn:disabled { background-color: #64748b; box-shadow: none; cursor: not-allowed; }
+        
+        .screen { display: none; width: 100%; flex-direction: column; align-items: center; animation: fadeIn 0.4s; }
+        .active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- TREE STYLES --- */
+        .tree-wrapper {
+            position: relative; width: 300px; height: 340px;
+            display: flex; justify-content: center; flex-shrink: 0;
+            margin-bottom: 20px;
+        }
+        .tree-body {
+            width: 260px; height: 300px;
+            background: linear-gradient(180deg, #16a34a 0%, #14532d 100%);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            position: absolute; bottom: 40px; left: 20px;
+            z-index: 5;
+        }
+        .tree-trunk {
+            width: 50px; height: 40px; background: #451a03;
+            position: absolute; bottom: 0; left: 125px; border-radius: 4px;
+        }
+        .ornament {
+            position: absolute; font-size: 28px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20; 
+            pointer-events: none; 
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        .star-top {
+            position: absolute; top: -35px; left: 105px; font-size: 60px;
+            filter: drop-shadow(0 0 15px gold); display: none;
+            z-index: 30;
+            animation: spin 4s infinite linear;
+        }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- QUIZ LAYOUT --- */
+        .quiz-layout {
+            display: flex; flex-direction: row; width: 100%;
+            gap: 20px; align-items: flex-start; justify-content: center;
+        }
+        .quiz-left { display: flex; justify-content: center; align-items: center; }
+        .quiz-right { flex: 1; display: flex; flex-direction: column; max-width: 500px; width: 100%; }
+
+        @media (max-width: 768px) {
+            .quiz-layout { flex-direction: column; align-items: center; }
+            .tree-wrapper { transform: scale(0.8); height: 280px; margin-bottom: -20px; }
+            .tree-body { bottom: 30px; } 
+        }
+
+        /* Level Badges */
+        .stage-badge {
+            background: #334155; padding: 15px; margin: 8px 0; border-radius: 12px; width: 100%;
+            display: flex; justify-content: space-between; align-items: center; opacity: 0.6;
+            border: 2px solid transparent; transition: all 0.2s;
+        }
+        .stage-badge.unlocked { opacity: 1; cursor: pointer; border-color: var(--accent-gold); background: #1e293b; }
+        .stage-badge.unlocked:hover { transform: translateX(5px); }
+        .stage-badge.done { background: #064e3b; border-color: var(--accent-green); }
+
+        /* Flashcards & Quiz UI */
+        .flashcard {
+            background: var(--card-bg); border: 2px solid #475569; border-radius: 15px; padding: 25px;
+            text-align: center; width: 100%; max-width: 500px; box-sizing: border-box; margin-bottom: 20px;
+        }
+        .word-en { font-size: 2.2em; color: var(--accent-gold); font-weight: 900; display: block; margin-bottom: 5px; }
+        .word-ru { color: #94a3b8; font-size: 1.2em; display: block; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;}
+        .grammar-tip { background: #0f172a; padding: 12px; border-radius: 8px; text-align: left; font-size: 1em; color: #e2e8f0; margin-top: 15px; line-height: 1.4;}
+
+        .option-btn {
+            background: white; color: #0f172a; border: none; text-align: left; margin-bottom: 12px;
+            padding: 15px; border-radius: 10px; font-size: 1.05em;
+            box-shadow: 0 4px 0 #cbd5e1; width: 100%; transition: transform 0.1s;
+        }
+        .option-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cbd5e1; }
+        .option-btn.selected { background: #fffbeb; box-shadow: 0 4px 0 #fcd34d; border: 2px solid #fcd34d; padding: 13px;}
+        .option-btn.correct { background: var(--accent-green); color: white; box-shadow: none; border: none; padding: 15px;}
+        .option-btn.wrong { background: var(--accent-red); color: white; box-shadow: none; animation: shake 0.4s; }
+
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Christmas Lingo Tree 🎄&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&amp;display=swap');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>:root {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--bg-color: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--card-bg: #1e293b;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--text-color: #f1f5f9;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-green: #22c55e;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-red: #ef4444;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>--accent-gold: #fbbf24;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Nunito', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--bg-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--text-color);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-x: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>user-select: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Snow Animation */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.snowflake {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: fixed;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0.8;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: fall linear forwards;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes fall {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>to { transform: translateY(105vh); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Container */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#app {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 500px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 90vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: rgba(30, 41, 59, 0.9);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 30px rgba(0,0,0,0.5);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 10;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #334155;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>h1, h2 { margin: 0 0 15px 0; text-align: center; color: var(--accent-gold); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>p { text-align: center; font-size: 1.1em; line-height: 1.5; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Buttons */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: var(--accent-green);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 1.1em;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: transform 0.1s, background 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 0 #15803d;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn:active { transform: translateY(4px); box-shadow: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-outline { background: transparent; border: 2px solid var(--accent-green); box-shadow: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.btn-outline:hover { background: rgba(34, 197, 94, 0.1); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Screens */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.screen { display: none; width: 100%; flex-direction: column; align-items: center; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.active { display: flex; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Tree Area */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tree-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 350px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tree-body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-left: 120px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-right: 120px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 300px solid #166534;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tree-trunk {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #78350f;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>bottom: 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.ornament {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 20;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.star-top {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: -25px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: -20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: var(--accent-gold);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filter: drop-shadow(0 0 10px var(--accent-gold));</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>animation: spin 3s infinite linear;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Study Cards */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.flashcard {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--card-bg);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #334155;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.emoji-lg { font-size: 4em; display: block; margin-bottom: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.word-en { font-size: 1.8em; font-weight: bold; color: var(--accent-gold); display: block;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.word-ru { font-size: 1.2em; color: #94a3b8; margin-top: 5px; display: block;}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.context { font-size: 1em; margin-top: 15px; font-style: italic; color: #cbd5e1; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Quiz UI */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.progress-bar {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #334155;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.progress-fill {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: var(--accent-gold);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 0%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: width 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.option-btn {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #0f172a;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #cbd5e1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: left;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 0 #cbd5e1;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.option-btn.selected { border-color: var(--accent-gold); background: #fffbeb; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.option-btn.correct { background: var(--accent-green); color: white; border-color: var(--accent-green); box-shadow: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.option-btn.wrong { background: var(--accent-red); color: white; border-color: var(--accent-red); box-shadow: none; animation: shake 0.5s; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@keyframes shake {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>0% { transform: translateX(0); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>25% { transform: translateX(-5px); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>50% { transform: translateX(5px); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>75% { transform: translateX(-5px); }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>100% { transform: translateX(0); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feedback-msg {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feedback-correct { color: var(--accent-green); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feedback-wrong { color: var(--accent-red); }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Snow Container --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="snow-container"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="app"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 1: Level Selection --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="start-screen" class="screen active"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-size: 4em; margin-bottom: 10px;"&gt;🎅&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1&gt;Christmas Lingo&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Let's decorate the tree!&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Choose your level:&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn" onclick="startGame('beginner')"&gt;Beginner (Level 1)&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn" onclick="startGame('elementary')"&gt;Elementary (Level 2)&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 2: Study Phase --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="study-screen" class="screen"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Learn Words&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="flashcard-container" class="flashcard"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- Content injected via JS --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn" id="study-next-btn" onclick="nextFlashcard()"&gt;Next&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 3: Game Phase --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="game-screen" class="screen"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="progress-bar"&gt;&lt;div class="progress-fill" id="progress-fill"&gt;&lt;/div&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="tree-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="tree-trunk"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="tree-body" id="game-tree"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="star-top" id="star-top"&gt;⭐&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="question-area" style="width: 100%;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 id="q-text" style="text-align: center; margin-bottom: 20px;"&gt;Question text&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="options-container"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="feedback" class="feedback-msg"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="btn" id="check-btn" onclick="checkAnswer()"&gt;Check Answer&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Screen 4: Victory --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="win-screen" class="screen"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style="font-size: 5em;"&gt;🎄✨&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1&gt;Merry Christmas!&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;You decorated the whole tree!&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Good job!&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn" onclick="location.reload()"&gt;Play Again&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// --- DATA ---</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const data = {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>beginner: {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>study: [</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Present", ru: "Подарок", emoji: "🎁", ex: "I have a present." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Reindeer", ru: "Северный олень", emoji: "🦌", ex: "The reindeer is fast." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Snowman", ru: "Снеговик", emoji: "⛄", ex: "Let's make a snowman!" },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "To decorate", ru: "Украшать", emoji: "🎄", ex: "We decorate the tree." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Santa Claus", ru: "Санта Клаус", emoji: "🎅", ex: "Santa is coming." }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>questions: [</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Vocab</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "What is this? 🎁", options: ["Star", "Present", "Tree"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Who helps Santa? 🦌", options: ["A dog", "A cat", "A reindeer"], a: 2 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "What is white and cold? ⛄", options: ["Snowman", "Sun", "Grass"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Grammar: I have / He wants</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "I ___ a red hat.", options: ["have", "has", "is"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Santa ___ a big bag.", options: ["have", "has", "am"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "He ___ a cookie.", options: ["wants", "want", "wanting"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "We ___ Christmas.", options: ["love", "loves", "loving"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Simple Present</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Santa ___ in the North Pole.", options: ["live", "lives", "living"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "The elves ___ toys.", options: ["make", "makes", "making"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Do you ___ snow?", options: ["like", "likes", "liked"], a: 0 }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>]</p>
-<p class="p1"><span class="Apple-converted-space">        </span>},</p>
-<p class="p1"><span class="Apple-converted-space">        </span>elementary: {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>study: [</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Sleigh", ru: "Сани", emoji: "🛷", ex: "Santa flies in a sleigh." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Chimney", ru: "Дымоход", emoji: "🏠", ex: "Santa goes down the chimney." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Candle", ru: "Свеча", emoji: "🕯️", ex: "Light the candle." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "Cozy", ru: "Уютный", emoji: "🧶", ex: "This sweater is cozy." },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ en: "To celebrate", ru: "Праздновать", emoji: "🎉", ex: "We celebrate with family." }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>questions: [</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Vocab</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "How does Santa travel? 🛷", options: ["By car", "By sleigh", "By bus"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Where is the fire? 🕯️", options: ["On the candle", "On the ice", "In the snow"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "The house is warm and ___.", options: ["cold", "cozy", "scary"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Grammar: Past Simple</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Yesterday I ___ a letter to Santa.", options: ["write", "wrote", "will write"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Last year we ___ to London.", options: ["go", "went", "goes"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "Did you ___ the tree?", options: ["decorate", "decorated", "decorates"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Grammar: Future Simple</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "I think it ___ snow tomorrow.", options: ["will", "did", "does"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "What ___ you do on Christmas?", options: ["will", "did", "had"], a: 0 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "We are ___ to buy gifts.", options: ["go", "going", "will"], a: 1 },</p>
-<p class="p1"><span class="Apple-converted-space">                </span>{ q: "I promise I ___ be good.", options: ["am", "will", "did"], a: 1 }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>]</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// --- STATE ---</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let currentLevel = null;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let studyIndex = 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let questionQueue = [];</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let currentQuestion = null;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let selectedOption = null;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let score = 0;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>let maxScore = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// --- AUDIO ---</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const audioCtx = new (window.AudioContext || window.webkitAudioContext)();</p>
-<p class="p2"><span class="Apple-converted-space">    </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function playBellSound() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (audioCtx.state === 'suspended') audioCtx.resume();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const oscillator = audioCtx.createOscillator();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const gainNode = audioCtx.createGain();</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.type = 'sine';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // High pitch</p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 1);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.connect(gainNode);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>gainNode.connect(audioCtx.destination);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.start();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>oscillator.stop(audioCtx.currentTime + 1);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// --- LOGIC ---</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function showScreen(id) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.screen').forEach(s =&gt; s.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById(id).classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function startGame(level) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>currentLevel = level;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>studyIndex = 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Copy questions to queue to allow modifying order</p>
-<p class="p1"><span class="Apple-converted-space">        </span>questionQueue = [...data[level].questions];<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>maxScore = questionQueue.length;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>score = 0;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>renderFlashcard();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>showScreen('study-screen');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Study Phase</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function renderFlashcard() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const list = data[currentLevel].study;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (studyIndex &gt;= list.length) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>startQuiz();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const item = list[studyIndex];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const html = `</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="emoji-lg"&gt;${item.emoji}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="word-en"&gt;${item.en}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;span class="word-ru"&gt;${item.ru}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="context"&gt;"${item.ex}"&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('flashcard-container').innerHTML = html;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const btnText = (studyIndex === list.length - 1) ? "Play Game!" : "Next Word";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('study-next-btn').innerText = btnText;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function nextFlashcard() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>studyIndex++;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>renderFlashcard();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Game Phase</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function startQuiz() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>showScreen('game-screen');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>loadNextQuestion();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function loadNextQuestion() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (questionQueue.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Victory!</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('star-top').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; showScreen('win-screen'), 1500);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>currentQuestion = questionQueue.shift(); // Take first</p>
-<p class="p1"><span class="Apple-converted-space">        </span>selectedOption = null;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('q-text').innerText = currentQuestion.q;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('feedback').innerText = "";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('check-btn').style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('check-btn').innerText = "Check";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('check-btn').disabled = true;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('check-btn').onclick = checkAnswer;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const container = document.getElementById('options-container');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>container.innerHTML = '';</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>currentQuestion.options.forEach((opt, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const btn = document.createElement('button');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>btn.className = 'btn btn-outline option-btn';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>btn.innerText = opt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>btn.onclick = () =&gt; selectOption(index, btn);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>container.appendChild(btn);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function selectOption(index, btnElement) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Remove selected class from all</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.option-btn').forEach(b =&gt; b.classList.remove('selected'));</p>
-<p class="p1"><span class="Apple-converted-space">        </span>btnElement.classList.add('selected');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>selectedOption = index;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('check-btn').disabled = false;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function checkAnswer() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const optionsBtns = document.querySelectorAll('.option-btn');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const feedback = document.getElementById('feedback');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const checkBtn = document.getElementById('check-btn');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>if (selectedOption === currentQuestion.a) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Correct</p>
-<p class="p1"><span class="Apple-converted-space">            </span>playBellSound();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>optionsBtns[selectedOption].classList.add('correct');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>feedback.innerText = "Correct! Great job!";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>feedback.className = "feedback-msg feedback-correct";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>addOrnament();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateProgress();</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>checkBtn.innerText = "Next Question";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>checkBtn.onclick = loadNextQuestion;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Wrong - Soft Mode</p>
-<p class="p1"><span class="Apple-converted-space">            </span>optionsBtns[selectedOption].classList.add('wrong');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>feedback.innerText = "Oops! Try to remember this one.";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>feedback.className = "feedback-msg feedback-wrong";</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Highlight correct one</p>
-<p class="p1"><span class="Apple-converted-space">            </span>optionsBtns[currentQuestion.a].classList.add('correct'); // Show correct answer visually</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Push back to end of queue to repeat later</p>
-<p class="p1"><span class="Apple-converted-space">            </span>questionQueue.push(currentQuestion);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>checkBtn.innerText = "Got it";</p>
-<p class="p1"><span class="Apple-converted-space">            </span>checkBtn.onclick = loadNextQuestion;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function addOrnament() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const tree = document.getElementById('game-tree');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ornaments = ["🔴", "🔵", "🟡", "🟣", "🍬", "🍭", "🔔"];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const randomOrn = ornaments[Math.floor(Math.random() * ornaments.length)];</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const el = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>el.className = 'ornament';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>el.innerText = randomOrn;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Random position within the triangle (rough approx)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Tree is 300px tall. Width varies.</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// At bottom (y=0) width is +/- 120. At top (y=300) width is 0.</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const y = Math.random() * 260 + 20; // 20 to 280</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Calculate max X at this Y</p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Slope factor: at y=0, x=120. at y=300, x=0.<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const maxX = 100 * (1 - (y / 300));<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const x = (Math.random() * maxX * 2) - maxX; // -maxX to +maxX</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>el.style.bottom = y + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>el.style.left = `calc(50% + ${x}px)`; // Center + offset</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>tree.appendChild(el);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function updateProgress() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>score++;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const pct = Math.min(100, (score / maxScore) * 100);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('progress-fill').style.width = pct + '%';</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Snow Effect</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function createSnow() {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const container = document.getElementById('snow-container');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const flake = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>flake.className = 'snowflake';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>flake.innerText = '❄';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>flake.style.left = Math.random() * 100 + 'vw';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>flake.style.fontSize = (Math.random() * 10 + 10) + 'px';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>flake.style.animationDuration = (Math.random() * 3 + 2) + 's';</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>container.appendChild(flake);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flake.remove();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}, 5000);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>setInterval(createSnow, 300);</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<div id="snow-container"></div>
+
+<div id="app">
+    <!-- Intro -->
+    <div id="intro-screen" class="screen active">
+        <div style="font-size: 5em; filter: drop-shadow(0 0 20px gold);">🎅</div>
+        <h1>Christmas Class</h1>
+        <p>Choose your level:</p>
+        <div style="width: 100%; max-width: 300px;">
+            <button class="btn" onclick="initGame('beginner')">Beginner (Level 1)</button>
+            <button class="btn btn-secondary" onclick="initGame('elementary')">Elementary (Level 2)</button>
+        </div>
+    </div>
+
+    <!-- Map (Stage Selection) -->
+    <div id="map-screen" class="screen">
+        <h2>Your Progress</h2>
+        <!-- Tree in Map -->
+        <div class="tree-wrapper">
+            <div class="tree-trunk"></div>
+            <div class="tree-body" id="map-tree">
+                <div class="star-top" id="star-map">⭐</div>
+            </div>
+        </div>
+
+        <div id="stages-list" style="width: 100%; max-width: 400px; margin-bottom: 20px;"></div>
+        <button class="btn btn-secondary" style="max-width: 200px;" onclick="location.reload()">Exit</button>
+    </div>
+
+    <!-- Study -->
+    <div id="study-screen" class="screen">
+        <h2>Learn 🧠</h2>
+        <div id="flashcard-content" class="flashcard"></div>
+        <button class="btn" style="max-width: 300px;" id="study-next" onclick="nextCard()">Next</button>
+    </div>
+
+    <!-- Quiz (Split Layout) -->
+    <div id="quiz-screen" class="screen">
+        <div class="quiz-layout">
+            <!-- Left: Tree -->
+            <div class="quiz-left">
+                <div class="tree-wrapper">
+                    <div class="tree-trunk"></div>
+                    <div class="tree-body" id="quiz-tree">
+                         <div class="star-top" id="star-quiz">⭐</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Questions -->
+            <div class="quiz-right">
+                <div style="display: flex; justify-content: space-between; color: #94a3b8; margin-bottom: 10px;">
+                    <span id="q-progress">1/10</span>
+                    <span>🎄 Quiz</span>
+                </div>
+                
+                <div style="background: #1e293b; padding: 20px; border-radius: 15px; border: 1px solid #475569; margin-bottom: 20px;">
+                    <p id="q-text" style="font-weight: 800; font-size: 1.3em; margin: 0;">?</p>
+                </div>
+
+                <div id="options-area"></div>
+                
+                <p id="feedback-msg" style="height: 25px; font-weight: bold; margin: 10px 0; text-align: center;"></p>
+                <button class="btn" id="check-btn" onclick="checkAnswer()">Check Answer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win -->
+    <div id="win-screen" class="screen">
+        <div style="font-size: 4em;">🎁</div>
+        <h2>Stage Complete!</h2>
+        <p>Look at your tree!</p>
+        <button class="btn" style="max-width: 300px;" onclick="showMap()">Back to Menu</button>
+    </div>
+</div>
+
+<script>
+    // --- CONTENT DATABASE ---
+    const DB = {
+        beginner: [
+            {
+                id: 'vocab', title: '1. Words 🦌',
+                study: [
+                    {en: "Present", ru: "Подарок", ex: "I have a present."},
+                    {en: "Tree", ru: "Елка", ex: "The tree is green."},
+                    {en: "Snowman", ru: "Снеговик", ex: "We make a snowman."},
+                    {en: "Reindeer", ru: "Олень", ex: "Santa has a reindeer."},
+                    {en: "Santa", ru: "Санта", ex: "Santa is nice."}
+                ],
+                quiz: [
+                    {q: "What is green and has lights? 🎄", opts: ["Tree", "Snowman", "Present"], a: 0},
+                    {q: "Translate: 'Снеговик'", opts: ["Santa", "Snowman", "Reindeer"], a: 1},
+                    {q: "He brings presents. Who is he? 🎅", opts: ["Reindeer", "Santa", "Snowman"], a: 1},
+                    {q: "Translate: 'Подарок'", opts: ["Tree", "Present", "Reindeer"], a: 1},
+                    {q: "Rudolph is a famous ___.", opts: ["Santa", "Reindeer", "Tree"], a: 1},
+                    {q: "Translate: 'Елка'", opts: ["Tree", "Present", "Snowman"], a: 0},
+                    {q: "It is white and made of snow. ⛄", opts: ["Santa", "Reindeer", "Snowman"], a: 2},
+                    {q: "Translate: 'Олень'", opts: ["Reindeer", "Present", "Tree"], a: 0},
+                    {q: "What do you open on Christmas?", opts: ["Tree", "Present", "Snowman"], a: 1},
+                    {q: "Translate: 'Санта'", opts: ["Santa", "Reindeer", "Tree"], a: 0},
+                    {q: "Where do we put the star?", opts: ["On the Tree", "On the Present", "On the Reindeer"], a: 0},
+                    {q: "He has a red hat.", opts: ["Snowman", "Santa", "Tree"], a: 1}
+                ]
+            },
+            {
+                id: 'phrases', title: '2. Phrases 🗣️',
+                study: [
+                    {en: "Merry Christmas", ru: "Счастливого Рождества", ex: "We say: Merry Christmas!"},
+                    {en: "Happy New Year", ru: "С Новым Годом", ex: "See you in January!"},
+                    {en: "Put on", ru: "Надевать", ex: "Put on your hat."}
+                ],
+                quiz: [
+                    {q: "Translate: 'Счастливого Рождества'", opts: ["Merry Christmas", "Happy New Year", "Put on"], a: 0},
+                    {q: "We say: ___ New Year!", opts: ["Merry", "Happy", "Put"], a: 1},
+                    {q: "It is cold. ___ your hat.", opts: ["Put on", "Happy", "Merry"], a: 0},
+                    {q: "Translate: 'С Новым Годом'", opts: ["Merry Christmas", "Put on", "Happy New Year"], a: 2},
+                    {q: "We say: ___ Christmas!", opts: ["Happy", "Merry", "Put"], a: 1},
+                    {q: "Translate: 'Надевать'", opts: ["Merry Christmas", "Put on", "Happy New Year"], a: 1},
+                    {q: "___ New Year to you!", opts: ["Happy", "Merry", "Put"], a: 0},
+                    {q: "___ on your scarf.", opts: ["Put", "Merry", "Happy"], a: 0},
+                    {q: "Merry ___!", opts: ["Christmas", "New Year", "Hat"], a: 0},
+                    {q: "Happy ___!", opts: ["Christmas", "New Year", "Hat"], a: 1}
+                ]
+            },
+            {
+                id: 'grammar', title: '3. Grammar 📚',
+                study: [
+                    {en: "I have / He has", ru: "Иметь", tip: "I/You/We/They HAVE. He/She/It HAS."},
+                    {en: "He wants", ru: "Он хочет (окончание S)", tip: "He/She/It + Verb(S). He wants, She likes."}
+                ],
+                quiz: [
+                    // FIX: "want" removed to avoid confusion. Distractors are clearly wrong grammatically.
+                    {q: "I ___ a present.", opts: ["have", "has", "is"], a: 0},
+                    {q: "Santa (He) ___ a bag.", opts: ["have", "has", "am"], a: 1},
+                    {q: "She ___ a cookie.", opts: ["want", "wants", "have"], a: 1},
+                    {q: "We ___ a tree.", opts: ["have", "has", "wants"], a: 0},
+                    {q: "The reindeer (It) ___ a red nose.", opts: ["have", "has", "want"], a: 1},
+                    {q: "He ___ to play.", opts: ["want", "wants", "have"], a: 1},
+                    {q: "They ___ gifts.", opts: ["have", "has", "wants"], a: 0},
+                    {q: "My mom (She) ___ a book.", opts: ["wants", "want", "have"], a: 0},
+                    {q: "You ___ a nice hat.", opts: ["have", "has", "wants"], a: 0},
+                    {q: "Santa ___ milk.", opts: ["want", "wants", "have"], a: 1}
+                ]
+            }
+        ],
+        elementary: [
+            {
+                id: 'vocab', title: '1. Words 🕯️',
+                study: [
+                    {en: "Chimney", ru: "Дымоход", ex: "Santa uses the chimney."},
+                    {en: "Sleigh", ru: "Сани", ex: "Flying sleigh."},
+                    {en: "Stocking", ru: "Рождественский носок", ex: "Put candy in the stocking."},
+                    {en: "Elf", ru: "Эльф", ex: "The elf is small."}
+                ],
+                quiz: [
+                    {q: "Translate: 'Дымоход'", opts: ["Sleigh", "Chimney", "Elf"], a: 1},
+                    {q: "Santa travels in a ___.", opts: ["Chimney", "Stocking", "Sleigh"], a: 2},
+                    {q: "Who helps Santa?", opts: ["Sleigh", "Elf", "Chimney"], a: 1},
+                    {q: "Translate: 'Сани'", opts: ["Stocking", "Sleigh", "Elf"], a: 1},
+                    {q: "We hang a ___ on the fireplace.", opts: ["Chimney", "Sleigh", "Stocking"], a: 2},
+                    {q: "Santa goes down the ___.", opts: ["Chimney", "Elf", "Sleigh"], a: 0},
+                    {q: "Translate: 'Рождественский носок'", opts: ["Stocking", "Sleigh", "Chimney"], a: 0},
+                    {q: "The ___ makes toys.", opts: ["Elf", "Sleigh", "Stocking"], a: 0},
+                    {q: "Translate: 'Эльф'", opts: ["Chimney", "Elf", "Sleigh"], a: 1},
+                    {q: "Smoke comes out of the ___.", opts: ["Stocking", "Sleigh", "Chimney"], a: 2}
+                ]
+            },
+            {
+                id: 'phrases', title: '2. Phrases ✨',
+                study: [
+                    {en: "Look forward to", ru: "Ждать с нетерпением", ex: "I look forward to it."},
+                    {en: "Take place", ru: "Происходить", ex: "The party takes place at home."},
+                    {en: "Wrap presents", ru: "Упаковывать подарки", ex: "Wrap the box."}
+                ],
+                quiz: [
+                    {q: "I look ___ to Christmas.", opts: ["forward", "place", "wrap"], a: 0},
+                    {q: "Where does the party take ___?", opts: ["forward", "place", "wrap"], a: 1},
+                    {q: "Translate: 'Упаковывать подарки'", opts: ["Take place", "Look forward", "Wrap presents"], a: 2},
+                    {q: "I need paper to ___ gifts.", opts: ["wrap", "place", "look"], a: 0},
+                    {q: "Translate: 'Ждать с нетерпением'", opts: ["Look forward to", "Take place", "Wrap presents"], a: 0},
+                    {q: "When does it take ___?", opts: ["wrap", "place", "forward"], a: 1},
+                    {q: "Translate: 'Происходить'", opts: ["Take place", "Look forward", "Wrap"], a: 0},
+                    {q: "Let's ___ the presents.", opts: ["wrap", "look", "take"], a: 0},
+                    {q: "We look forward ___ the holidays.", opts: ["to", "at", "in"], a: 0},
+                    {q: "Did you ___ the present?", opts: ["wrap", "place", "look"], a: 0}
+                ]
+            },
+            {
+                id: 'grammar', title: '3. Grammar 🕰️',
+                study: [
+                    {en: "Past Simple", ru: "Прошлое", tip: "Yesterday I PLAYED. I WENT (go)."},
+                    {en: "Future Simple", ru: "Будущее", tip: "Tomorrow I WILL go."}
+                ],
+                quiz: [
+                    {q: "Yesterday I ___ a letter.", opts: ["wrote", "will write", "write"], a: 0},
+                    {q: "Tomorrow I ___ buy a gift.", opts: ["will", "went", "did"], a: 0},
+                    {q: "Last year we ___ to London.", opts: ["go", "will go", "went"], a: 2},
+                    {q: "He ___ a snowman yesterday.", opts: ["built", "will build", "build"], a: 0},
+                    {q: "I ___ help you.", opts: ["will", "went", "did"], a: 0},
+                    {q: "We ___ happy yesterday.", opts: ["will", "are", "were"], a: 2},
+                    {q: "Did you ___ the tree?", opts: ["decorate", "decorated", "will decorate"], a: 0},
+                    {q: "I ___ call Santa soon.", opts: ["will", "went", "did"], a: 0},
+                    {q: "She ___ not hungry yesterday.", opts: ["was", "will", "is"], a: 0},
+                    {q: "They ___ cookies last night.", opts: ["ate", "will eat", "eat"], a: 0}
+                ]
+            }
+        ]
+    };
+
+    // --- STATE ---
+    let currentLevelData = [];
+    let currentStageIndex = 0;
+    let currentStage = null;
+    let cardIndex = 0;
+    let qQueue = [];
+    let currentQ = null;
+    let selOpt = null;
+    let treeState = []; 
+
+    // --- AUDIO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playJingle() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [880, 1100, 1320, 1760].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.value = freq;
+            osc.type = 'sine';
+            const start = now + (i * 0.05);
+            gain.gain.setValueAtTime(0, start);
+            gain.gain.linearRampToValueAtTime(0.05, start + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, start + 1.0);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(start);
+            osc.stop(start + 1.5);
+        });
+    }
+
+    // --- LOGIC ---
+    function initGame(level) {
+        currentLevelData = DB[level];
+        treeState = []; 
+        renderTreeState('quiz-tree');
+        renderTreeState('map-tree');
+        document.getElementById('star-quiz').style.display = 'none';
+        document.getElementById('star-map').style.display = 'none';
+        showMap();
+    }
+
+    function showMap() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('map-screen').classList.add('active');
+        
+        // Sync map tree
+        renderTreeState('map-tree');
+        
+        const list = document.getElementById('stages-list');
+        list.innerHTML = '';
+
+        currentLevelData.forEach((stage, idx) => {
+            const isUnlocked = idx === 0 || currentLevelData[idx-1].done;
+            const isDone = stage.done;
+            
+            const div = document.createElement('div');
+            div.className = `stage-badge ${isUnlocked ? 'unlocked' : ''} ${isDone ? 'done' : ''}`;
+            div.innerHTML = `<span>${stage.title}</span> <span>${isDone ? '✅' : (isUnlocked ? '▶' : '🔒')}</span>`;
+            
+            if(isUnlocked && !isDone) {
+                div.onclick = () => startStage(idx);
+            }
+            list.appendChild(div);
+        });
+
+        // Show Star on Map if all done
+        if(currentLevelData.every(s => s.done)) {
+            document.getElementById('star-map').style.display = 'block';
+        }
+    }
+
+    function startStage(idx) {
+        currentStageIndex = idx;
+        currentStage = currentLevelData[idx];
+        cardIndex = 0;
+        showStudy();
+    }
+
+    function showStudy() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('study-screen').classList.add('active');
+        renderCard();
+    }
+
+    function renderCard() {
+        const item = currentStage.study[cardIndex];
+        const container = document.getElementById('flashcard-content');
+        
+        let html = `<span class="word-en">${item.en}</span>`;
+        html += `<span class="word-ru">${item.ru}</span>`;
+        if(item.ex) html += `<div class="context">"${item.ex}"</div>`;
+        if(item.tip) html += `<div class="grammar-tip">💡 ${item.tip}</div>`;
+        
+        container.innerHTML = html;
+
+        const btn = document.getElementById('study-next');
+        const isLast = cardIndex >= currentStage.study.length - 1;
+        btn.innerText = isLast ? "Start Quiz!" : "Next";
+        btn.onclick = isLast ? startQuiz : nextCard;
+    }
+
+    function nextCard() { cardIndex++; renderCard(); }
+
+    function startQuiz() {
+        qQueue = JSON.parse(JSON.stringify(currentStage.quiz));
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('quiz-screen').classList.add('active');
+        
+        renderTreeState('quiz-tree');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if(qQueue.length === 0) {
+            currentStage.done = true;
+            document.getElementById('win-screen').classList.add('active');
+            document.getElementById('quiz-screen').classList.remove('active');
+            return;
+        }
+
+        currentQ = qQueue.shift();
+        selOpt = null;
+        
+        const total = currentStage.quiz.length;
+        const current = total - qQueue.length;
+        document.getElementById('q-progress').innerText = `${current}/${total}`;
+
+        document.getElementById('q-text').innerText = currentQ.q;
+        document.getElementById('feedback-msg').innerText = '';
+        const btn = document.getElementById('check-btn');
+        btn.disabled = true; btn.innerText = "Check Answer"; btn.onclick = checkAnswer;
+
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        currentQ.opts.forEach((txt, i) => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = txt;
+            b.onclick = () => {
+                document.querySelectorAll('.option-btn').forEach(x => x.classList.remove('selected'));
+                b.classList.add('selected');
+                selOpt = i;
+                btn.disabled = false;
+            };
+            area.appendChild(b);
+        });
+    }
+
+    function checkAnswer() {
+        const opts = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback-msg');
+        const btn = document.getElementById('check-btn');
+
+        if(selOpt === currentQ.a) {
+            opts[selOpt].classList.add('correct');
+            feedback.innerText = "Correct! 🎄";
+            feedback.style.color = "#22c55e";
+            playJingle();
+            
+            // Add Ornament
+            addOrnamentVisual();
+
+            btn.innerText = "Next Question";
+            btn.onclick = loadQuestion;
+        } else {
+            opts[selOpt].classList.add('wrong');
+            opts[currentQ.a].classList.add('correct');
+            feedback.innerText = "Remember this one!";
+            feedback.style.color = "#ef4444";
+            qQueue.push(currentQ); // Re-queue
+            btn.innerText = "Got it";
+            btn.onclick = loadQuestion;
+        }
+    }
+
+    // --- VISUAL TREE SYSTEM ---
+    
+    function addOrnamentVisual() {
+        const types = ['🔴','🔵','🟡','🟣','🎀','🍬','🔔','❄️','🍪'];
+        const type = types[Math.floor(Math.random()*types.length)];
+        
+        // Tree Body Dimensions: W=260, H=300
+        // Triangle shape: Top (50%, 0), Bottom (0, 100), Bottom (100, 100)
+        
+        const y = Math.random() * 260 + 20; // 20px from bottom to 280px
+        
+        // Calculate max width at this height Y (linear interpolation)
+        // At y=0 (bottom): Width = 260. At y=300 (top): Width = 0.
+        const widthAtY = 240 * (1 - (y/300)); 
+        
+        // Random X centered around 130 (half of 260)
+        const xOffset = (Math.random() * widthAtY) - (widthAtY/2);
+        const xFinal = 130 + xOffset; // 130 is center
+
+        const ornamentData = { type: type, x: xFinal, y: y };
+        treeState.push(ornamentData);
+        
+        // Render immediately to quiz tree
+        renderOrnament(document.getElementById('quiz-tree'), ornamentData, true);
+    }
+
+    function renderTreeState(treeId) {
+        const container = document.getElementById(treeId);
+        // Clean old ornaments
+        container.querySelectorAll('.ornament').forEach(el => el.remove());
+        
+        treeState.forEach(data => {
+            renderOrnament(container, data, false);
+        });
+    }
+
+    function renderOrnament(container, data, animate) {
+        const el = document.createElement('div');
+        el.className = 'ornament';
+        el.innerText = data.type;
+        el.style.bottom = data.y + 'px';
+        el.style.left = data.x + 'px'; // Absolute inside container
+        el.style.transform = 'translateX(-50%)'; // Center pivot
+        
+        if(!animate) el.style.animation = 'none';
+        container.appendChild(el);
+    }
+
+    // Snow
+    setInterval(() => {
+        const c = document.getElementById('snow-container');
+        const f = document.createElement('div');
+        f.className = 'snowflake';
+        f.innerText = '❄';
+        f.style.left = Math.random()*100 + 'vw';
+        f.style.fontSize = (Math.random()*15+10)+'px';
+        f.style.animationDuration = (Math.random()*3+3)+'s';
+        c.appendChild(f);
+        setTimeout(()=>f.remove(), 6000);
+    }, 400);
+
+</script>
 </body>
 </html>
