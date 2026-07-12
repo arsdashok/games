@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== USERS =====
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isTeacherOf(userId);
+      allow create: if isSelf(userId);
+      allow update: if isSelf(userId) && !changingRestrictedFields();
+      allow delete: if false;
+
+      // Sessions subcollection (game-play logs, optional)
+      match /sessions/{sessionId} {
+        allow read, write: if isSelf(userId);
+      }
+    }
+
+    // ===== SETS =====
+    match /sets/{setId} {
+      allow read: if isSignedIn() && (
+        resource.data.ownerId == request.auth.uid
+        || (resource.data.shared == true && isInSameClass(resource.data.ownerId))
+      );
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ===== CLASSES =====
+    match /classes/{code} {
+      // Any signed-in user can read class metadata (needed for "join class by code")
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.teacherId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+    }
+
+    // ===== HELPERS =====
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isTeacherOf(studentUid) {
+      let me = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let student = get(/databases/$(database)/documents/users/$(studentUid)).data;
+      return me.role == 'teacher'
+             && student.classCode != null
+             && student.classCode == me.classCode;
+    }
+
+    function isInSameClass(ownerUid) {
+      let me = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let owner = get(/databases/$(database)/documents/users/$(ownerUid)).data;
+      return me.classCode != null && me.classCode == owner.classCode;
+    }
+
+    function changingRestrictedFields() {
+      // Block self-promotion: only Cloud Functions can elevate role or tier
+      return request.resource.data.role != resource.data.role
+          || request.resource.data.subscription.tier != resource.data.subscription.tier;
+    }
+  }
+}

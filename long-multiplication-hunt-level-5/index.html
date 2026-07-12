@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Explorer L5 — Long Multiplication Mastery + Bridge</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Patrick+Hand&display=swap');
+
+@page { size: A4; margin: 14mm 12mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Fredoka', 'Nunito', Arial, sans-serif;
+  background:
+    radial-gradient(circle at 8% 12%, #fef3c7 0%, transparent 22%),
+    radial-gradient(circle at 92% 8%, #fce7f3 0%, transparent 18%),
+    radial-gradient(circle at 6% 95%, #dbeafe 0%, transparent 20%),
+    radial-gradient(circle at 95% 90%, #d1fae5 0%, transparent 22%),
+    #fffbeb;
+  color: #1f2937;
+  padding: 12px 30px 18px 30px;
+  max-width: 760px;
+  margin: auto;
+}
+
+header {
+  background: linear-gradient(135deg, #a7f3d0 0%, #86efac 60%, #6ee7b7 100%);
+  border: 4px solid #10b981;
+  border-radius: 28px;
+  padding: 18px 24px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 0 #047857, 0 10px 24px rgba(16,185,129,0.25);
+  text-align: center;
+}
+header h1 { font-size: 26px; font-weight: 700; color: #065f46; text-shadow: 2px 2px 0 #fff; }
+header .subtitle { font-family: 'Patrick Hand', cursive; font-size: 17px; color: #065f46; margin-top: 2px; }
+
+.section {
+  background: #fff;
+  border-radius: 22px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  border: 3px solid var(--border);
+  box-shadow: 0 4px 0 var(--shadow), 0 6px 16px rgba(0,0,0,0.05);
+  position: relative;
+  page-break-inside: avoid;
+}
+.section.theme-amber { --border: #fbbf24; --shadow: #d97706; --pill: #fef3c7; --pill-text: #92400e; --accent: #f59e0b; }
+.section.theme-blue  { --border: #93c5fd; --shadow: #1d4ed8; --pill: #dbeafe; --pill-text: #1e40af; --accent: #3b82f6; }
+.section.theme-pink  { --border: #f9a8d4; --shadow: #be185d; --pill: #fce7f3; --pill-text: #9d174d; --accent: #ec4899; }
+.section.theme-mint  { --border: #6ee7b7; --shadow: #047857; --pill: #d1fae5; --pill-text: #065f46; --accent: #10b981; }
+.section.theme-purple{ --border: #c4b5fd; --shadow: #6d28d9; --pill: #ede9fe; --pill-text: #5b21b6; --accent: #8b5cf6; }
+.section.theme-red   { --border: #fca5a5; --shadow: #991b1b; --pill: #fee2e2; --pill-text: #991b1b; --accent: #ef4444; }
+.section.theme-yellow{ --border: #fcd34d; --shadow: #b45309; --pill: #fef3c7; --pill-text: #92400e; --accent: #f59e0b; }
+
+.section-num {
+  display: inline-block; background: var(--accent); color: #fff; font-weight: 700;
+  padding: 4px 14px; border-radius: 14px; font-size: 14px;
+  box-shadow: 0 2px 0 var(--shadow); margin-right: 8px;
+}
+.section h2 { font-size: 20px; font-weight: 700; color: var(--pill-text); display: inline; }
+.section .time-tag {
+  float: right; font-family: 'Patrick Hand', cursive; font-size: 14px;
+  color: var(--pill-text); background: var(--pill);
+  padding: 2px 12px; border-radius: 12px; border: 2px solid var(--border);
+}
+.section p { font-size: 14.5px; line-height: 1.55; margin: 8px 0; }
+.section p b { color: var(--pill-text); }
+
+.key-box {
+  background: var(--pill); border: 2.5px dashed var(--border);
+  border-radius: 14px; padding: 12px 16px; margin: 10px 0;
+  font-size: 14px; line-height: 1.5;
+}
+.key-box .key-title {
+  font-family: 'Fredoka', sans-serif; font-weight: 700; color: var(--pill-text);
+  font-size: 14px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.prob-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0;
+}
+.prob-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+.prob {
+  background: var(--pill); border: 2.5px solid var(--border);
+  border-radius: 14px; padding: 10px 12px;
+}
+.prob .prob-num {
+  display: inline-block; background: var(--accent); color: white;
+  width: 28px; height: 28px; border-radius: 50%;
+  text-align: center; line-height: 28px; font-weight: 800; font-size: 14px; margin-right: 6px;
+}
+.prob .prob-eq {
+  display: inline; font-family: 'Courier New', monospace;
+  font-size: 18px; font-weight: 700; color: var(--pill-text);
+}
+.prob .workbox {
+  background:
+    linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+    linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+    rgba(255,255,255,0.5);
+  border: 1.5px dashed var(--border); border-radius: 8px;
+  min-height: 160px; margin-top: 6px; padding: 4px;
+}
+
+.box-row { display: flex; gap: 12px; margin-top: 8px; }
+.box {
+  flex: 1; background: var(--pill); border: 2.5px solid var(--border);
+  border-radius: 12px; padding: 10px 12px;
+}
+.box .label { font-size: 11px; font-weight: 700; color: var(--pill-text); text-transform: uppercase; letter-spacing: 0.5px; }
+.box .answer-line { border-bottom: 2.5px dashed var(--accent); height: 28px; margin-top: 6px; }
+
+.hunt-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0;
+}
+.hunt-card {
+  background: #fff; border: 2.5px solid #6b7280;
+  border-radius: 12px; padding: 10px;
+  font-family: 'Courier New', monospace; font-size: 15px;
+  line-height: 1.3; text-align: center;
+}
+.hunt-card .hunt-id {
+  background: #6b7280; color: white;
+  font-family: 'Fredoka', sans-serif; font-weight: 700;
+  border-radius: 8px; padding: 3px 10px;
+  display: inline-block; margin-bottom: 6px;
+}
+
+.mega-story {
+  background: #f0fdf4; border-radius: 10px;
+  padding: 12px 16px; margin-bottom: 10px;
+  font-size: 14.5px; line-height: 1.55;
+}
+.mega-story b { color: #047857; }
+
+.celebration {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 4px solid #f59e0b;
+  border-radius: 22px;
+  padding: 18px 22px;
+  margin-top: 16px;
+  text-align: center;
+  box-shadow: 0 4px 0 #b45309;
+}
+.celebration h2 {
+  font-family: 'Fredoka', sans-serif; font-size: 24px;
+  color: #92400e; font-weight: 700; margin-bottom: 8px;
+}
+.celebration p {
+  font-family: 'Patrick Hand', cursive; font-size: 16px;
+  color: #92400e; line-height: 1.5;
+}
+
+.teacher-only {
+  background: #fffbeb; border: 2px dashed #d97706;
+  border-radius: 12px; padding: 12px 16px; margin-top: 16px;
+  font-size: 13px; page-break-inside: avoid;
+}
+.teacher-only h3 { color: #92400e; font-size: 14px; margin-bottom: 6px; text-transform: uppercase; }
+.teacher-only b { color: #b45309; }
+
+@media print { body { padding: 0; background: #fffbeb; } .section { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+
+<header>
+  <h1>🦕 Explorer's Maths Adventure — Level 5: MASTERY ⚔️</h1>
+  <div class="subtitle">★ Long Multiplication Final Boss + Bridge to Next Adventure ★ 1 hour</div>
+</header>
+
+
+<!-- ============ 0. COLD TEST ============ -->
+<div class="section theme-amber">
+  <span class="time-tag">3 min</span>
+  <span class="section-num">0</span>
+  <h2>🧊 Cold Test — Full Range</h2>
+  <p style="font-family:'Patrick Hand',cursive; font-size:16px;">Quick fire from everything we've learned. Speed counts!</p>
+  <div class="prob-grid three-col">
+    <div class="prob"><span class="prob-num">1</span> <span class="prob-eq">40 × 7 = ?</span></div>
+    <div class="prob"><span class="prob-num">2</span> <span class="prob-eq">300 × 5 = ?</span></div>
+    <div class="prob"><span class="prob-num">3</span> <span class="prob-eq">68 × 4 = ?</span></div>
+    <div class="prob"><span class="prob-num">4</span> <span class="prob-eq">25 × 12 = ?</span></div>
+    <div class="prob"><span class="prob-num">5</span> <span class="prob-eq">9 × 9 = ?</span></div>
+    <div class="prob"><span class="prob-num">6</span> <span class="prob-eq">156 × 14 = ?</span></div>
+  </div>
+</div>
+
+
+<!-- ============ 1. MIXED ASSESSMENT ============ -->
+<div class="section theme-blue">
+  <span class="time-tag">18 min</span>
+  <span class="section-num">1</span>
+  <h2>🎯 Mixed Practice — Show What You Know</h2>
+
+  <p style="font-family:'Patrick Hand',cursive; font-size:16px; color:#1e40af;">Mix of 2-digit and 3-digit × 2-digit. Estimate FIRST. Column method.</p>
+
+  <div class="prob-grid">
+    <div class="prob">
+      <span class="prob-num">1</span><span class="prob-eq">53 × 27</span>
+      <div class="workbox"></div>
+    </div>
+    <div class="prob">
+      <span class="prob-num">2</span><span class="prob-eq">86 × 34</span>
+      <div class="workbox"></div>
+    </div>
+    <div class="prob">
+      <span class="prob-num">3</span><span class="prob-eq">218 × 19</span>
+      <div class="workbox"></div>
+    </div>
+    <div class="prob">
+      <span class="prob-num">4</span><span class="prob-eq">145 × 28</span>
+      <div class="workbox"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ 2. MEGA MINECRAFT BOSS ============ -->
+<div class="section theme-mint" style="background:linear-gradient(135deg, #d1fae5, #f0fdf4);">
+  <span class="time-tag">12 min</span>
+  <span class="section-num">2</span>
+  <h2>🐉 BOSS PROBLEM — The Great Diamond Heist</h2>
+
+  <div class="mega-story" style="background:#fff; border: 2.5px solid #10b981;">
+    Steve discovers <b>24 pillager outposts</b>. Each outpost has <b>36 chests</b>. Each chest has <b>8 emeralds</b>.<br><br>
+    🟢 But during the raid, a creeper blew up part of his loot — he lost <b>1,250 emeralds</b>.<br><br>
+    <b>How many emeralds does Steve end up with?</b>
+  </div>
+
+  <p style="font-family:'Patrick Hand',cursive; font-size:15px; color:#047857;">This is a <b>three-step problem</b>. Use 3 boxes — Step 1, Step 2, Step 3.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px;">
+    <div style="background:#d1fae5; border:2px solid #10b981; border-radius:10px; padding:10px;">
+      <div style="font-family:'Fredoka',sans-serif; font-weight:700; color:#047857; font-size:12px; text-transform:uppercase;">Step 1 — total chests</div>
+      <div style="font-family:'Patrick Hand',cursive; font-size:13px; color:#047857; margin-top:4px;">24 × 36 = ?</div>
+      <div style="background:
+        linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        rgba(255,255,255,0.8);
+        border:1.5px dashed #10b981; border-radius:6px; min-height:120px; padding:4px; margin-top: 6px;"></div>
+    </div>
+    <div style="background:#d1fae5; border:2px solid #10b981; border-radius:10px; padding:10px;">
+      <div style="font-family:'Fredoka',sans-serif; font-weight:700; color:#047857; font-size:12px; text-transform:uppercase;">Step 2 — total emeralds</div>
+      <div style="font-family:'Patrick Hand',cursive; font-size:13px; color:#047857; margin-top:4px;">(Step 1) × 8 = ?</div>
+      <div style="background:
+        linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        rgba(255,255,255,0.8);
+        border:1.5px dashed #10b981; border-radius:6px; min-height:120px; padding:4px; margin-top: 6px;"></div>
+    </div>
+    <div style="background:#d1fae5; border:2px solid #10b981; border-radius:10px; padding:10px;">
+      <div style="font-family:'Fredoka',sans-serif; font-weight:700; color:#047857; font-size:12px; text-transform:uppercase;">Step 3 — minus the lost loot</div>
+      <div style="font-family:'Patrick Hand',cursive; font-size:13px; color:#047857; margin-top:4px;">(Step 2) − 1250 = ?</div>
+      <div style="background:
+        linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0/24px 24px,
+        rgba(255,255,255,0.8);
+        border:1.5px dashed #10b981; border-radius:6px; min-height:120px; padding:4px; margin-top: 6px;"></div>
+    </div>
+  </div>
+
+  <div style="background:#fef3c7; border:2.5px solid #f59e0b; border-radius:10px; padding:10px 14px; margin-top:10px; display:flex; align-items:center; gap:12px;">
+    <span style="font-family:'Fredoka',sans-serif; font-weight:700; color:#92400e; font-size:14px;">✨ Final answer:</span>
+    <span style="flex:1; border-bottom:2.5px dashed #f59e0b; height:28px;"></span>
+    <span style="font-family:'Patrick Hand',cursive; font-size:14px; color:#92400e;">emeralds</span>
+  </div>
+</div>
+
+
+<!-- ============ 3. CREEPER HUNT — FINAL EDITION ============ -->
+<div class="section theme-red">
+  <span class="time-tag">10 min</span>
+  <span class="section-num">3</span>
+  <h2>💥 Creeper Hunt — FINAL EDITION (3 creepers!)</h2>
+
+  <div class="key-box" style="background:#fee2e2; border-color:#dc2626;">
+    <p style="font-size:14.5px;"><b>The hardest creeper hunt yet.</b> 🟢💥🟢💥🟢 <b>Three</b> wrong answers hide in here. Only ONE is correct. Find all three creepers.</p>
+  </div>
+
+  <div class="hunt-grid">
+    <div class="hunt-card">
+      <span class="hunt-id">A</span>
+      <div>43 × 27 = <b>1161</b></div>
+      <div style="font-size:12px; color:#6b7280; margin-top:6px;">(43 × 7 = 301; 43 × 20 = 860; 301 + 860 = 1161)</div>
+    </div>
+    <div class="hunt-card">
+      <span class="hunt-id">B</span>
+      <div>67 × 23 = <b>1641</b></div>
+      <div style="font-size:12px; color:#6b7280; margin-top:6px;">(67 × 3 = 201; 67 × 20 = 1340; 201 + 1340 = ???)</div>
+    </div>
+    <div class="hunt-card">
+      <span class="hunt-id">C</span>
+      <div>134 × 16 = <b>2244</b></div>
+      <div style="font-size:12px; color:#6b7280; margin-top:6px;">(134 × 6 = 804; 134 × 10 = 1340; 804 + 1340 = ???)</div>
+    </div>
+    <div class="hunt-card">
+      <span class="hunt-id">D</span>
+      <div>52 × 38 = <b>1876</b></div>
+      <div style="font-size:12px; color:#6b7280; margin-top:6px;">(52 × 8 = 416; 52 × 30 = 1560; 416 + 1560 = ???)</div>
+    </div>
+  </div>
+
+  <p style="font-family:'Patrick Hand',cursive; font-size:15px; margin-top:12px;">
+    Creeper 1: <b style="border-bottom:2px dashed #dc2626; padding:0 18px;">&nbsp;</b> &nbsp;→ correct: <b style="border-bottom:2px dashed #dc2626; padding:0 24px;">&nbsp;</b><br>
+    Creeper 2: <b style="border-bottom:2px dashed #dc2626; padding:0 18px;">&nbsp;</b> &nbsp;→ correct: <b style="border-bottom:2px dashed #dc2626; padding:0 24px;">&nbsp;</b><br>
+    Creeper 3: <b style="border-bottom:2px dashed #dc2626; padding:0 18px;">&nbsp;</b> &nbsp;→ correct: <b style="border-bottom:2px dashed #dc2626; padding:0 24px;">&nbsp;</b><br>
+    The CORRECT one is: <b style="border-bottom:2px dashed #047857; padding:0 18px;">&nbsp;</b>
+  </p>
+</div>
+
+
+<!-- ============ 4. BRIDGE TO NEXT ADVENTURE ============ -->
+<div class="section theme-purple">
+  <span class="time-tag">10 min</span>
+  <span class="section-num">4</span>
+  <h2>🔮 Sneak Peek — Next Adventure: Division!</h2>
+
+  <div class="key-box">
+    <div class="key-title">💡 Multiplication has an INVERSE</div>
+    Every multiplication fact secretly contains a division fact (and vice versa). They're best friends.
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0;">
+    <div style="background:#ede9fe; border:2.5px solid #8b5cf6; border-radius:12px; padding:14px 18px; text-align:center;">
+      <div style="font-family:'Fredoka',sans-serif; font-weight:700; color:#5b21b6; font-size:14px; margin-bottom:8px;">What you know</div>
+      <div style="font-family:'Courier New',monospace; font-size:22px; font-weight:700; color:#5b21b6;">6 × 4 = 24</div>
+      <div style="font-family:'Patrick Hand',cursive; font-size:13px; color:#5b21b6; margin-top:6px;">"six fours make twenty-four"</div>
+    </div>
+    <div style="background:#fef3c7; border:2.5px solid #f59e0b; border-radius:12px; padding:14px 18px; text-align:center;">
+      <div style="font-family:'Fredoka',sans-serif; font-weight:700; color:#92400e; font-size:14px; margin-bottom:8px;">What it ALSO means</div>
+      <div style="font-family:'Courier New',monospace; font-size:22px; font-weight:700; color:#92400e;">24 ÷ 4 = 6</div>
+      <div style="font-family:'Patrick Hand',cursive; font-size:13px; color:#92400e; margin-top:6px;">"24 split into 4 groups = 6 each"</div>
+    </div>
+  </div>
+
+  <p style="font-family:'Patrick Hand',cursive; font-size:16px; color:#5b21b6; margin-top: 10px;"><b>Try it:</b> if 7 × 8 = 56, then…</p>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+    <div style="background:#fff; border:2px dashed #8b5cf6; border-radius:8px; padding:10px 14px; font-family:'Courier New',monospace; font-size:18px;">
+      56 ÷ 8 = <span style="border-bottom:2px solid #8b5cf6; display:inline-block; min-width:40px;">&nbsp;</span>
+    </div>
+    <div style="background:#fff; border:2px dashed #8b5cf6; border-radius:8px; padding:10px 14px; font-family:'Courier New',monospace; font-size:18px;">
+      56 ÷ 7 = <span style="border-bottom:2px solid #8b5cf6; display:inline-block; min-width:40px;">&nbsp;</span>
+    </div>
+  </div>
+
+  <p style="font-family:'Patrick Hand',cursive; font-size:15px; color:#5b21b6; margin-top: 12px;">⚔️ <b>Next adventure (Level 6):</b> Short division — the "bus stop" method. Same friendship between × and ÷, just written on paper.</p>
+</div>
+
+
+<!-- ============ 5. CELEBRATION ============ -->
+<div class="celebration">
+  <h2>🏆 LONG MULTIPLICATION COMPLETE! 🏆</h2>
+  <p>You went from "what's a placeholder zero?" to <b>3-digit × 2-digit multi-step problems</b> in 5 lessons. RAWR-some, Explorer! 🦖💪</p>
+  <p style="margin-top:8px; font-size:14px;">Long mult unlocked. Ready for Division Adventures next time. ⚔️</p>
+</div>
+
+
+<!-- ============ ANSWER KEY ============ -->
+<div class="teacher-only">
+  <h3>🔑 Answer Key — Teacher Only</h3>
+  <p><b>Section 0 cold test:</b> 1) 280 &nbsp; 2) 1500 &nbsp; 3) 272 &nbsp; 4) 300 &nbsp; 5) 81 &nbsp; 6) 2184</p>
+  <p><b>Section 1 mixed practice:</b> 1) 53×27 = <b>1431</b> &nbsp; 2) 86×34 = <b>2924</b> &nbsp; 3) 218×19 = <b>4142</b> &nbsp; 4) 145×28 = <b>4060</b></p>
+  <p><b>Section 2 BOSS:</b> Step 1: 24×36 = 864 chests &nbsp;|&nbsp; Step 2: 864×8 = 6912 emeralds &nbsp;|&nbsp; Step 3: 6912−1250 = <b>5662 emeralds</b></p>
+  <p><b>Section 3 Creeper Hunt:</b><br>
+    Creeper 1: <b>B</b> — 67×23 should be <b>1541</b> (201+1340=1541, not 1641)<br>
+    Creeper 2: <b>C</b> — 134×16 should be <b>2144</b> (804+1340=2144, not 2244)<br>
+    Creeper 3: <b>D</b> — 52×38 should be <b>1976</b> (416+1560=1976, not 1876)<br>
+    The CORRECT one is <b>A</b> (43×27 = 1161 ✓).
+  </p>
+  <p><b>Section 4 division teaser:</b> 56÷8 = 7 &nbsp; 56÷7 = 8 (the inverse facts).</p>
+</div>
+
+
+</body>
+</html>

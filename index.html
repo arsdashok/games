@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dasha's Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',system-ui,sans-serif;color:#2b2340;
+    background:radial-gradient(circle at 25% 15%,#efeafc,#e3f2f6 65%);min-height:100vh;padding:30px 18px 60px}
+  header{text-align:center;margin-bottom:26px}
+  h1{font-family:'Baloo 2',cursive;font-size:40px;background:linear-gradient(120deg,#6c4bb6,#159aa8);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  header p{color:#5c5478;font-size:17px;margin-top:4px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h2.cat{font-family:'Baloo 2',cursive;font-size:22px;color:#4a3a7a;margin:26px 0 12px;
+    border-left:5px solid #159aa8;padding-left:12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .card{background:#fff;border-radius:18px;padding:18px;display:flex;gap:14px;align-items:flex-start;
+    box-shadow:0 8px 22px rgba(90,70,150,.14);transition:transform .12s,box-shadow .12s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(90,70,150,.22)}
+  .emoji{font-size:40px;line-height:1;flex:0 0 auto}
+  .ct{flex:1}
+  .ct h3{font-family:'Baloo 2',cursive;font-size:19px;margin-bottom:3px}
+  .ct p{font-size:14px;color:#635b80;line-height:1.4;margin-bottom:10px}
+  .play{display:inline-block;background:linear-gradient(135deg,#6c4bb6,#159aa8);color:#fff;font-weight:700;
+    text-decoration:none;padding:8px 18px;border-radius:999px;font-size:15px}
+  .levels{display:flex;flex-wrap:wrap;gap:6px}
+  .lvl{background:#efeafc;color:#6c4bb6;font-weight:700;text-decoration:none;padding:6px 12px;border-radius:999px;font-size:13px;border:1px solid #ddd2f2}
+  .lvl:hover{background:#6c4bb6;color:#fff}
+  footer{text-align:center;color:#8a82a6;font-size:13px;margin-top:34px}
+</style></head>
+<body>
+  <header>
+    <h1>🎮 Dasha's Games</h1>
+    <p>24 games in one place. Tap one to play.</p>
+  </header>
+  <div class="wrap"><h2 class="cat">Numbers &amp; Maths</h2><div class="grid"><div class="card">
+      <div class="emoji">🔢</div>
+      <div class="ct">
+        <h3>Number Pop</h3>
+        <p>Tap to pop numbers. Pick which numbers appear.</p>
+        <a class="play" href="number-pop/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🔭</div>
+      <div class="ct">
+        <h3>Number Explorer</h3>
+        <p>Explore and read numbers.</p>
+        <a class="play" href="number-explorer/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">➗</div>
+      <div class="ct">
+        <h3>Math Master</h3>
+        <p>Times-tables mastery challenge.</p>
+        <a class="play" href="math-master/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🦕</div>
+      <div class="ct">
+        <h3>Dino Count Squad</h3>
+        <p>Counting with dinosaurs.</p>
+        <a class="play" href="dino-count-squad/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">👾</div>
+      <div class="ct">
+        <h3>Intruder Hunt</h3>
+        <p>Spot the wrong answer among the right ones.</p>
+        <a class="play" href="intruder-hunt/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">✖️</div>
+      <div class="ct">
+        <h3>Long Multiplication Hunt</h3>
+        <p>Find the mistake in long multiplication. Four levels.</p>
+        <div class="levels"><a class="lvl" href="long-multiplication-hunt-level-2/">Level 2</a><a class="lvl" href="long-multiplication-hunt-level-3/">Level 3</a><a class="lvl" href="long-multiplication-hunt-level-4/">Level 4</a><a class="lvl" href="long-multiplication-hunt-level-5/">Level 5</a></div>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🎯</div>
+      <div class="ct">
+        <h3>Times Tables Bingo</h3>
+        <p>Find-the-cell bingo. Three sets.</p>
+        <div class="levels"><a class="lvl" href="times-tables-bingo-set-1/">Set 1</a><a class="lvl" href="times-tables-bingo-set-2/">Set 2</a><a class="lvl" href="times-tables-bingo-set-3/">Set 3</a></div>
+      </div>
+    </div></div><h2 class="cat">Grammar &amp; Speaking</h2><div class="grid"><div class="card">
+      <div class="emoji">⚡</div>
+      <div class="ct">
+        <h3>Verb Master</h3>
+        <p>Verb-forms trainer.</p>
+        <a class="play" href="verb-master/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🙏</div>
+      <div class="ct">
+        <h3>Requests &amp; Get</h3>
+        <p>Make requests, use phrases with get. Speaking pairs.</p>
+        <a class="play" href="requests-and-get/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🏆</div>
+      <div class="ct">
+        <h3>Comparatives Quiz Master</h3>
+        <p>Quiz-show on comparatives.</p>
+        <a class="play" href="comparatives-quiz-master/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🕵️</div>
+      <div class="ct">
+        <h3>Speech Detective</h3>
+        <p>Catch the speech mistakes.</p>
+        <a class="play" href="speech-detective/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🔎</div>
+      <div class="ct">
+        <h3>Word Detective</h3>
+        <p>Find the odd word out.</p>
+        <a class="play" href="word-detective/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🚀</div>
+      <div class="ct">
+        <h3>Space Lotto</h3>
+        <p>Space-themed vocabulary lotto.</p>
+        <a class="play" href="space-lotto/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">💬</div>
+      <div class="ct">
+        <h3>Adjectives Speaking</h3>
+        <p>Speaking prompts with adjectives.</p>
+        <a class="play" href="adjectives-speaking/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">⏪</div>
+      <div class="ct">
+        <h3>Past Narrative Warm-up</h3>
+        <p>Tell a story in the past. Warm-up.</p>
+        <a class="play" href="past-narrative-warm-up/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🎲</div>
+      <div class="ct">
+        <h3>Trial Games</h3>
+        <p>Mixed warm-up mini-games.</p>
+        <a class="play" href="trial-games/">▶ Play</a>
+      </div>
+    </div></div><h2 class="cat">Puzzles &amp; Stories</h2><div class="grid"><div class="card">
+      <div class="emoji">🌲</div>
+      <div class="ct">
+        <h3>Dark Forest Story Machine</h3>
+        <p>Build a spooky story, choice by choice.</p>
+        <a class="play" href="dark-forest-story-machine/">▶ Play</a>
+      </div>
+    </div><div class="card">
+      <div class="emoji">🔒</div>
+      <div class="ct">
+        <h3>Timmy's Bag Lock</h3>
+        <p>Crack the code to open the bag.</p>
+        <a class="play" href="timmy-s-bag-lock/">▶ Play</a>
+      </div>
+    </div></div><h2 class="cat">Seasonal</h2><div class="grid"><div class="card">
+      <div class="emoji">🎄</div>
+      <div class="ct">
+        <h3>Christmas Quest</h3>
+        <p>Festive vocabulary quest.</p>
+        <a class="play" href="christmas-quest/">▶ Play</a>
+      </div>
+    </div></div></div>
+  <footer>Made for lessons. Have fun! ✨</footer>
+</body></html>

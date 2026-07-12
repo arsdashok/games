@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Captain's Space Lotto 🚀</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 20%, #312e81 0, transparent 40%),
+      radial-gradient(circle at 85% 75%, #5b21b6 0, transparent 45%),
+      #1e1b4b;
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px 14px 40px;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, #fff 50%, transparent),
+      radial-gradient(1.5px 1.5px at 70% 20%, #fff 50%, transparent),
+      radial-gradient(1px 1px at 40% 70%, #fff 50%, transparent),
+      radial-gradient(1.5px 1.5px at 90% 50%, #fff 50%, transparent),
+      radial-gradient(1px 1px at 55% 90%, #fff 50%, transparent),
+      radial-gradient(1px 1px at 10% 80%, #fff 50%, transparent);
+    opacity: .5;
+  }
+  .wrap { position: relative; z-index: 1; width: 100%; max-width: 760px; }
+
+  h1 { font-size: 28px; text-align: center; margin-bottom: 2px; }
+  .tag { text-align: center; font-size: 13.5px; opacity: .85; margin-bottom: 12px; }
+
+  .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+  button {
+    font-family: inherit; cursor: pointer; border: none; border-radius: 14px;
+    font-weight: 700; color: #fff; transition: transform .08s, filter .15s;
+  }
+  button:active { transform: scale(.95); }
+  .btn-call { font-size: 20px; padding: 14px 26px; background: linear-gradient(135deg,#f59e0b,#f97316); box-shadow: 0 4px 0 #c2620c; }
+  .btn-call:hover { filter: brightness(1.05); }
+  .btn-mini { font-size: 14px; padding: 12px 16px; background: #4c1d95; box-shadow: 0 4px 0 #2e1065; }
+  .btn-mini:hover { filter: brightness(1.15); }
+
+  .themebar { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom: 12px; }
+  .theme-btn {
+    font-size: 14px; padding: 9px 16px; border-radius: 999px;
+    background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.22);
+    color:#fff; opacity:.8;
+  }
+  .theme-btn:hover { opacity:1; }
+  .theme-btn.active {
+    opacity:1; background: linear-gradient(135deg,#f59e0b,#f97316);
+    border-color: #fbbf24; box-shadow: 0 3px 0 #c2620c;
+  }
+
+  .voicebar { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom: 12px; font-size: 13px; }
+  .voicebar label { opacity:.8; }
+  .voicebar select {
+    font-family: inherit; font-size: 13px; padding: 7px 10px; border-radius: 10px;
+    border: 2px solid rgba(255,255,255,.25); background: #2e1065; color:#fff; max-width: 320px;
+  }
+  .voicebar .test { font-size:12px; padding:8px 12px; background:#0e7490; box-shadow:0 3px 0 #155e63; }
+
+  .last {
+    text-align: center; margin: 0 0 10px; min-height: 70px;
+    background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.18);
+    border-radius: 14px; padding: 10px 14px;
+  }
+  .last .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .65; }
+  .last .q-big { font-size: 40px; line-height: 1; margin-top: 2px; }
+  .last .prompt { font-size: 13px; opacity: .9; margin-top: 6px; }
+  .last.idle .q-big { opacity: .4; }
+  .last.speaking .q-big { animation: pulse .7s ease-in-out 2; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+  .talk {
+    background: rgba(251,191,36,.14); border: 2px dashed #fbbf24;
+    border-radius: 12px; padding: 7px 14px; margin-bottom: 16px;
+    font-size: 13px; text-align: center;
+  }
+  .talk b { color: #fde047; }
+
+  /* Two players */
+  .boards { display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; }
+  .player {
+    flex: 1 1 300px; max-width: 340px;
+    padding: 12px 12px 14px; border-radius: 22px; border: 4px solid;
+  }
+  .player.Captain {
+    background: rgba(168,85,247,.16); border-color: #a855f7;
+    box-shadow: 0 0 0 1px rgba(168,85,247,.4), 0 10px 26px rgba(88,28,135,.55);
+  }
+  .player.dasha {
+    background: rgba(34,211,238,.14); border-color: #22d3ee;
+    box-shadow: 0 0 0 1px rgba(34,211,238,.4), 0 10px 26px rgba(8,80,110,.55);
+  }
+  .player h2 {
+    text-align: center; font-size: 19px; margin-bottom: 10px;
+    padding: 8px; border-radius: 12px; color: #fff;
+  }
+  .player.Captain h2 { background: linear-gradient(135deg,#7c3aed,#a855f7); box-shadow: 0 3px 0 #581c87; }
+  .player.dasha h2 { background: linear-gradient(135deg,#0891b2,#06b6d4); box-shadow: 0 3px 0 #155e63; }
+
+  /* VS badge between the two boards */
+  .vs {
+    flex: 0 0 auto; align-self: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg,#f59e0b,#f97316);
+    color: #fff; font-weight: 900; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 4px #1e1b4b, 0 4px 10px rgba(0,0,0,.4);
+  }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cell {
+    position: relative; aspect-ratio: 1 / 1;
+    background: linear-gradient(160deg,#faf5ff,#ede9fe);
+    border: 3px solid #a78bfa; border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; color: #4c1d95; user-select: none;
+    transition: transform .1s, box-shadow .15s;
+  }
+  .player.dasha .cell { background: linear-gradient(160deg,#ecfeff,#cffafe); border-color: #22d3ee; color: #155e75; }
+  .cell:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,.3); }
+  .cell .em { font-size: 34px; line-height: 1; }
+  .cell .w { margin-top: 3px; font-size: 13px; font-weight: 700; }
+  .cell .x { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 52px; color: #ef4444; font-weight: 900; }
+  .cell.crossed { background: linear-gradient(160deg,#ddd6fe,#c4b5fd); }
+  .cell.crossed .em, .cell.crossed .w { opacity: .35; }
+  .cell.crossed .x { display: flex; }
+  .cell.win { border-color: #22c55e; box-shadow: 0 0 0 3px #22c55e, 0 0 16px #22c55e; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 60%{transform:translateX(7px)} }
+  .cell.shake { animation: shake .32s; }
+
+  .overlay { position: fixed; inset: 0; z-index: 10; display: none; align-items: center; justify-content: center; flex-direction: column; background: rgba(30,27,75,.8); backdrop-filter: blur(2px); }
+  .overlay.show { display: flex; }
+  .overlay .big { font-size: 56px; font-weight: 900; color: #fde047; text-shadow: 0 4px 0 #b45309; animation: pop .4s; text-align:center; }
+  .overlay .sub { font-size: 20px; margin: 8px 0 18px; }
+  @keyframes pop { 0%{transform:scale(.3);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  .confetti { position: fixed; top: -40px; font-size: 26px; z-index: 9; pointer-events: none; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: .2; } }
+
+  .hint { text-align:center; font-size: 12px; opacity:.6; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title">🚀 Space Lotto</h1>
+  <div class="tag">The robot asks <b>“Is there a …?”</b> — answer, find it, and cross it out. First to 3 in a row wins!</div>
+
+  <div class="themebar" id="themebar">
+    <button class="theme-btn active" data-theme="space">🚀 Space</button>
+    <button class="theme-btn" data-theme="animals">🐾 Animals</button>
+    <button class="theme-btn" data-theme="food">🍎 Food</button>
+  </div>
+
+  <div class="controls">
+    <button class="btn-call" id="callBtn">🔊 Call a word</button>
+    <button class="btn-mini" id="repeatBtn">🔁 Repeat</button>
+    <button class="btn-mini" id="newBtn">✨ New game</button>
+  </div>
+
+  <div class="last idle" id="lastBox">
+    <div class="lbl">The robot is asking…</div>
+    <div class="q-big" id="lastQ">🔊</div>
+    <div class="prompt" id="lastPrompt">Press “Call a word” to start</div>
+  </div>
+
+  <div class="talk">
+    🗣️ Answer: <b>Yes, there is!</b> (cross it out) &nbsp;·&nbsp; <b>No, there isn't.</b> (you don't have it)
+  </div>
+
+  <div class="boards">
+    <div class="player Captain">
+      <h2>🚀 Captain</h2>
+      <div class="board" id="board-Captain"></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="player dasha">
+      <h2>🛸 Dasha</h2>
+      <div class="board" id="board-dasha"></div>
+    </div>
+  </div>
+
+  <div class="hint">Tip: turn the volume on 🔈. You can only cross a word AFTER the robot says it.</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="big" id="overlayBig">LOTTO! 🎉</div>
+  <div class="sub" id="overlaySub"></div>
+  <button class="btn-call" id="playAgain">Play again 🚀</button>
+</div>
+
+<script>
+// Countable nouns only, so "Is there a/an ___?" is always grammatically correct.
+const THEMES = {
+  space: { name:'Space', emoji:'🚀', confetti:['🚀','🪐','⭐','✨','🌟'], words:[
+    {w:'rocket', e:'🚀'}, {w:'planet', e:'🪐'}, {w:'star', e:'⭐'},
+    {w:'moon', e:'🌙'}, {w:'galaxy', e:'🌌'}, {w:'alien', e:'👽'},
+    {w:'UFO', e:'🛸'}, {w:'comet', e:'☄️'}, {w:'telescope', e:'🔭'},
+    {w:'astronaut', e:'👨‍🚀'}, {w:'satellite', e:'🛰️'}
+  ]},
+  animals: { name:'Animal', emoji:'🐾', confetti:['🐶','🐱','🦁','✨','🌟'], words:[
+    {w:'dog', e:'🐶'}, {w:'cat', e:'🐱'}, {w:'elephant', e:'🐘'},
+    {w:'lion', e:'🦁'}, {w:'monkey', e:'🐵'}, {w:'rabbit', e:'🐰'},
+    {w:'fish', e:'🐟'}, {w:'frog', e:'🐸'}, {w:'bird', e:'🐦'},
+    {w:'snake', e:'🐍'}, {w:'bear', e:'🐻'}
+  ]},
+  food: { name:'Food', emoji:'🍎', confetti:['🍎','🍌','🍕','✨','🌟'], words:[
+    {w:'apple', e:'🍎'}, {w:'banana', e:'🍌'}, {w:'egg', e:'🥚'},
+    {w:'orange', e:'🍊'}, {w:'pizza', e:'🍕'}, {w:'cake', e:'🍰'},
+    {w:'carrot', e:'🥕'}, {w:'ice cream', e:'🍦'}, {w:'sandwich', e:'🥪'},
+    {w:'lemon', e:'🍋'}, {w:'onion', e:'🧅'}
+  ]}
+};
+let currentTheme = 'space';
+let WORDS = THEMES[currentTheme].words;
+const WIN_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
+const LABEL = { Captain: '🚀 Captain', dasha: '🛸 Dasha' };
+
+let boards = { Captain: [], dasha: [] };
+let called = [];
+let lastItem = null;
+let won = false;
+
+let seed = (Date.now ? Date.now() : 12345) % 2147483647;
+function rnd(){ seed = (seed*16807) % 2147483647; return (seed-1)/2147483646; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor((i+1)*rnd()); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function article(w){ return /^[aeio]/i.test(w) ? 'an' : 'a'; }   // an alien / an astronaut / an Earth, else a
+
+/* ---------- Voice: locked to Google UK English Female ---------- */
+let chosenVoice = null;
+function loadVoices(){
+  const vs = speechSynthesis.getVoices();
+  chosenVoice =
+    vs.find(v => v.name === 'Google UK English Female') ||
+    vs.find(v => /google/i.test(v.name) && /en-GB/i.test(v.lang)) ||
+    vs.find(v => /en-GB/i.test(v.lang) && /female|samantha|kate|serena|stephanie/i.test(v.name)) ||
+    vs.find(v => /en-GB/i.test(v.lang)) ||
+    vs.find(v => /^en/i.test(v.lang)) || null;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = chosenVoice ? chosenVoice.lang : 'en-GB';
+  u.rate = 0.9; u.pitch = 1.0;
+  if(chosenVoice) u.voice = chosenVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- Board ---------- */
+function renderBoard(key){
+  const el = document.getElementById('board-'+key);
+  el.innerHTML = '';
+  boards[key].forEach((c,i)=>{
+    const d = document.createElement('div');
+    d.className = 'cell'; d.dataset.board = key; d.dataset.i = i;
+    d.innerHTML = `<span class="em">${c.e}</span><span class="w">${c.w}</span><span class="x">✗</span>`;
+    d.addEventListener('click', ()=> toggleCell(key,i));
+    el.appendChild(d);
+  });
+}
+
+function toggleCell(key,i){
+  if(won) return;
+  const d = document.querySelector(`.cell[data-board="${key}"][data-i="${i}"]`);
+  const word = boards[key][i].w;
+  if(!d.classList.contains('crossed')){
+    if(!called.includes(word)){
+      d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+      document.getElementById('lastBox').classList.remove('idle');
+      document.getElementById('lastPrompt').textContent = 'Listen first! 🔊 Press “Call a word”.';
+      return;
+    }
+    d.classList.add('crossed');
+  } else {
+    d.classList.remove('crossed');
+  }
+  checkWin(key);
+}
+
+function checkWin(key){
+  const cells = [...document.querySelectorAll(`.cell[data-board="${key}"]`)];
+  for(const line of WIN_LINES){
+    if(line.every(i=>cells[i].classList.contains('crossed'))){
+      won = true; line.forEach(i=>cells[i].classList.add('win'));
+      celebrate(LABEL[key] + ' wins!', '3 in a row! 🌟');
+      return;
+    }
+  }
+  if(cells.every(c=>c.classList.contains('crossed'))){
+    won = true; celebrate(LABEL[key] + ' wins!', 'Full board! 🌟');
+  }
+}
+
+function celebrate(title, sub){
+  document.getElementById('overlayBig').textContent = title + ' 🎉';
+  document.getElementById('overlaySub').textContent = sub;
+  document.getElementById('overlay').classList.add('show');
+  speak('Lotto! Well done!');
+  const cset = THEMES[currentTheme].confetti;
+  for(let k=0;k<26;k++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = cset[k % cset.length];
+    c.style.left = (rnd()*100)+'vw';
+    c.style.animationDuration = (1.5 + rnd()*1.8)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 3500);
+  }
+}
+
+/* ---------- Calling ---------- */
+function callWord(){
+  if(won) return;
+  const remaining = WORDS.filter(x=>!called.includes(x.w));
+  if(remaining.length === 0){ speak('No more words!'); return; }
+  const pick = remaining[Math.floor(rnd()*remaining.length)];
+  called.push(pick.w);
+  lastItem = pick;
+  speak(`Is there ${article(pick.w)} ${pick.w}?`);
+  // Listening game: do NOT show the word — the robot's voice is the only clue.
+  const box = document.getElementById('lastBox');
+  box.classList.remove('idle');
+  box.classList.remove('speaking'); void box.offsetWidth; box.classList.add('speaking');
+  document.getElementById('lastQ').textContent = '🔊';
+  document.getElementById('lastPrompt').textContent = 'Listen! Got it? Cross it out ✗  ·  Don’t have it? Say: No, there isn’t.';
+}
+
+function newGame(){
+  won = false; called = []; lastItem = null;
+  boards.Captain = shuffle(WORDS).slice(0,9);
+  boards.dasha = shuffle(WORDS).slice(0,9);
+  renderBoard('Captain'); renderBoard('dasha');
+  document.getElementById('overlay').classList.remove('show');
+  const box = document.getElementById('lastBox');
+  box.classList.add('idle'); box.classList.remove('speaking');
+  document.getElementById('lastQ').textContent = '🔊';
+  document.getElementById('lastPrompt').textContent = 'Press “Call a word” to start';
+}
+
+function setTheme(key){
+  if(!THEMES[key]) return;
+  currentTheme = key;
+  WORDS = THEMES[key].words;
+  const t = `${THEMES[key].emoji} ${THEMES[key].name} Lotto`;
+  document.getElementById('title').textContent = t;
+  document.title = t;
+  document.querySelectorAll('.theme-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.theme === key);
+  });
+  newGame();
+}
+
+document.getElementById('callBtn').addEventListener('click', callWord);
+document.getElementById('repeatBtn').addEventListener('click', ()=>{ if(lastItem) speak(`Is there ${article(lastItem.w)} ${lastItem.w}?`); });
+document.getElementById('newBtn').addEventListener('click', newGame);
+document.getElementById('playAgain').addEventListener('click', newGame);
+document.querySelectorAll('.theme-btn').forEach(b=>{
+  b.addEventListener('click', ()=> setTheme(b.dataset.theme));
+});
+
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = loadVoices; }
+loadVoices();
+setTheme('space');
+</script>
+</body>
+</html>

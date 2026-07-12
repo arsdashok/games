@@ -1,0 +1,3073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Verb Master — Irregular Verbs</title>
+<meta name="description" content="Master English irregular verbs through 5 games — flashcards, hangman, speed quiz, sort, story detective, battle. Built for ESL learners and tutors.">
+<meta name="theme-color" content="#7c3aed">
+
+<!-- PWA manifest + icons -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<!-- iOS Safari "Add to Home Screen" support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Verb Master">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Social preview -->
+<meta property="og:title" content="Verb Master — Irregular Verbs">
+<meta property="og:description" content="Learn English irregular verbs through games.">
+<meta property="og:image" content="icons/icon-512.png">
+<meta property="og:type" content="website">
+
+<style>
+/* ===== CSS VARIABLES & RESET ===== */
+:root {
+  --bg: #0f0f1a;
+  --bg2: #1a1a2e;
+  --bg3: #16213e;
+  --card: #1e1e36;
+  --card-hover: #2a2a4a;
+  --purple: #7c3aed;
+  --purple-light: #a78bfa;
+  --pink: #ec4899;
+  --green: #10b981;
+  --green-dark: #059669;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-bright: #f8fafc;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden;
+  /* iOS safe-area for notch + home bar when installed as PWA */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* ===== UTILITY ===== */
+.hidden { display: none !important; }
+.btn { padding: 12px 28px; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: linear-gradient(135deg, var(--purple), var(--pink)); color: white; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+.btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+.btn-secondary:hover { background: var(--card-hover); }
+.btn-success { background: linear-gradient(135deg, var(--green), var(--cyan)); color: white; }
+.btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+.btn-warn { background: linear-gradient(135deg, var(--yellow), #f97316); color: #000; }
+.btn-warn:hover { transform: translateY(-2px); }
+.btn-small { padding: 8px 16px; font-size: 14px; }
+.btn-back { position: absolute; top: 20px; left: 20px; z-index: 10; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+  padding: 12px 16px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1);
+  background: var(--bg); color: var(--text); font-size: 16px; width: 100%; outline: none; transition: border 0.2s;
+}
+input:focus { border-color: var(--purple); }
+
+/* ===== SCREENS ===== */
+.screen { display: none; min-height: 100vh; position: relative; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ===== LOGIN SCREEN ===== */
+#loginScreen {
+  justify-content: center; align-items: center;
+  background: radial-gradient(ellipse at center, var(--bg3) 0%, var(--bg) 70%);
+}
+.login-box { background: var(--card); border-radius: 20px; padding: 48px; max-width: 420px; width: 90%; box-shadow: var(--shadow); text-align: center; }
+.login-box h1 { font-size: 36px; margin-bottom: 8px; background: linear-gradient(135deg, var(--purple-light), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.login-box .subtitle { color: var(--text-dim); margin-bottom: 32px; font-size: 14px; }
+.login-box .logo-icon { font-size: 64px; margin-bottom: 16px; display: block; }
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-group label { display: block; margin-bottom: 6px; color: var(--text-dim); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.role-toggle { display: flex; gap: 8px; margin-bottom: 24px; }
+.role-toggle button { flex:1; padding: 10px; border-radius: var(--radius); border: 2px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-dim); font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.role-toggle button.active { border-color: var(--purple); color: var(--purple-light); background: rgba(124,58,237,0.1); }
+.login-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.switch-link { color: var(--purple-light); cursor: pointer; font-size: 14px; margin-top: 16px; }
+.switch-link:hover { text-decoration: underline; }
+.error-msg { color: var(--red); font-size: 13px; margin-top: 8px; min-height: 20px; }
+
+/* ===== STUDENT DASHBOARD ===== */
+#studentDashboard { background: var(--bg); }
+.dash-header { padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; background: var(--bg2); border-bottom: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 12px; }
+.dash-header .user-info { display: flex; align-items: center; gap: 12px; }
+.dash-header .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+.dash-header .username { font-size: 18px; font-weight: 600; }
+.dash-header .xp-bar { display: flex; align-items: center; gap: 12px; }
+.xp-track { width: 200px; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.xp-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--pink)); border-radius: 4px; transition: width 0.5s; }
+.xp-label { font-size: 13px; color: var(--text-dim); }
+.level-badge { background: linear-gradient(135deg, var(--yellow), #f97316); color: #000; font-weight: 800; padding: 4px 12px; border-radius: 20px; font-size: 13px; }
+.dash-actions { display: flex; gap: 8px; }
+
+.stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 24px 32px; }
+.stat-card { background: var(--card); border-radius: var(--radius); padding: 20px; text-align: center; }
+.stat-card .stat-num { font-size: 32px; font-weight: 800; background: linear-gradient(135deg, var(--purple-light), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat-card .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+.dash-section-title { font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; padding: 0 32px; margin-top: 8px; margin-bottom: 8px; font-weight: 700; }
+
+.games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 16px 32px 24px; }
+.game-card { background: var(--card); border-radius: 16px; padding: 28px; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+.game-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); border-color: rgba(124,58,237,0.3); }
+.game-card.locked { opacity: 0.55; cursor: not-allowed; }
+.game-card.locked:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,0.05); }
+.game-card .game-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.game-card h3 { font-size: 20px; margin-bottom: 8px; color: var(--text-bright); }
+.game-card p { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+.game-card .best-score { margin-top: 12px; font-size: 13px; color: var(--yellow); font-weight: 600; }
+.game-card .lock-msg { margin-top: 12px; font-size: 13px; color: var(--red); font-weight: 600; }
+.game-card.feature-card { background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1)); border-color: rgba(124,58,237,0.4); }
+.game-card::after { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 0 16px 0 60px; opacity: 0.1; }
+
+/* ===== TEACHER DASHBOARD ===== */
+#teacherDashboard { background: var(--bg); }
+.teacher-content { padding: 24px 32px; }
+.teacher-content h2 { margin-bottom: 20px; font-size: 24px; }
+.student-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border-radius: var(--radius); overflow: hidden; }
+.student-table th { background: var(--bg3); padding: 14px 16px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+.student-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.student-table tr:last-child td { border-bottom: none; }
+.student-table tr:hover td { background: rgba(124,58,237,0.05); }
+.progress-mini { width: 60px; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 8px; }
+.progress-mini-fill { height: 100%; border-radius: 3px; }
+
+.teacher-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.teacher-tabs button { padding: 10px 20px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-dim); cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.teacher-tabs button.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+.class-code-box { background: var(--card); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.class-code { font-size: 32px; font-weight: 800; letter-spacing: 4px; color: var(--purple-light); font-family: monospace; }
+
+.detail-panel { background: var(--card); border-radius: var(--radius); padding: 24px; margin-top: 20px; }
+.detail-panel h3 { margin-bottom: 16px; }
+.verb-progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.verb-chip { padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.verb-chip small { font-weight: 500; opacity: 0.8; }
+.verb-chip.mastered { background: rgba(16,185,129,0.15); color: var(--green); }
+.verb-chip.learning { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.verb-chip.studied { background: rgba(59,130,246,0.15); color: var(--blue); }
+.verb-chip.new { background: rgba(239,68,68,0.10); color: var(--red); }
+
+/* ===== TIER FILTER ===== */
+.tier-filter { display: flex; gap: 6px; padding: 0 32px; margin-bottom: 12px; flex-wrap: wrap; }
+.tier-filter button { padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: var(--card); color: var(--text-dim); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.tier-filter button.active { background: var(--purple); color: white; border-color: var(--purple); }
+.tier-filter button:hover:not(.active) { border-color: var(--purple); }
+
+.tier-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.tier-badge.easy { background: rgba(16,185,129,0.2); color: var(--green); }
+.tier-badge.medium { background: rgba(245,158,11,0.2); color: var(--yellow); }
+.tier-badge.hard { background: rgba(239,68,68,0.2); color: var(--red); }
+
+/* ===== AUDIO + TRANSLATE BUTTONS ===== */
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15);
+  background: var(--bg3); color: var(--text); cursor: pointer; font-size: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.icon-btn:hover { background: var(--purple); transform: scale(1.05); }
+.icon-btn.small { width: 32px; height: 32px; font-size: 14px; }
+.icon-btn:active { transform: scale(0.95); }
+
+.translation-bubble {
+  display: inline-block; padding: 6px 14px; border-radius: 20px; background: rgba(59,130,246,0.15);
+  color: var(--blue); font-size: 14px; font-weight: 600; margin-top: 8px;
+  animation: fadeInDown 0.3s;
+}
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+
+/* ===== GAME SCREENS ===== */
+.game-screen { background: var(--bg); align-items: center; }
+.game-container { width: 100%; max-width: 900px; padding: 20px; margin: 0 auto; flex: 1; display: flex; flex-direction: column; }
+.game-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.game-header h2 { font-size: 24px; }
+.game-score { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.game-score span { font-size: 14px; color: var(--text-dim); }
+.game-score .score-val { color: var(--yellow); font-weight: 700; font-size: 18px; }
+.timer-bar { width: 100%; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
+.timer-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--yellow), var(--red)); border-radius: 3px; transition: width 0.1s linear; }
+
+@keyframes shake { 0%,100%{ transform:translateX(0) } 25%{ transform:translateX(-5px) } 75%{ transform:translateX(5px) } }
+
+/* ===== STUDY (FLASHCARDS) ===== */
+.study-controls { display: flex; gap: 8px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.study-progress { font-size: 14px; color: var(--text-dim); }
+.study-progress strong { color: var(--green); font-weight: 700; }
+
+.flashcard-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.flashcard {
+  background: var(--card); border-radius: 20px; padding: 40px 32px;
+  width: 100%; max-width: 540px; min-height: 320px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; cursor: pointer; transition: all 0.3s;
+  border: 2px solid rgba(255,255,255,0.05);
+  position: relative; user-select: none;
+}
+.flashcard:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
+.flashcard .fc-tier { position: absolute; top: 16px; left: 16px; }
+.flashcard .fc-flip-hint { position: absolute; bottom: 12px; right: 16px; font-size: 12px; color: var(--text-dim); }
+.flashcard .fc-v1 { font-size: 56px; font-weight: 800; background: linear-gradient(135deg, var(--purple-light), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+.flashcard .fc-audio { margin-top: 8px; }
+.flashcard .fc-back { display: none; }
+.flashcard.flipped .fc-front { display: none; }
+.flashcard.flipped .fc-back { display: block; width: 100%; }
+
+.fc-back .fc-forms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.fc-back .fc-form-cell { padding: 14px 8px; background: var(--bg3); border-radius: var(--radius); }
+.fc-back .fc-form-cell .fc-form-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.fc-back .fc-form-cell .fc-form-value { font-size: 22px; font-weight: 700; color: var(--text-bright); word-break: break-word; }
+.fc-back .fc-form-cell.dup { border: 1px dashed rgba(245,158,11,0.5); }
+.fc-back .fc-ru { font-size: 18px; color: var(--blue); margin-bottom: 12px; font-weight: 600; }
+.fc-back .fc-example { font-size: 14px; color: var(--text-dim); font-style: italic; line-height: 1.5; padding: 12px; background: var(--bg); border-radius: var(--radius); margin-bottom: 8px; }
+.fc-back .fc-dup-note { font-size: 12px; color: var(--yellow); margin-top: 4px; }
+
+.flashcard-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; justify-content: center; }
+.flashcard-actions button { min-width: 130px; }
+
+.study-empty { text-align: center; color: var(--text-dim); padding: 40px; }
+
+/* ===== HANGMAN ===== */
+.hangman-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; }
+.hangman-prompt { text-align: center; }
+.hangman-prompt .hp-base { font-size: 14px; color: var(--text-dim); margin-bottom: 6px; }
+.hangman-prompt .hp-v1 { font-size: 44px; font-weight: 800; color: var(--purple-light); margin-bottom: 6px; display: inline-flex; align-items: center; gap: 12px; }
+.hangman-prompt .hp-form { font-size: 18px; color: var(--yellow); font-weight: 700; }
+
+.hangman-stage { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.hangman-stickman { width: 160px; height: 180px; }
+.hangman-stickman line, .hangman-stickman circle { stroke: var(--text-bright); stroke-width: 3; fill: none; stroke-linecap: round; }
+.hangman-stickman .frame { stroke: var(--text-dim); }
+.hangman-stickman .part { opacity: 0; transition: opacity 0.3s; }
+.hangman-stickman .part.shown { opacity: 1; }
+
+.hangman-word { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.hangman-letter {
+  width: 36px; height: 44px; border-bottom: 3px solid var(--text-dim);
+  display: flex; align-items: flex-end; justify-content: center;
+  font-size: 28px; font-weight: 700; color: var(--text-bright);
+  text-transform: lowercase;
+}
+.hangman-letter.revealed { border-color: var(--green); color: var(--green); }
+.hangman-letter.space { border: none; width: 14px; }
+
+.hangman-keyboard { display: grid; grid-template-columns: repeat(13, 1fr); gap: 6px; max-width: 600px; width: 100%; }
+.hangman-key {
+  padding: 10px 4px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+  background: var(--card); color: var(--text); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; text-transform: uppercase;
+}
+.hangman-key:hover:not(:disabled) { background: var(--purple); border-color: var(--purple); color: white; }
+.hangman-key:disabled { opacity: 0.35; cursor: not-allowed; }
+.hangman-key.correct { background: rgba(16,185,129,0.25); border-color: var(--green); color: var(--green); }
+.hangman-key.wrong { background: rgba(239,68,68,0.25); border-color: var(--red); color: var(--red); }
+
+.hangman-meta { display: flex; gap: 16px; font-size: 14px; color: var(--text-dim); }
+.hangman-meta span strong { color: var(--text-bright); }
+
+.hangman-feedback { min-height: 24px; font-size: 16px; font-weight: 600; text-align: center; }
+
+/* ===== Speed Quiz ===== */
+.speed-center { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.speed-prompt { font-size: 18px; color: var(--text-dim); margin-bottom: 8px; }
+.speed-word-row { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.speed-word { font-size: 56px; font-weight: 800; background: linear-gradient(135deg, var(--purple-light), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; word-break: break-word; }
+.speed-form-label { font-size: 22px; color: var(--yellow); font-weight: 700; margin-bottom: 24px; }
+.speed-input { font-size: 32px; text-align: center; max-width: 350px; padding: 16px; background: var(--card); border: 2px solid rgba(255,255,255,0.1); border-radius: var(--radius); color: var(--text-bright); }
+.speed-input:focus { border-color: var(--purple); }
+.speed-input.correct { border-color: var(--green); background: rgba(16,185,129,0.1); }
+.speed-input.wrong { border-color: var(--red); background: rgba(239,68,68,0.1); }
+.speed-streak { font-size: 14px; color: var(--text-dim); margin-top: 16px; }
+.speed-streak .streak-num { color: var(--yellow); font-weight: 700; font-size: 20px; }
+.speed-feedback { margin-top: 12px; font-size: 16px; min-height: 24px; font-weight: 600; }
+
+/* ===== Sort It Out ===== */
+.sort-word-area { text-align: center; margin: 24px 0; }
+.sort-current-word { font-size: 48px; font-weight: 800; color: var(--text-bright); padding: 24px; background: var(--card); border-radius: 16px; display: inline-flex; align-items: center; gap: 14px; min-width: 200px; word-break: break-word; }
+.sort-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 600px; margin: 0 auto; }
+.sort-btn { padding: 16px; font-size: 18px; font-weight: 700; border-radius: var(--radius); border: 2px solid rgba(255,255,255,0.1); background: var(--card); color: var(--text); cursor: pointer; transition: all 0.2s; }
+.sort-btn:hover { border-color: var(--purple); transform: translateY(-2px); }
+.sort-btn.correct { background: rgba(16,185,129,0.2); border-color: var(--green); color: var(--green); }
+.sort-btn.wrong { background: rgba(239,68,68,0.2); border-color: var(--red); color: var(--red); }
+
+/* ===== Story Detective ===== */
+.story-card { background: var(--card); border-radius: 16px; padding: 32px; max-width: 700px; margin: 0 auto; width: 100%; }
+.story-card .story-num { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.story-card .story-sentence { font-size: 22px; line-height: 1.6; margin-bottom: 24px; color: var(--text-bright); }
+.story-card .story-sentence .blank { border-bottom: 3px solid var(--purple); padding: 2px 8px; min-width: 100px; display: inline-block; color: var(--purple-light); font-weight: 700; }
+.story-card .story-hint { font-size: 15px; color: var(--text-dim); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.story-card .story-hint strong { color: var(--yellow); }
+.story-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.story-option { padding: 14px; border-radius: var(--radius); border: 2px solid rgba(255,255,255,0.1); background: var(--bg3); color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+.story-option:hover { border-color: var(--purple); }
+.story-option.correct { background: rgba(16,185,129,0.2); border-color: var(--green); color: var(--green); }
+.story-option.wrong { background: rgba(239,68,68,0.2); border-color: var(--red); color: var(--red); }
+
+/* ===== Battle ===== */
+.battle-arena { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.battle-scene { display: flex; justify-content: space-around; align-items: center; width: 100%; max-width: 700px; margin-bottom: 32px; gap: 16px; flex-wrap: wrap; }
+.battle-char { text-align: center; }
+.battle-char .char-sprite { font-size: 80px; margin-bottom: 8px; display: block; transition: transform 0.3s; }
+.battle-char .char-sprite.attack { animation: attackAnim 0.4s; }
+.battle-char .char-sprite.hurt { animation: hurtAnim 0.4s; }
+.battle-char .char-name { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+.hp-bar { width: 160px; height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; margin: 0 auto; }
+.hp-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
+.hp-fill.player { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.hp-fill.enemy { background: linear-gradient(90deg, var(--red), var(--pink)); }
+.hp-text { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.battle-vs { font-size: 36px; font-weight: 900; color: var(--text-dim); }
+.battle-question { background: var(--card); border-radius: 16px; padding: 28px; max-width: 600px; width: 100%; }
+.battle-question .bq-prompt { font-size: 16px; color: var(--text-dim); margin-bottom: 8px; }
+.battle-question .bq-word-row { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.battle-question .bq-word { font-size: 36px; font-weight: 800; color: var(--purple-light); word-break: break-word; }
+.battle-question .bq-form { font-size: 18px; color: var(--yellow); font-weight: 700; margin-bottom: 20px; }
+.battle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.battle-opt { padding: 14px; border-radius: var(--radius); border: 2px solid rgba(255,255,255,0.1); background: var(--bg3); color: var(--text); font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.battle-opt:hover { border-color: var(--purple); }
+.battle-opt.correct { background: rgba(16,185,129,0.2); border-color: var(--green); color: var(--green); }
+.battle-opt.wrong { background: rgba(239,68,68,0.2); border-color: var(--red); color: var(--red); }
+.battle-log { margin-top: 12px; font-size: 14px; color: var(--text-dim); min-height: 20px; }
+
+@keyframes attackAnim { 0%{ transform: translateX(0) } 50%{ transform: translateX(30px) scale(1.1) } 100%{ transform: translateX(0) } }
+@keyframes hurtAnim { 0%{ transform: translateX(0) } 25%{ transform: translateX(-10px) } 50%{ transform: translateX(10px) } 75%{ transform: translateX(-5px) } 100%{ transform: translateX(0) } }
+
+/* ===== CUSTOM SETS ===== */
+.set-card { position: relative; }
+.set-card.add-card { border: 2px dashed rgba(124,58,237,0.4); background: transparent; text-align: center; }
+.set-card.add-card:hover { background: rgba(124,58,237,0.05); }
+.set-card .set-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.set-card .set-chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-dim); }
+.set-card .set-actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.set-card .set-actions button { flex: 1; min-width: 80px; }
+.set-card .set-name { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; }
+.set-card .set-summary { font-size: 13px; color: var(--text-dim); }
+
+.set-verb-list { max-height: 320px; overflow-y: auto; background: var(--bg); border-radius: var(--radius); padding: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); }
+.set-tier-group { margin-bottom: 12px; }
+.set-tier-group:last-child { margin-bottom: 0; }
+.set-tier-group h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 6px; }
+.set-verb-row { display: flex; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; gap: 10px; user-select: none; transition: background 0.15s; }
+.set-verb-row:hover { background: rgba(124,58,237,0.08); }
+.set-verb-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--purple); cursor: pointer; }
+.set-verb-row .svr-forms { color: var(--text-dim); font-size: 13px; }
+.set-verb-row .svr-v1 { font-weight: 600; min-width: 90px; }
+.set-verb-row .svr-ru { color: var(--blue); font-size: 12px; flex: 1; text-align: right; }
+
+.set-quick-actions { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.set-quick-actions button { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: var(--bg3); color: var(--text-dim); cursor: pointer; }
+.set-quick-actions button:hover { background: var(--card-hover); color: var(--text); }
+
+.set-play-game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.set-play-game-grid button { padding: 16px 12px; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1); background: var(--bg3); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+.set-play-game-grid button:hover { background: var(--purple); border-color: var(--purple); }
+.set-play-game-grid button:disabled { opacity: 0.4; cursor: not-allowed; }
+.set-play-game-grid button .spg-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+/* ===== SETTINGS MODAL ===== */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+.modal-box { background: var(--card); border-radius: 20px; padding: 32px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-box h2 { margin-bottom: 20px; }
+.setting-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 12px; flex-wrap: wrap; }
+.setting-row:last-child { border-bottom: none; }
+.setting-row .s-label { font-weight: 600; color: var(--text); }
+.setting-row .s-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.setting-row .s-control { flex-shrink: 0; }
+.setting-row input[type="number"] { width: 80px; }
+.setting-row select { padding: 8px 12px; border-radius: var(--radius); background: var(--bg); color: var(--text); border: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+
+/* ===== GAME OVER / RESULTS ===== */
+.results-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+.results-box { background: var(--card); border-radius: 20px; padding: 48px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+.results-box .result-icon { font-size: 64px; margin-bottom: 16px; display: block; }
+.results-box h2 { font-size: 28px; margin-bottom: 8px; }
+.results-box .result-score { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, var(--yellow), #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 12px 0; }
+.results-box .result-detail { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; }
+.results-box .result-xp { font-size: 16px; color: var(--green); font-weight: 700; margin-bottom: 20px; }
+.results-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .games-grid { grid-template-columns: 1fr; }
+  .sort-buttons { grid-template-columns: 1fr; }
+  .battle-scene { flex-direction: column; gap: 16px; }
+  .battle-vs { font-size: 24px; }
+  .dash-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .hangman-keyboard { grid-template-columns: repeat(7, 1fr); }
+  .flashcard .fc-v1 { font-size: 42px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN SCREEN ========== -->
+<div id="loginScreen" class="screen active">
+  <div class="login-box">
+    <span class="logo-icon">⚡</span>
+    <h1>Verb Master</h1>
+    <p class="subtitle">Master irregular verbs through games</p>
+
+    <div id="loginForm">
+      <div class="role-toggle">
+        <button id="roleStudent" class="active" onclick="setRole('student')">🎮 Student</button>
+        <button id="roleTeacher" onclick="setRole('teacher')">📊 Teacher</button>
+      </div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="loginName" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Password">
+      </div>
+      <div class="form-group hidden" id="classCodeGroup">
+        <label>Class Code (from your teacher)</label>
+        <input type="text" id="loginClassCode" placeholder="e.g. ABC123">
+      </div>
+      <div class="error-msg" id="loginError"></div>
+      <div class="login-actions">
+        <button class="btn btn-primary" onclick="doLogin()">Log In</button>
+        <button class="btn btn-secondary" onclick="doRegister()">Create Account</button>
+      </div>
+      <div style="margin-top:20px;font-size:11px;color:var(--text-dim);">
+        <a href="#" onclick="event.preventDefault();resetAllData();" style="color:var(--text-dim);text-decoration:underline;cursor:pointer;">Reset all data</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== STUDENT DASHBOARD ========== -->
+<div id="studentDashboard" class="screen">
+  <div class="dash-header">
+    <div class="user-info">
+      <div class="avatar" id="studentAvatar">D</div>
+      <div>
+        <div class="username" id="studentName">Student</div>
+        <div style="font-size:12px;color:var(--text-dim)">Student</div>
+      </div>
+    </div>
+    <div class="xp-bar">
+      <span class="level-badge" id="studentLevel">Lvl 1</span>
+      <div class="xp-track"><div class="xp-fill" id="studentXpFill" style="width:0%"></div></div>
+      <span class="xp-label" id="studentXpLabel">0 / 100 XP</span>
+    </div>
+    <div class="dash-actions">
+      <button class="btn btn-secondary btn-small" onclick="openSettings()">⚙️</button>
+      <button class="btn btn-secondary btn-small" onclick="logout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-num" id="statStudied">0</div><div class="stat-label">Studied</div></div>
+    <div class="stat-card"><div class="stat-num" id="statMastered">0</div><div class="stat-label">Mastered</div></div>
+    <div class="stat-card"><div class="stat-num" id="statAccuracy">0%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">Best Streak</div></div>
+  </div>
+
+  <div class="dash-section-title">📚 Learn first</div>
+  <div class="games-grid">
+    <div class="game-card feature-card" onclick="startGame('study')">
+      <span class="game-icon">📖</span>
+      <h3>Study (Flashcards)</h3>
+      <p>Flip cards, hear pronunciation, see translation. Mark verbs as learned to unlock games.</p>
+      <div class="best-score" id="studyProgress"></div>
+    </div>
+  </div>
+
+  <div class="dash-section-title">📦 My sets <span style="font-weight:400;text-transform:none;color:var(--text-dim);">— targeted verb lists (e.g. school week)</span></div>
+  <div class="games-grid" id="setsGrid"></div>
+
+  <div class="dash-section-title">🎮 Practice (unlocked by studying)</div>
+  <div class="tier-filter" style="margin-bottom:0;">
+    <span style="font-size:12px;color:var(--text-dim);align-self:center;margin-right:6px;">Tier filter for games:</span>
+    <button data-dash-tier="all" class="active" onclick="setDashTier('all', this)">All studied</button>
+    <button data-dash-tier="easy" onclick="setDashTier('easy', this)">Easy</button>
+    <button data-dash-tier="medium" onclick="setDashTier('medium', this)">Medium</button>
+    <button data-dash-tier="hard" onclick="setDashTier('hard', this)">Hard</button>
+  </div>
+  <div class="games-grid">
+    <div class="game-card" id="cardHangman" onclick="startGame('hangman')">
+      <span class="game-icon">🪢</span>
+      <h3>Hangman</h3>
+      <p>Guess the V2 or V3 form letter by letter. 6 lives per round.</p>
+      <div class="best-score" id="bestHangman"></div>
+      <div class="lock-msg hidden" id="lockHangman"></div>
+    </div>
+    <div class="game-card" id="cardSpeed" onclick="startGame('speed')">
+      <span class="game-icon">⚡</span>
+      <h3>Speed Quiz</h3>
+      <p>Type the V2, V3, or V1 form as fast as you can.</p>
+      <div class="best-score" id="bestSpeed"></div>
+      <div class="lock-msg hidden" id="lockSpeed"></div>
+    </div>
+    <div class="game-card" id="cardSort" onclick="startGame('sort')">
+      <span class="game-icon">🧩</span>
+      <h3>Sort It Out</h3>
+      <p>Is this word V1, V2, or V3? Sort verb forms into columns.</p>
+      <div class="best-score" id="bestSort"></div>
+      <div class="lock-msg hidden" id="lockSort"></div>
+    </div>
+    <div class="game-card" id="cardStory" onclick="startGame('story')">
+      <span class="game-icon">🔍</span>
+      <h3>Story Detective</h3>
+      <p>Pick the correct form to fit the sentence.</p>
+      <div class="best-score" id="bestStory"></div>
+      <div class="lock-msg hidden" id="lockStory"></div>
+    </div>
+    <div class="game-card" id="cardBattle" onclick="startGame('battle')">
+      <span class="game-icon">⚔️</span>
+      <h3>Verb Battle</h3>
+      <p>Defeat 5 monsters by answering verb questions correctly.</p>
+      <div class="best-score" id="bestBattle"></div>
+      <div class="lock-msg hidden" id="lockBattle"></div>
+    </div>
+    <div class="game-card" id="cardWeak" onclick="startGame('weak')">
+      <span class="game-icon">🎯</span>
+      <h3>My Weak Verbs</h3>
+      <p>Targeted drill on verbs you've been getting wrong.</p>
+      <div class="best-score" id="bestWeak"></div>
+      <div class="lock-msg hidden" id="lockWeak"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TEACHER DASHBOARD ========== -->
+<div id="teacherDashboard" class="screen">
+  <div class="dash-header">
+    <div class="user-info">
+      <div class="avatar" style="background:linear-gradient(135deg,var(--blue),var(--cyan));" id="teacherAvatar">T</div>
+      <div>
+        <div class="username" id="teacherName">Teacher</div>
+        <div style="font-size:12px;color:var(--text-dim)">Teacher</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-small" onclick="logout()">Log Out</button>
+  </div>
+
+  <div class="teacher-content">
+    <div class="class-code-box">
+      <div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:4px;">YOUR CLASS CODE</div>
+        <div class="class-code" id="teacherClassCode">------</div>
+      </div>
+      <div style="font-size:13px;color:var(--text-dim);max-width:300px;">Share this code with students. They enter it when creating their account to link to your class.</div>
+    </div>
+
+    <div class="teacher-tabs">
+      <button class="active" onclick="showTeacherTab('students',this)">📋 Students</button>
+      <button onclick="showTeacherTab('verbs',this)">📖 Verb Progress</button>
+      <button onclick="showTeacherTab('export',this)">📤 Export Data</button>
+    </div>
+
+    <div id="teacherTabStudents">
+      <table class="student-table">
+        <thead><tr><th>Student</th><th>Level</th><th>XP</th><th>Studied</th><th>Mastered</th><th>Accuracy</th><th>Last Active</th></tr></thead>
+        <tbody id="studentsTableBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:40px;">No students linked yet. Share your class code!</td></tr>
+        </tbody>
+      </table>
+      <div id="studentDetailPanel" class="detail-panel hidden">
+        <h3 id="detailStudentName">Student Details</h3>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+
+    <div id="teacherTabVerbs" class="hidden">
+      <h3 style="margin-bottom:16px;">Class Verb Mastery Overview</h3>
+      <div id="classVerbGrid" class="verb-progress-grid"></div>
+    </div>
+
+    <div id="teacherTabExport" class="hidden">
+      <div style="background:var(--card);border-radius:var(--radius);padding:24px;">
+        <h3 style="margin-bottom:12px;">Export Class Data</h3>
+        <p style="color:var(--text-dim);margin-bottom:16px;font-size:14px;">Download all student progress as JSON for backup or analysis.</p>
+        <button class="btn btn-primary" onclick="exportClassData()">📥 Export Data</button>
+        <div style="margin-top:20px;">
+          <h3 style="margin-bottom:12px;">Import Student Data</h3>
+          <p style="color:var(--text-dim);margin-bottom:16px;font-size:14px;">Import progress from a student on another device.</p>
+          <input type="file" id="importFile" accept=".json" style="color:var(--text-dim);">
+          <button class="btn btn-secondary btn-small" style="margin-top:8px;" onclick="importStudentData()">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME: STUDY (FLASHCARDS) ========== -->
+<div id="gameStudy" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>📖 Study</h2>
+      <div class="study-progress">Studied: <strong id="studyCount">0</strong> / <span id="studyTotal">0</span></div>
+    </div>
+    <div class="tier-filter">
+      <button data-tier="easy" onclick="setStudyTier('easy', this)">Easy</button>
+      <button data-tier="medium" onclick="setStudyTier('medium', this)">Medium</button>
+      <button data-tier="hard" onclick="setStudyTier('hard', this)">Hard</button>
+      <button data-tier="all" class="active" onclick="setStudyTier('all', this)">All</button>
+      <button data-tier="not-studied" onclick="setStudyTier('not-studied', this)">Not yet studied</button>
+    </div>
+    <div class="flashcard-area">
+      <div class="flashcard" id="flashcard" onclick="flipFlashcard()">
+        <div class="study-empty hidden" id="studyEmpty">No verbs in this filter. Pick another.</div>
+        <div class="fc-front" id="fcFront">
+          <span class="fc-tier"><span class="tier-badge" id="fcTier">easy</span></span>
+          <div class="fc-v1" id="fcV1">go</div>
+          <div class="fc-audio">
+            <button class="icon-btn" onclick="event.stopPropagation();speakWord(currentStudy.verb.v1);" title="Hear pronunciation">🔊</button>
+          </div>
+          <div class="fc-flip-hint">click to flip</div>
+        </div>
+        <div class="fc-back" id="fcBack">
+          <span class="fc-tier"><span class="tier-badge" id="fcTierBack">easy</span></span>
+          <div class="fc-forms">
+            <div class="fc-form-cell"><div class="fc-form-label">V1 — Base</div><div class="fc-form-value" id="fcV1Back"></div></div>
+            <div class="fc-form-cell" id="fcV2Cell"><div class="fc-form-label">V2 — Past</div><div class="fc-form-value" id="fcV2"></div></div>
+            <div class="fc-form-cell" id="fcV3Cell"><div class="fc-form-label">V3 — Past Part.</div><div class="fc-form-value" id="fcV3"></div></div>
+          </div>
+          <div class="fc-dup-note hidden" id="fcDupNote"></div>
+          <div class="fc-ru" id="fcRu">—</div>
+          <div class="fc-example" id="fcExample">—</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+            <button class="icon-btn small" onclick="event.stopPropagation();speakWord(currentStudy.verb.v1);" title="V1">🔊 V1</button>
+            <button class="icon-btn small" onclick="event.stopPropagation();speakWord(currentStudy.verb.v2);" title="V2">🔊 V2</button>
+            <button class="icon-btn small" onclick="event.stopPropagation();speakWord(currentStudy.verb.v3);" title="V3">🔊 V3</button>
+          </div>
+          <div class="fc-flip-hint">click to flip back</div>
+        </div>
+      </div>
+      <div class="flashcard-actions">
+        <button class="btn btn-secondary" onclick="prevFlashcard()">← Previous</button>
+        <button class="btn btn-warn" onclick="markUnstudied()" id="btnUnstudy">↻ Need practice</button>
+        <button class="btn btn-success" onclick="markStudied()" id="btnStudied">✓ I know it</button>
+        <button class="btn btn-secondary" onclick="nextFlashcard()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME: HANGMAN ========== -->
+<div id="gameHangman" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>🪢 Hangman</h2>
+      <div class="game-score">
+        <span>Score: <span class="score-val" id="hangmanScore">0</span></span>
+        <span>Round: <span class="score-val" id="hangmanRound">1/8</span></span>
+      </div>
+    </div>
+    <div class="hangman-area">
+      <div class="hangman-prompt">
+        <div class="hp-base">Guess the form of</div>
+        <div class="hp-v1">
+          <span id="hangmanV1">go</span>
+          <button class="icon-btn small" onclick="speakWord(hangmanState.round.verb.v1)">🔊</button>
+          <button class="icon-btn small" onclick="toggleHangmanRu()" title="Show translation">🇷🇺</button>
+        </div>
+        <div class="hp-form" id="hangmanFormLabel">→ V2 (Past Simple)</div>
+        <div class="translation-bubble hidden" id="hangmanRu">—</div>
+      </div>
+      <div class="hangman-stage">
+        <svg class="hangman-stickman" viewBox="0 0 160 180">
+          <!-- gallows frame -->
+          <line class="frame" x1="20" y1="170" x2="120" y2="170"/>
+          <line class="frame" x1="50" y1="170" x2="50" y2="20"/>
+          <line class="frame" x1="50" y1="20" x2="110" y2="20"/>
+          <line class="frame" x1="110" y1="20" x2="110" y2="40"/>
+          <!-- man parts -->
+          <circle class="part" id="hmHead" cx="110" cy="55" r="14"/>
+          <line class="part" id="hmBody" x1="110" y1="69" x2="110" y2="115"/>
+          <line class="part" id="hmArmL" x1="110" y1="80" x2="92" y2="100"/>
+          <line class="part" id="hmArmR" x1="110" y1="80" x2="128" y2="100"/>
+          <line class="part" id="hmLegL" x1="110" y1="115" x2="94" y2="140"/>
+          <line class="part" id="hmLegR" x1="110" y1="115" x2="126" y2="140"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+          <div class="hangman-word" id="hangmanWord"></div>
+          <div class="hangman-meta">
+            <span>Lives: <strong id="hangmanLives">6</strong></span>
+            <span>Wrong: <strong id="hangmanWrong">—</strong></span>
+          </div>
+          <div class="hangman-feedback" id="hangmanFeedback"></div>
+        </div>
+      </div>
+      <div class="hangman-keyboard" id="hangmanKeyboard"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME: SPEED QUIZ ========== -->
+<div id="gameSpeed" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>⚡ Speed Quiz</h2>
+      <div class="game-score">
+        <span>Score: <span class="score-val" id="speedScore">0</span></span>
+        <span>Round: <span class="score-val" id="speedRound">1/15</span></span>
+      </div>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="speedTimer" style="width:100%"></div></div>
+    <div class="speed-center">
+      <div class="speed-prompt" id="speedPrompt">Write the V2 form of:</div>
+      <div class="speed-word-row">
+        <div class="speed-word" id="speedWord">go</div>
+        <button class="icon-btn" onclick="speakWord(speedState.round.shownWord)">🔊</button>
+        <button class="icon-btn" onclick="toggleSpeedRu()" title="Show translation">🇷🇺</button>
+      </div>
+      <div class="translation-bubble hidden" id="speedRu">—</div>
+      <div class="speed-form-label" id="speedFormLabel">→ V2 (Past Simple)</div>
+      <input type="text" class="speed-input" id="speedInput" placeholder="type here..." autocomplete="off" spellcheck="false">
+      <div class="speed-feedback" id="speedFeedback"></div>
+      <div class="speed-streak">Streak: <span class="streak-num" id="speedStreak">0</span> 🔥</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME: SORT IT OUT ========== -->
+<div id="gameSort" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>🧩 Sort It Out</h2>
+      <div class="game-score">
+        <span>Score: <span class="score-val" id="sortScore">0</span></span>
+        <span>Round: <span class="score-val" id="sortRound">1/20</span></span>
+      </div>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="sortTimer" style="width:100%"></div></div>
+    <div class="sort-word-area">
+      <div class="sort-current-word">
+        <span id="sortWord">went</span>
+        <button class="icon-btn small" onclick="speakWord(sortState.item.word)">🔊</button>
+      </div>
+    </div>
+    <div class="sort-buttons">
+      <button class="sort-btn" onclick="sortAnswer(0)">V1<br><small style="color:var(--text-dim)">Base Form</small></button>
+      <button class="sort-btn" onclick="sortAnswer(1)">V2<br><small style="color:var(--text-dim)">Past Simple</small></button>
+      <button class="sort-btn" onclick="sortAnswer(2)">V3<br><small style="color:var(--text-dim)">Past Participle</small></button>
+    </div>
+    <div id="sortFeedback" style="text-align:center;margin-top:16px;font-size:15px;min-height:24px;color:var(--text-dim)"></div>
+  </div>
+</div>
+
+<!-- ========== GAME: STORY DETECTIVE ========== -->
+<div id="gameStory" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>🔍 Story Detective</h2>
+      <div class="game-score">
+        <span>Score: <span class="score-val" id="storyScore">0</span></span>
+        <span>Case: <span class="score-val" id="storyRound">1/12</span></span>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+      <div class="story-card">
+        <div class="story-num" id="storyNum">Case 1 of 12</div>
+        <div class="story-sentence" id="storySentence"></div>
+        <div class="story-hint" id="storyHint"></div>
+        <div class="story-options" id="storyOptions"></div>
+        <div id="storyFeedback" style="margin-top:16px;font-size:15px;min-height:24px;text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME: VERB BATTLE ========== -->
+<div id="gameBattle" class="screen game-screen">
+  <div class="game-container">
+    <button class="btn btn-secondary btn-small btn-back" onclick="backToDash()">← Back</button>
+    <div class="game-header" style="margin-left:80px;">
+      <h2>⚔️ Verb Battle</h2>
+      <div class="game-score">
+        <span>Defeated: <span class="score-val" id="battleDefeated">0</span> / <span id="battleTotal">5</span></span>
+      </div>
+    </div>
+    <div class="battle-arena">
+      <div class="battle-scene">
+        <div class="battle-char">
+          <span class="char-sprite" id="playerSprite">🧙</span>
+          <div class="char-name" id="playerBattleName">You</div>
+          <div class="hp-bar"><div class="hp-fill player" id="playerHp" style="width:100%"></div></div>
+          <div class="hp-text" id="playerHpText">100/100</div>
+        </div>
+        <div class="battle-vs">VS</div>
+        <div class="battle-char">
+          <span class="char-sprite" id="enemySprite">👹</span>
+          <div class="char-name" id="enemyName">Goblin</div>
+          <div class="hp-bar"><div class="hp-fill enemy" id="enemyHp" style="width:100%"></div></div>
+          <div class="hp-text" id="enemyHpText">50/50</div>
+        </div>
+      </div>
+      <div class="battle-question">
+        <div class="bq-prompt">Pick the correct form:</div>
+        <div class="bq-word-row">
+          <div class="bq-word" id="battleWord">go</div>
+          <button class="icon-btn small" onclick="speakWord(battleState.round.shownWord)">🔊</button>
+          <button class="icon-btn small" onclick="toggleBattleRu()" title="Show translation">🇷🇺</button>
+        </div>
+        <div class="translation-bubble hidden" id="battleRu">—</div>
+        <div class="bq-form" id="battleForm">→ V2</div>
+        <div class="battle-options" id="battleOptions"></div>
+        <div class="battle-log" id="battleLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SETTINGS MODAL ========== -->
+<div id="settingsModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h2>⚙️ Settings</h2>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Default tier in games</div>
+        <div class="s-desc">Restrict random verbs to this tier</div>
+      </div>
+      <div class="s-control">
+        <select id="setTier">
+          <option value="all">All studied</option>
+          <option value="easy">Easy only</option>
+          <option value="medium">Medium only</option>
+          <option value="hard">Hard only</option>
+        </select>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Sort timer (seconds)</div>
+        <div class="s-desc">Time per word in Sort It Out</div>
+      </div>
+      <div class="s-control">
+        <input type="number" id="setSortTimer" min="5" max="20" value="8">
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Speed Quiz timer (seconds)</div>
+        <div class="s-desc">Time per word</div>
+      </div>
+      <div class="s-control">
+        <input type="number" id="setSpeedTimer" min="5" max="30" value="10">
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Voice</div>
+        <div class="s-desc">Which 🔊 voice to use</div>
+      </div>
+      <div class="s-control">
+        <select id="setVoice" style="max-width:220px;"></select>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Speech rate</div>
+        <div class="s-desc">How fast 🔊 speaks (0.6–1.3)</div>
+      </div>
+      <div class="s-control">
+        <input type="number" id="setRate" min="0.5" max="1.5" step="0.05" value="1.0">
+        <button class="btn btn-secondary btn-small" style="margin-left:6px;" onclick="testVoicePreview()">Test</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Speed Quiz: ask V1 too</div>
+        <div class="s-desc">Show V2/V3 → guess base form</div>
+      </div>
+      <div class="s-control">
+        <select id="setReverse">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+    </div>
+    <div class="results-actions" style="margin-top:24px;">
+      <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+      <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SET EDITOR MODAL ========== -->
+<div id="setEditorModal" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:680px;">
+    <h2 id="setEditorTitle">Create set</h2>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Set name</div>
+        <div class="s-desc">Short, descriptive — e.g. "School week 1"</div>
+      </div>
+      <div class="s-control" style="min-width:220px;">
+        <input type="text" id="setName" placeholder="e.g. School week 1">
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="s-label">Forms to practice</div>
+        <div class="s-desc">Which form(s) the games will ask for</div>
+      </div>
+      <div class="s-control">
+        <select id="setFormsSelect">
+          <option value="v2">V2 only (Past Simple)</option>
+          <option value="v3">V3 only (Past Participle)</option>
+          <option value="v2,v3" selected>Both V2 and V3</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label>Verbs (<span id="setSelectedCount">0</span> selected)</label>
+      <div class="set-quick-actions">
+        <button onclick="setEditorSelectTier('easy')">+ All easy</button>
+        <button onclick="setEditorSelectTier('medium')">+ All medium</button>
+        <button onclick="setEditorSelectTier('hard')">+ All hard</button>
+        <button onclick="setEditorSelectStudied()">+ All my studied</button>
+        <button onclick="setEditorClear()">Clear all</button>
+      </div>
+      <input type="text" id="setSearch" placeholder="🔍 Search verbs..." oninput="renderSetVerbList()">
+      <div class="set-verb-list" id="setVerbList"></div>
+    </div>
+    <div class="results-actions" style="margin-top:20px;">
+      <button class="btn btn-primary" onclick="saveSet()">Save set</button>
+      <button class="btn btn-secondary" onclick="closeSetEditor()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SET PLAY MODAL ========== -->
+<div id="setPlayModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h2 id="setPlayTitle">Practice set</h2>
+    <p style="color:var(--text-dim);margin-bottom:4px;font-size:14px;" id="setPlaySummary">—</p>
+    <p style="color:var(--text-dim);margin-bottom:12px;font-size:13px;">Pick a game:</p>
+    <div class="set-play-game-grid">
+      <button onclick="playSet('hangman')"><span class="spg-icon">🪢</span>Hangman</button>
+      <button onclick="playSet('speed')"><span class="spg-icon">⚡</span>Speed Quiz</button>
+      <button id="setPlayStoryBtn" onclick="playSet('story')"><span class="spg-icon">🔍</span>Story Detective</button>
+      <button id="setPlayBattleBtn" onclick="playSet('battle')"><span class="spg-icon">⚔️</span>Verb Battle</button>
+      <button id="setPlaySortBtn" onclick="playSet('sort')"><span class="spg-icon">🧩</span>Sort It Out</button>
+    </div>
+    <div class="results-actions" style="margin-top:20px;">
+      <button class="btn btn-secondary" onclick="closeSetPlay()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== RESULTS OVERLAY ========== -->
+<div id="resultsOverlay" class="results-overlay hidden">
+  <div class="results-box">
+    <span class="result-icon" id="resultIcon">🏆</span>
+    <h2 id="resultTitle">Well Done!</h2>
+    <div class="result-score" id="resultScore">850</div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="result-xp" id="resultXp">+50 XP</div>
+    <div class="results-actions">
+      <button class="btn btn-primary" id="resultPlayAgain">Play Again</button>
+      <button class="btn btn-secondary" onclick="backToDash()">Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===============================================
+// VERB DATABASE — restructured with tier + ru
+// Tiers: easy (most common, beginner), medium, hard
+// ===============================================
+const VERBS = [
+  // ===== EASY (20) =====
+  {v1:'be', v2:'was/were', v3:'been', ru:'быть', tier:'easy', sentences:[
+    {s:'I ___ at the park yesterday.', form:'v2', answer:'was', options:['was','been','be','being']},
+    {s:'She has ___ to Paris three times.', form:'v3', answer:'been', options:['been','was','be','being']}
+  ]},
+  {v1:'have', v2:'had', v3:'had', ru:'иметь', tier:'easy', sentences:[
+    {s:'We ___ a great time at the party.', form:'v2', answer:'had', options:['had','have','haved','having']},
+    {s:'I have ___ this car for 5 years.', form:'v3', answer:'had', options:['had','have','haved','having']}
+  ]},
+  {v1:'do', v2:'did', v3:'done', ru:'делать', tier:'easy', sentences:[
+    {s:'She ___ her homework after dinner.', form:'v2', answer:'did', options:['did','done','do','doing']},
+    {s:'I have ___ all the exercises.', form:'v3', answer:'done', options:['done','did','do','doing']}
+  ]},
+  {v1:'go', v2:'went', v3:'gone', ru:'идти / ехать', tier:'easy', sentences:[
+    {s:'We ___ to the cinema yesterday.', form:'v2', answer:'went', options:['went','gone','go','going']},
+    {s:'She has ___ to the store.', form:'v3', answer:'gone', options:['gone','went','go','going']}
+  ]},
+  {v1:'see', v2:'saw', v3:'seen', ru:'видеть', tier:'easy', sentences:[
+    {s:'I ___ a beautiful sunset yesterday.', form:'v2', answer:'saw', options:['saw','seen','see','seeing']},
+    {s:'Have you ___ the new movie?', form:'v3', answer:'seen', options:['seen','saw','see','seeing']}
+  ]},
+  {v1:'come', v2:'came', v3:'come', ru:'приходить', tier:'easy', sentences:[
+    {s:'He ___ home late last night.', form:'v2', answer:'came', options:['came','come','comed','coming']},
+    {s:'They have ___ from a long trip.', form:'v3', answer:'come', options:['come','came','comed','coming']}
+  ]},
+  {v1:'get', v2:'got', v3:'got', ru:'получать', tier:'easy', altV3:['gotten'], sentences:[
+    {s:'She ___ a new job last month.', form:'v2', answer:'got', options:['got','get','getted','getting']},
+    {s:'I have ___ a message from him.', form:'v3', answer:'got', options:['got','get','getted','getting']}
+  ]},
+  {v1:'give', v2:'gave', v3:'given', ru:'давать', tier:'easy', sentences:[
+    {s:'He ___ me a great book.', form:'v2', answer:'gave', options:['gave','given','give','giving']},
+    {s:'The award was ___ to the best student.', form:'v3', answer:'given', options:['given','gave','give','giving']}
+  ]},
+  {v1:'take', v2:'took', v3:'taken', ru:'брать', tier:'easy', sentences:[
+    {s:'He ___ the bus to school.', form:'v2', answer:'took', options:['took','taken','take','taking']},
+    {s:'All the seats have been ___.', form:'v3', answer:'taken', options:['taken','took','take','taking']}
+  ]},
+  {v1:'make', v2:'made', v3:'made', ru:'делать / создавать', tier:'easy', sentences:[
+    {s:'She ___ a cake for the birthday.', form:'v2', answer:'made', options:['made','make','maked','making']},
+    {s:'The dress was ___ by hand.', form:'v3', answer:'made', options:['made','make','maked','making']}
+  ]},
+  {v1:'say', v2:'said', v3:'said', ru:'сказать', tier:'easy', sentences:[
+    {s:'He ___ goodbye and left.', form:'v2', answer:'said', options:['said','say','sayed','saying']},
+    {s:'It has been ___ many times before.', form:'v3', answer:'said', options:['said','say','sayed','saying']}
+  ]},
+  {v1:'know', v2:'knew', v3:'known', ru:'знать', tier:'easy', sentences:[
+    {s:'I ___ the answer but I forgot.', form:'v2', answer:'knew', options:['knew','known','know','knowing']},
+    {s:'She has ___ him since childhood.', form:'v3', answer:'known', options:['known','knew','know','knowing']}
+  ]},
+  {v1:'find', v2:'found', v3:'found', ru:'находить', tier:'easy', sentences:[
+    {s:'They ___ a treasure in the garden.', form:'v2', answer:'found', options:['found','find','finded','finding']},
+    {s:'The lost dog has been ___.', form:'v3', answer:'found', options:['found','find','finded','finding']}
+  ]},
+  {v1:'eat', v2:'ate', v3:'eaten', ru:'есть', tier:'easy', sentences:[
+    {s:'We ___ pizza for lunch.', form:'v2', answer:'ate', options:['ate','eaten','eat','eating']},
+    {s:'I have already ___ breakfast.', form:'v3', answer:'eaten', options:['eaten','ate','eat','eating']}
+  ]},
+  {v1:'run', v2:'ran', v3:'run', ru:'бежать', tier:'easy', sentences:[
+    {s:'She ___ 5 km this morning.', form:'v2', answer:'ran', options:['ran','run','runned','running']},
+    {s:'He has ___ three marathons this year.', form:'v3', answer:'run', options:['run','ran','runned','running']}
+  ]},
+  {v1:'sit', v2:'sat', v3:'sat', ru:'сидеть', tier:'easy', sentences:[
+    {s:'He ___ in the front row.', form:'v2', answer:'sat', options:['sat','sit','sitted','sitting']},
+    {s:'We have ___ here for an hour.', form:'v3', answer:'sat', options:['sat','sit','sitted','sitting']}
+  ]},
+  {v1:'read', v2:'read', v3:'read', ru:'читать', tier:'easy', sentences:[
+    {s:'She ___ the whole book in one day.', form:'v2', answer:'read', options:['read','readed','reads','reading']},
+    {s:'I have ___ this article before.', form:'v3', answer:'read', options:['read','readed','reads','reading']}
+  ]},
+  {v1:'write', v2:'wrote', v3:'written', ru:'писать', tier:'easy', sentences:[
+    {s:'He ___ a letter to his friend.', form:'v2', answer:'wrote', options:['wrote','written','write','writing']},
+    {s:'The book was ___ by a famous author.', form:'v3', answer:'written', options:['written','wrote','write','writing']}
+  ]},
+  {v1:'tell', v2:'told', v3:'told', ru:'рассказывать', tier:'easy', sentences:[
+    {s:'He ___ me about his vacation.', form:'v2', answer:'told', options:['told','tell','telled','telling']},
+    {s:'She has ___ everyone the news.', form:'v3', answer:'told', options:['told','tell','telled','telling']}
+  ]},
+  {v1:'think', v2:'thought', v3:'thought', ru:'думать', tier:'easy', sentences:[
+    {s:'I ___ about it all day.', form:'v2', answer:'thought', options:['thought','think','thinked','thinking']},
+    {s:'This has been ___ through carefully.', form:'v3', answer:'thought', options:['thought','think','thinked','thinking']}
+  ]},
+
+  // ===== MEDIUM (29) =====
+  {v1:'become', v2:'became', v3:'become', ru:'становиться', tier:'medium', sentences:[
+    {s:'He ___ a doctor last year.', form:'v2', answer:'became', options:['became','become','becomes','becoming']},
+    {s:'She has ___ very popular recently.', form:'v3', answer:'become', options:['become','became','becomes','becoming']}
+  ]},
+  {v1:'begin', v2:'began', v3:'begun', ru:'начинать', tier:'medium', sentences:[
+    {s:'The movie ___ at 8 pm.', form:'v2', answer:'began', options:['began','begun','begin','begins']},
+    {s:'They have ___ a new project.', form:'v3', answer:'begun', options:['begun','began','begin','beginning']}
+  ]},
+  {v1:'break', v2:'broke', v3:'broken', ru:'ломать', tier:'medium', sentences:[
+    {s:'He ___ his arm playing football.', form:'v2', answer:'broke', options:['broke','broken','break','breaking']},
+    {s:'The window has been ___ since Monday.', form:'v3', answer:'broken', options:['broken','broke','break','breaking']}
+  ]},
+  {v1:'bring', v2:'brought', v3:'brought', ru:'приносить', tier:'medium', sentences:[
+    {s:'She ___ flowers to the party.', form:'v2', answer:'brought', options:['brought','bring','bringed','bringing']},
+    {s:'Have you ___ your homework?', form:'v3', answer:'brought', options:['brought','bring','bringed','bringing']}
+  ]},
+  {v1:'build', v2:'built', v3:'built', ru:'строить', tier:'medium', sentences:[
+    {s:'They ___ a new school in our town.', form:'v2', answer:'built', options:['built','build','builded','building']},
+    {s:'The house was ___ in 1990.', form:'v3', answer:'built', options:['built','build','builded','building']}
+  ]},
+  {v1:'buy', v2:'bought', v3:'bought', ru:'покупать', tier:'medium', sentences:[
+    {s:'I ___ a new phone last week.', form:'v2', answer:'bought', options:['bought','buy','buyed','buying']},
+    {s:'She has ___ a beautiful dress.', form:'v3', answer:'bought', options:['bought','buy','buyed','buying']}
+  ]},
+  {v1:'choose', v2:'chose', v3:'chosen', ru:'выбирать', tier:'medium', sentences:[
+    {s:'She ___ the red dress for the party.', form:'v2', answer:'chose', options:['chose','chosen','choose','choosing']},
+    {s:'The winner has been ___ already.', form:'v3', answer:'chosen', options:['chosen','chose','choose','choosing']}
+  ]},
+  {v1:'draw', v2:'drew', v3:'drawn', ru:'рисовать', tier:'medium', sentences:[
+    {s:'The artist ___ a beautiful portrait.', form:'v2', answer:'drew', options:['drew','drawn','draw','drawing']},
+    {s:'The picture was ___ by a child.', form:'v3', answer:'drawn', options:['drawn','drew','draw','drawing']}
+  ]},
+  {v1:'drink', v2:'drank', v3:'drunk', ru:'пить', tier:'medium', sentences:[
+    {s:'We ___ coffee at the cafe.', form:'v2', answer:'drank', options:['drank','drunk','drink','drinking']},
+    {s:'She has ___ all the water.', form:'v3', answer:'drunk', options:['drunk','drank','drink','drinking']}
+  ]},
+  {v1:'drive', v2:'drove', v3:'driven', ru:'водить (машину)', tier:'medium', sentences:[
+    {s:'He ___ to work every day last year.', form:'v2', answer:'drove', options:['drove','driven','drive','driving']},
+    {s:'She has ___ across the country.', form:'v3', answer:'driven', options:['driven','drove','drive','driving']}
+  ]},
+  {v1:'fall', v2:'fell', v3:'fallen', ru:'падать', tier:'medium', sentences:[
+    {s:'She ___ down the stairs yesterday.', form:'v2', answer:'fell', options:['fell','fallen','fall','falling']},
+    {s:'The leaves have ___ from the trees.', form:'v3', answer:'fallen', options:['fallen','fell','fall','falling']}
+  ]},
+  {v1:'feel', v2:'felt', v3:'felt', ru:'чувствовать', tier:'medium', sentences:[
+    {s:'I ___ tired after the long walk.', form:'v2', answer:'felt', options:['felt','feel','feeled','feeling']},
+    {s:'She has ___ better since the treatment.', form:'v3', answer:'felt', options:['felt','feel','feeled','feeling']}
+  ]},
+  {v1:'fly', v2:'flew', v3:'flown', ru:'летать', tier:'medium', sentences:[
+    {s:'We ___ to London last summer.', form:'v2', answer:'flew', options:['flew','flown','fly','flying']},
+    {s:'She has ___ around the world.', form:'v3', answer:'flown', options:['flown','flew','fly','flying']}
+  ]},
+  {v1:'forget', v2:'forgot', v3:'forgotten', ru:'забывать', tier:'medium', altV3:['forgot'], sentences:[
+    {s:'I ___ my keys at home.', form:'v2', answer:'forgot', options:['forgot','forgotten','forget','forgetting']},
+    {s:'He has ___ her birthday again.', form:'v3', answer:'forgotten', options:['forgotten','forgot','forget','forgetting']}
+  ]},
+  {v1:'grow', v2:'grew', v3:'grown', ru:'расти / выращивать', tier:'medium', sentences:[
+    {s:'The city ___ quickly in the 2000s.', form:'v2', answer:'grew', options:['grew','grown','grow','growing']},
+    {s:'She has ___ a lot since last year.', form:'v3', answer:'grown', options:['grown','grew','grow','growing']}
+  ]},
+  {v1:'hear', v2:'heard', v3:'heard', ru:'слышать', tier:'medium', sentences:[
+    {s:'I ___ a strange noise last night.', form:'v2', answer:'heard', options:['heard','hear','heared','hearing']},
+    {s:'Have you ___ the news?', form:'v3', answer:'heard', options:['heard','hear','heared','hearing']}
+  ]},
+  {v1:'keep', v2:'kept', v3:'kept', ru:'хранить / держать', tier:'medium', sentences:[
+    {s:'She ___ the secret for years.', form:'v2', answer:'kept', options:['kept','keep','keeped','keeping']},
+    {s:'The food should be ___ in the fridge.', form:'v3', answer:'kept', options:['kept','keep','keeped','keeping']}
+  ]},
+  {v1:'leave', v2:'left', v3:'left', ru:'уезжать / оставлять', tier:'medium', sentences:[
+    {s:'He ___ the office at 6 pm.', form:'v2', answer:'left', options:['left','leave','leaved','leaving']},
+    {s:'She has ___ her phone at home.', form:'v3', answer:'left', options:['left','leave','leaved','leaving']}
+  ]},
+  {v1:'lose', v2:'lost', v3:'lost', ru:'терять / проигрывать', tier:'medium', sentences:[
+    {s:'Our team ___ the game yesterday.', form:'v2', answer:'lost', options:['lost','lose','losed','losing']},
+    {s:'I have ___ my keys again!', form:'v3', answer:'lost', options:['lost','lose','losed','losing']}
+  ]},
+  {v1:'meet', v2:'met', v3:'met', ru:'встречать', tier:'medium', sentences:[
+    {s:'We ___ for the first time in Paris.', form:'v2', answer:'met', options:['met','meet','meeted','meeting']},
+    {s:'Have you ___ the new teacher?', form:'v3', answer:'met', options:['met','meet','meeted','meeting']}
+  ]},
+  {v1:'ride', v2:'rode', v3:'ridden', ru:'кататься', tier:'medium', sentences:[
+    {s:'He ___ his bike to school every day.', form:'v2', answer:'rode', options:['rode','ridden','ride','riding']},
+    {s:'She has ___ a horse many times.', form:'v3', answer:'ridden', options:['ridden','rode','ride','riding']}
+  ]},
+  {v1:'send', v2:'sent', v3:'sent', ru:'отправлять', tier:'medium', sentences:[
+    {s:'She ___ me a text message.', form:'v2', answer:'sent', options:['sent','send','sended','sending']},
+    {s:'The package has been ___ already.', form:'v3', answer:'sent', options:['sent','send','sended','sending']}
+  ]},
+  {v1:'sing', v2:'sang', v3:'sung', ru:'петь', tier:'medium', sentences:[
+    {s:'She ___ a beautiful song at the concert.', form:'v2', answer:'sang', options:['sang','sung','sing','singing']},
+    {s:'That song has been ___ by millions.', form:'v3', answer:'sung', options:['sung','sang','sing','singing']}
+  ]},
+  {v1:'sleep', v2:'slept', v3:'slept', ru:'спать', tier:'medium', sentences:[
+    {s:'I ___ for 10 hours last night.', form:'v2', answer:'slept', options:['slept','sleep','sleeped','sleeping']},
+    {s:'She has ___ well since the holiday.', form:'v3', answer:'slept', options:['slept','sleep','sleeped','sleeping']}
+  ]},
+  {v1:'speak', v2:'spoke', v3:'spoken', ru:'говорить', tier:'medium', sentences:[
+    {s:'He ___ to the manager about the issue.', form:'v2', answer:'spoke', options:['spoke','spoken','speak','speaking']},
+    {s:'English is ___ in many countries.', form:'v3', answer:'spoken', options:['spoken','spoke','speak','speaking']}
+  ]},
+  {v1:'sell', v2:'sold', v3:'sold', ru:'продавать', tier:'medium', sentences:[
+    {s:'They ___ their house last month.', form:'v2', answer:'sold', options:['sold','sell','selled','selling']},
+    {s:'All tickets have been ___.', form:'v3', answer:'sold', options:['sold','sell','selled','selling']}
+  ]},
+  {v1:'spend', v2:'spent', v3:'spent', ru:'тратить', tier:'medium', sentences:[
+    {s:'We ___ the weekend at the beach.', form:'v2', answer:'spent', options:['spent','spend','spended','spending']},
+    {s:'Too much money has been ___ already.', form:'v3', answer:'spent', options:['spent','spend','spended','spending']}
+  ]},
+  {v1:'stand', v2:'stood', v3:'stood', ru:'стоять', tier:'medium', sentences:[
+    {s:'She ___ in line for two hours.', form:'v2', answer:'stood', options:['stood','stand','standed','standing']},
+    {s:'The building has ___ here for centuries.', form:'v3', answer:'stood', options:['stood','stand','standed','standing']}
+  ]},
+  {v1:'throw', v2:'threw', v3:'thrown', ru:'бросать', tier:'medium', sentences:[
+    {s:'She ___ the ball to her friend.', form:'v2', answer:'threw', options:['threw','thrown','throw','throwing']},
+    {s:'The ball was ___ very far.', form:'v3', answer:'thrown', options:['thrown','threw','throw','throwing']}
+  ]},
+
+  // ===== HARD (10) =====
+  {v1:'catch', v2:'caught', v3:'caught', ru:'ловить', tier:'hard', sentences:[
+    {s:'The police ___ the thief yesterday.', form:'v2', answer:'caught', options:['caught','catch','catched','catching']},
+    {s:'Have you ever ___ a big fish?', form:'v3', answer:'caught', options:['caught','catch','catched','catching']}
+  ]},
+  {v1:'hide', v2:'hid', v3:'hidden', ru:'прятать(ся)', tier:'hard', sentences:[
+    {s:'The cat ___ under the bed.', form:'v2', answer:'hid', options:['hid','hidden','hide','hiding']},
+    {s:'The treasure was ___ in a cave.', form:'v3', answer:'hidden', options:['hidden','hid','hide','hiding']}
+  ]},
+  {v1:'pay', v2:'paid', v3:'paid', ru:'платить', tier:'hard', sentences:[
+    {s:'I ___ for the dinner last night.', form:'v2', answer:'paid', options:['paid','pay','payed','paying']},
+    {s:'The bill has been ___ already.', form:'v3', answer:'paid', options:['paid','pay','payed','paying']}
+  ]},
+  {v1:'steal', v2:'stole', v3:'stolen', ru:'красть', tier:'hard', sentences:[
+    {s:'Someone ___ my bicycle!', form:'v2', answer:'stole', options:['stole','stolen','steal','stealing']},
+    {s:'The painting was ___ from the museum.', form:'v3', answer:'stolen', options:['stolen','stole','steal','stealing']}
+  ]},
+  {v1:'swim', v2:'swam', v3:'swum', ru:'плавать', tier:'hard', sentences:[
+    {s:'We ___ in the ocean all day.', form:'v2', answer:'swam', options:['swam','swum','swim','swimming']},
+    {s:'She has ___ across the lake twice.', form:'v3', answer:'swum', options:['swum','swam','swim','swimming']}
+  ]},
+  {v1:'teach', v2:'taught', v3:'taught', ru:'учить (кого-то)', tier:'hard', sentences:[
+    {s:'She ___ English for 10 years.', form:'v2', answer:'taught', options:['taught','teach','teached','teaching']},
+    {s:'I was ___ how to cook by my mom.', form:'v3', answer:'taught', options:['taught','teach','teached','teaching']}
+  ]},
+  {v1:'understand', v2:'understood', v3:'understood', ru:'понимать', tier:'hard', sentences:[
+    {s:'I ___ the lesson after the explanation.', form:'v2', answer:'understood', options:['understood','understand','understanded','understanding']},
+    {s:'The rules are ___ by everyone.', form:'v3', answer:'understood', options:['understood','understand','understanded','understanding']}
+  ]},
+  {v1:'wake', v2:'woke', v3:'woken', ru:'просыпаться', tier:'hard', sentences:[
+    {s:'I ___ up early this morning.', form:'v2', answer:'woke', options:['woke','woken','wake','waking']},
+    {s:'She has ___ up at 6 am every day.', form:'v3', answer:'woken', options:['woken','woke','wake','waking']}
+  ]},
+  {v1:'wear', v2:'wore', v3:'worn', ru:'носить (одежду)', tier:'hard', sentences:[
+    {s:'She ___ a beautiful dress to the party.', form:'v2', answer:'wore', options:['wore','worn','wear','wearing']},
+    {s:'These shoes have been ___ too much.', form:'v3', answer:'worn', options:['worn','wore','wear','wearing']}
+  ]},
+  {v1:'win', v2:'won', v3:'won', ru:'побеждать', tier:'hard', sentences:[
+    {s:'Our team ___ the championship!', form:'v2', answer:'won', options:['won','win','winned','winning']},
+    {s:'She has ___ three gold medals.', form:'v3', answer:'won', options:['won','win','winned','winning']}
+  ]},
+
+  // ===== EXTENSION PACK (standard reference book) =====
+  // --- EASY additions ---
+  {v1:'put', v2:'put', v3:'put', ru:'класть', tier:'easy', sentences:[
+    {s:'She ___ the keys on the table.', form:'v2', answer:'put', options:['put','putted','puts','putting']},
+    {s:'I have ___ everything in the bag.', form:'v3', answer:'put', options:['put','putted','puts','putting']}
+  ]},
+  {v1:'let', v2:'let', v3:'let', ru:'позволять', tier:'easy', sentences:[
+    {s:'Mum ___ me stay up late.', form:'v2', answer:'let', options:['let','letted','lets','letting']},
+    {s:'They have ___ us use their car.', form:'v3', answer:'let', options:['let','letted','lets','letting']}
+  ]},
+  {v1:'cut', v2:'cut', v3:'cut', ru:'резать', tier:'easy', sentences:[
+    {s:'He ___ his finger while cooking.', form:'v2', answer:'cut', options:['cut','cutted','cuts','cutting']},
+    {s:'The grass has been ___ already.', form:'v3', answer:'cut', options:['cut','cutted','cuts','cutting']}
+  ]},
+  {v1:'hit', v2:'hit', v3:'hit', ru:'ударять', tier:'easy', sentences:[
+    {s:'The ball ___ the window.', form:'v2', answer:'hit', options:['hit','hitted','hits','hitting']},
+    {s:'He has ___ the target three times.', form:'v3', answer:'hit', options:['hit','hitted','hits','hitting']}
+  ]},
+  {v1:'hurt', v2:'hurt', v3:'hurt', ru:'болеть / ранить', tier:'easy', sentences:[
+    {s:'I ___ my knee playing football.', form:'v2', answer:'hurt', options:['hurt','hurted','hurts','hurting']},
+    {s:'She has ___ her back lifting boxes.', form:'v3', answer:'hurt', options:['hurt','hurted','hurts','hurting']}
+  ]},
+  {v1:'show', v2:'showed', v3:'shown', ru:'показывать', tier:'easy', altV3:['showed'], sentences:[
+    {s:'He ___ me his new phone.', form:'v2', answer:'showed', options:['showed','shown','show','showing']},
+    {s:'The film has been ___ many times.', form:'v3', answer:'shown', options:['shown','showed','show','showing']}
+  ]},
+  {v1:'lie', v2:'lay', v3:'lain', ru:'лежать', tier:'easy', sentences:[
+    {s:'The cat ___ on the sofa all day.', form:'v2', answer:'lay', options:['lay','laid','lied','lying']},
+    {s:'She has ___ in bed for hours.', form:'v3', answer:'lain', options:['lain','laid','lay','lying']}
+  ]},
+
+  // --- MEDIUM additions ---
+  {v1:'cost', v2:'cost', v3:'cost', ru:'стоить', tier:'medium', sentences:[
+    {s:'The dinner ___ £30 last night.', form:'v2', answer:'cost', options:['cost','costed','costs','costing']},
+    {s:'These tickets have ___ a fortune.', form:'v3', answer:'cost', options:['cost','costed','costs','costing']}
+  ]},
+  {v1:'hold', v2:'held', v3:'held', ru:'держать', tier:'medium', sentences:[
+    {s:'She ___ the baby gently.', form:'v2', answer:'held', options:['held','holded','hold','holding']},
+    {s:'The record has been ___ for years.', form:'v3', answer:'held', options:['held','holded','hold','holding']}
+  ]},
+  {v1:'mean', v2:'meant', v3:'meant', ru:'иметь в виду / значить', tier:'medium', sentences:[
+    {s:'I ___ to call you yesterday.', form:'v2', answer:'meant', options:['meant','meaned','mean','meaning']},
+    {s:'It has ___ a lot to me.', form:'v3', answer:'meant', options:['meant','meaned','mean','meaning']}
+  ]},
+  {v1:'fight', v2:'fought', v3:'fought', ru:'драться / бороться', tier:'medium', sentences:[
+    {s:'The two boys ___ in the playground.', form:'v2', answer:'fought', options:['fought','fighted','fight','fighting']},
+    {s:'He has ___ many battles.', form:'v3', answer:'fought', options:['fought','fighted','fight','fighting']}
+  ]},
+  {v1:'lead', v2:'led', v3:'led', ru:'вести', tier:'medium', sentences:[
+    {s:'She ___ us to the secret garden.', form:'v2', answer:'led', options:['led','leaded','lead','leading']},
+    {s:'He has ___ the team for 5 years.', form:'v3', answer:'led', options:['led','leaded','lead','leading']}
+  ]},
+  {v1:'learn', v2:'learnt', v3:'learnt', ru:'учить (что-то)', tier:'medium', altV2:['learned'], altV3:['learned'], sentences:[
+    {s:'She ___ Spanish last summer.', form:'v2', answer:'learnt', options:['learnt','learning','learn','learns']},
+    {s:'I have ___ a lot from her.', form:'v3', answer:'learnt', options:['learnt','learning','learn','learns']}
+  ]},
+  {v1:'feed', v2:'fed', v3:'fed', ru:'кормить', tier:'medium', sentences:[
+    {s:'He ___ the cat this morning.', form:'v2', answer:'fed', options:['fed','feeded','feed','feeding']},
+    {s:'The horses have been ___ already.', form:'v3', answer:'fed', options:['fed','feeded','feed','feeding']}
+  ]},
+  {v1:'beat', v2:'beat', v3:'beaten', ru:'бить / побеждать', tier:'medium', sentences:[
+    {s:'Our team ___ the champions!', form:'v2', answer:'beat', options:['beat','beaten','beats','beating']},
+    {s:'The record has been ___ at last.', form:'v3', answer:'beaten', options:['beaten','beat','beats','beating']}
+  ]},
+  {v1:'bite', v2:'bit', v3:'bitten', ru:'кусать', tier:'medium', sentences:[
+    {s:'The dog ___ the postman yesterday.', form:'v2', answer:'bit', options:['bit','bitten','bite','biting']},
+    {s:'He has been ___ by mosquitoes.', form:'v3', answer:'bitten', options:['bitten','bit','bite','biting']}
+  ]},
+  {v1:'blow', v2:'blew', v3:'blown', ru:'дуть', tier:'medium', sentences:[
+    {s:'The wind ___ all night.', form:'v2', answer:'blew', options:['blew','blown','blow','blowing']},
+    {s:'The candle has been ___ out.', form:'v3', answer:'blown', options:['blown','blew','blow','blowing']}
+  ]},
+  {v1:'deal', v2:'dealt', v3:'dealt', ru:'иметь дело / заключать сделку', tier:'medium', sentences:[
+    {s:'She ___ with the problem calmly.', form:'v2', answer:'dealt', options:['dealt','dealed','deal','dealing']},
+    {s:'I have ___ with this before.', form:'v3', answer:'dealt', options:['dealt','dealed','deal','dealing']}
+  ]},
+  {v1:'dream', v2:'dreamt', v3:'dreamt', ru:'мечтать / видеть сон', tier:'medium', altV2:['dreamed'], altV3:['dreamed'], sentences:[
+    {s:'I ___ about flying last night.', form:'v2', answer:'dreamt', options:['dreamt','dreaming','dream','dreams']},
+    {s:'She has ___ of this moment for years.', form:'v3', answer:'dreamt', options:['dreamt','dreaming','dream','dreams']}
+  ]},
+  {v1:'ring', v2:'rang', v3:'rung', ru:'звонить', tier:'medium', sentences:[
+    {s:'The phone ___ five times.', form:'v2', answer:'rang', options:['rang','rung','ring','ringing']},
+    {s:'The bell has been ___ already.', form:'v3', answer:'rung', options:['rung','rang','ring','ringing']}
+  ]},
+  {v1:'rise', v2:'rose', v3:'risen', ru:'подниматься / вставать', tier:'medium', sentences:[
+    {s:'The sun ___ at 6 am.', form:'v2', answer:'rose', options:['rose','risen','rise','rising']},
+    {s:'Prices have ___ sharply this year.', form:'v3', answer:'risen', options:['risen','rose','rise','rising']}
+  ]},
+  {v1:'shake', v2:'shook', v3:'shaken', ru:'трясти', tier:'medium', sentences:[
+    {s:'He ___ the bottle before opening it.', form:'v2', answer:'shook', options:['shook','shaken','shake','shaking']},
+    {s:'Her hand has been ___ by everyone.', form:'v3', answer:'shaken', options:['shaken','shook','shake','shaking']}
+  ]},
+  {v1:'shine', v2:'shone', v3:'shone', ru:'светить / сиять', tier:'medium', sentences:[
+    {s:'The sun ___ all day.', form:'v2', answer:'shone', options:['shone','shined','shine','shining']},
+    {s:'His shoes have ___ since he polished them.', form:'v3', answer:'shone', options:['shone','shined','shine','shining']}
+  ]},
+  {v1:'shoot', v2:'shot', v3:'shot', ru:'стрелять', tier:'medium', sentences:[
+    {s:'The hunter ___ at the deer.', form:'v2', answer:'shot', options:['shot','shooted','shoot','shooting']},
+    {s:'The film was ___ in Spain.', form:'v3', answer:'shot', options:['shot','shooted','shoot','shooting']}
+  ]},
+  {v1:'shut', v2:'shut', v3:'shut', ru:'закрывать', tier:'medium', sentences:[
+    {s:'She ___ the door quietly.', form:'v2', answer:'shut', options:['shut','shutted','shuts','shutting']},
+    {s:'The shop has been ___ since Monday.', form:'v3', answer:'shut', options:['shut','shutted','shuts','shutting']}
+  ]},
+  {v1:'sink', v2:'sank', v3:'sunk', ru:'тонуть / погружаться', tier:'medium', sentences:[
+    {s:'The ship ___ in the storm.', form:'v2', answer:'sank', options:['sank','sunk','sink','sinking']},
+    {s:'The boat has ___ to the bottom.', form:'v3', answer:'sunk', options:['sunk','sank','sink','sinking']}
+  ]},
+  {v1:'slide', v2:'slid', v3:'slid', ru:'скользить', tier:'medium', sentences:[
+    {s:'He ___ down the hill on a sledge.', form:'v2', answer:'slid', options:['slid','slided','slide','sliding']},
+    {s:'The drawer has ___ open again.', form:'v3', answer:'slid', options:['slid','slided','slide','sliding']}
+  ]},
+  {v1:'lend', v2:'lent', v3:'lent', ru:'давать в долг', tier:'medium', sentences:[
+    {s:'She ___ me her umbrella.', form:'v2', answer:'lent', options:['lent','lended','lend','lending']},
+    {s:'The book has been ___ to a friend.', form:'v3', answer:'lent', options:['lent','lended','lend','lending']}
+  ]},
+  {v1:'light', v2:'lit', v3:'lit', ru:'зажигать / освещать', tier:'medium', altV2:['lighted'], altV3:['lighted'], sentences:[
+    {s:'She ___ the candles on the cake.', form:'v2', answer:'lit', options:['lit','lighted','light','lighting']},
+    {s:'The street has been ___ all night.', form:'v3', answer:'lit', options:['lit','lighted','light','lighting']}
+  ]},
+  {v1:'smell', v2:'smelt', v3:'smelt', ru:'пахнуть / нюхать', tier:'medium', altV2:['smelled'], altV3:['smelled'], sentences:[
+    {s:'I ___ smoke in the kitchen.', form:'v2', answer:'smelt', options:['smelt','smelling','smell','smells']},
+    {s:'The room has ___ of paint for days.', form:'v3', answer:'smelt', options:['smelt','smelling','smell','smells']}
+  ]},
+  {v1:'stick', v2:'stuck', v3:'stuck', ru:'приклеивать / застрять', tier:'medium', sentences:[
+    {s:'The label ___ to the bottle.', form:'v2', answer:'stuck', options:['stuck','sticked','stick','sticking']},
+    {s:'His name has ___ in my mind.', form:'v3', answer:'stuck', options:['stuck','sticked','stick','sticking']}
+  ]},
+  {v1:'sweep', v2:'swept', v3:'swept', ru:'подметать', tier:'medium', sentences:[
+    {s:'She ___ the floor twice.', form:'v2', answer:'swept', options:['swept','sweeped','sweep','sweeping']},
+    {s:'The leaves have been ___ away.', form:'v3', answer:'swept', options:['swept','sweeped','sweep','sweeping']}
+  ]},
+  {v1:'burn', v2:'burnt', v3:'burnt', ru:'гореть / жечь', tier:'medium', altV2:['burned'], altV3:['burned'], sentences:[
+    {s:'The toast ___ in the toaster.', form:'v2', answer:'burnt', options:['burnt','burned','burn','burning']},
+    {s:'The candle has ___ down completely.', form:'v3', answer:'burnt', options:['burnt','burned','burn','burning']}
+  ]},
+
+  // --- HARD additions ---
+  {v1:'speed', v2:'sped', v3:'sped', ru:'мчаться / ускоряться', tier:'hard', altV2:['speeded'], altV3:['speeded'], sentences:[
+    {s:'The car ___ past us on the motorway.', form:'v2', answer:'sped', options:['sped','speeded','speed','speeding']},
+    {s:'Time has ___ by since then.', form:'v3', answer:'sped', options:['sped','speeded','speed','speeding']}
+  ]},
+  {v1:'stink', v2:'stank', v3:'stunk', ru:'вонять', tier:'hard', sentences:[
+    {s:'The bin ___ of rotten food.', form:'v2', answer:'stank', options:['stank','stunk','stink','stinking']},
+    {s:'The fridge has ___ for a week.', form:'v3', answer:'stunk', options:['stunk','stank','stink','stinking']}
+  ]},
+  {v1:'broadcast', v2:'broadcast', v3:'broadcast', ru:'передавать (по радио/ТВ)', tier:'hard', sentences:[
+    {s:'The BBC ___ the speech live.', form:'v2', answer:'broadcast', options:['broadcast','broadcasted','broadcasts','broadcasting']},
+    {s:'The match has been ___ worldwide.', form:'v3', answer:'broadcast', options:['broadcast','broadcasted','broadcasts','broadcasting']}
+  ]},
+  {v1:'forecast', v2:'forecast', v3:'forecast', ru:'прогнозировать', tier:'hard', sentences:[
+    {s:'They ___ rain for the weekend.', form:'v2', answer:'forecast', options:['forecast','forecasted','forecasts','forecasting']},
+    {s:'Snow has been ___ for Friday.', form:'v3', answer:'forecast', options:['forecast','forecasted','forecasts','forecasting']}
+  ]},
+  {v1:'prove', v2:'proved', v3:'proven', ru:'доказывать', tier:'hard', altV3:['proved'], sentences:[
+    {s:'She ___ that the theory was wrong.', form:'v2', answer:'proved', options:['proved','proven','prove','proving']},
+    {s:'The point has been ___ many times.', form:'v3', answer:'proven', options:['proven','proved','prove','proving']}
+  ]},
+];
+
+const MIN_STUDIED_TO_PLAY = 3; // minimum studied verbs before games unlock
+
+// ===============================================
+// HELPER FUNCTIONS
+// ===============================================
+
+// Detect duplicate-form patterns
+function dupPattern(v) {
+  if (v.v1 === v.v2 && v.v2 === v.v3) return 'all-same';
+  if (v.v2 === v.v3) return 'v2v3-same';
+  if (v.v1 === v.v3) return 'v1v3-same'; // come/came/come
+  if (v.v1 === v.v2) return 'v1v2-same'; // rare but possible
+  return 'distinct';
+}
+
+// All form-variants for a given column (handles "/" splits AND altVx arrays)
+function allFormsForCol(verb, col) {
+  const splitForms = (s) => (s || '').split('/').map(x => x.trim()).filter(Boolean);
+  if (col === 0) return [...splitForms(verb.v1), ...(verb.altV1 || [])];
+  if (col === 1) return [...splitForms(verb.v2), ...(verb.altV2 || [])];
+  return [...splitForms(verb.v3), ...(verb.altV3 || [])];
+}
+
+// All forms of a verb that match a given written word
+function formsForWord(verb, word) {
+  const cols = [];
+  if (allFormsForCol(verb, 0).includes(word)) cols.push(0);
+  if (allFormsForCol(verb, 1).includes(word)) cols.push(1);
+  if (allFormsForCol(verb, 2).includes(word)) cols.push(2);
+  return cols;
+}
+
+// Randomly pick one variant to display for a column (e.g. learnt vs learned)
+function pickFormForCol(verb, col) {
+  const all = allFormsForCol(verb, col);
+  return all[Math.floor(Math.random() * all.length)] || '';
+}
+
+// Display all forms with " / " separator (for feedback messages, flashcards)
+function displayAllForms(verb, form) {
+  const col = form === 'v1' ? 0 : form === 'v2' ? 1 : 2;
+  return allFormsForCol(verb, col).join(' / ');
+}
+
+// Pick a single readable form for display (was/were → was OR were randomly)
+function pickDisplayForm(formStr) {
+  if (!formStr) return formStr;
+  if (formStr.includes('/')) {
+    const opts = formStr.split('/').map(s => s.trim());
+    return opts[Math.floor(Math.random() * opts.length)];
+  }
+  return formStr;
+}
+
+// Check if user's answer matches any valid variant (handles was/were AND altV*)
+function isAnswerCorrect(userInput, verb, form) {
+  const ans = (userInput || '').trim().toLowerCase();
+  if (!ans) return false;
+  const col = form === 'v1' ? 0 : form === 'v2' ? 1 : 2;
+  const allowed = allFormsForCol(verb, col).map(s => s.toLowerCase());
+  return allowed.includes(ans);
+}
+
+// TTS — voice selection (filters out bad/robotic system voices)
+let _voicesCache = [];
+let _bestVoice = null;
+
+// Voices that sound bad / robotic / novelty — never pick these as default
+const BAD_VOICE_PATTERNS = [
+  /albert/i, /alice/i, /bad news/i, /bahh/i, /bells/i, /boing/i, /bubbles/i,
+  /cellos/i, /deranged/i, /eddy/i, /flo/i, /fred/i, /good news/i, /grandma/i, /grandpa/i,
+  /hysterical/i, /jester/i, /junior/i, /kathy/i, /organ/i, /pipe organ/i,
+  /princess/i, /ralph/i, /reed/i, /rocko/i, /sandy/i, /shelley/i, /superstar/i,
+  /trinoids/i, /whisper/i, /zarvox/i, /bubble/i, /wobble/i,
+];
+
+function isUsableVoice(v) {
+  if (!v || !v.lang) return false;
+  if (!v.lang.toLowerCase().startsWith('en')) return false;
+  if (BAD_VOICE_PATTERNS.some(p => p.test(v.name))) return false;
+  return true;
+}
+
+function refreshVoices() {
+  if (typeof speechSynthesis === 'undefined') return;
+  _voicesCache = speechSynthesis.getVoices().filter(isUsableVoice);
+  // Preference order: Google natural > Microsoft natural > premium macOS > anything en
+  const preferences = [
+    /Google.*US English/i,
+    /Google.*UK English Female/i,
+    /Google.*UK English/i,
+    /Google.*English/i,
+    /Microsoft.*Aria/i,
+    /Microsoft.*Jenny/i,
+    /Microsoft.*Guy/i,
+    /Microsoft.*Natural/i,
+    /Samantha.*Premium/i,
+    /Ava.*Premium/i,
+    /Allison.*Premium/i,
+    /Daniel.*Premium/i,
+    /Samantha/i,
+    /Ava/i,
+    /Allison/i,
+    /Susan/i,
+    /Karen/i,
+    /Daniel/i,
+    /Moira/i,
+    /Tessa/i,
+  ];
+  for (const pat of preferences) {
+    const v = _voicesCache.find(v => pat.test(v.name));
+    if (v) { _bestVoice = v; return; }
+  }
+  _bestVoice = _voicesCache[0] || null;
+}
+
+if (typeof speechSynthesis !== 'undefined') {
+  refreshVoices();
+  speechSynthesis.onvoiceschanged = refreshVoices;
+}
+
+function speakWord(text) {
+  if (!text) return;
+  if (typeof speechSynthesis === 'undefined') return;
+  const phrase = String(text).replace('/', ' or ');
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(phrase);
+  // Pick voice: user-selected > best auto > system default
+  const userVoiceName = currentUser && currentUser.settings && currentUser.settings.voice;
+  const userVoice = userVoiceName && _voicesCache.find(v => v.name === userVoiceName);
+  if (userVoice) u.voice = userVoice;
+  else if (_bestVoice) u.voice = _bestVoice;
+  u.rate = (currentUser && currentUser.settings && currentUser.settings.rate) || 1.0;
+  u.pitch = 1.0;
+  u.lang = (u.voice && u.voice.lang) || 'en-US';
+  speechSynthesis.speak(u);
+}
+
+// Filter verbs by tier
+function verbsByTier(verbs, tier) {
+  if (!tier || tier === 'all') return verbs;
+  return verbs.filter(v => v.tier === tier);
+}
+
+// Studied verbs for current user
+function studiedSet() {
+  return new Set((currentUser && currentUser.studied) || []);
+}
+function getStudiedVerbs(tierOverride) {
+  const set = studiedSet();
+  let pool = VERBS.filter(v => set.has(v.v1));
+  const tier = tierOverride || (currentUser.settings && currentUser.settings.tier) || 'all';
+  return verbsByTier(pool, tier);
+}
+
+// Get verbs the student is weak on (low accuracy or recently failed)
+function getWeakVerbs(n) {
+  const studied = getStudiedVerbs();
+  if (studied.length === 0) return [];
+  const scored = studied.map(v => {
+    const stat = currentUser.verbStats[v.v1] || { correct: 0, total: 0, lastSeen: null };
+    const rate = stat.total > 0 ? stat.correct / stat.total : 0.4; // unseen treated as somewhat weak
+    const recencyBoost = stat.lastSeen ? 0 : 0.2; // never tested → bump priority
+    return { verb: v, weakness: 1 - rate + recencyBoost + Math.random() * 0.05 };
+  });
+  scored.sort((a, b) => b.weakness - a.weakness);
+  return scored.slice(0, n).map(x => x.verb);
+}
+
+// Format-aware option-form text
+function formLabel(form) {
+  return form === 'v1' ? 'V1 (Base)' : form === 'v2' ? 'V2 (Past Simple)' : 'V3 (Past Participle)';
+}
+
+// ===============================================
+// STATE MANAGEMENT (localStorage; swap for Firebase later)
+// ===============================================
+const STORAGE_KEY = 'verbmaster_data';
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { users: [], classes: {} };
+  } catch { return { users: [], classes: {} }; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let currentUser = null;
+let currentGame = null;
+
+// ===============================================
+// AUTH SYSTEM
+// ===============================================
+let selectedRole = 'student';
+
+function setRole(role) {
+  selectedRole = role;
+  document.getElementById('roleStudent').classList.toggle('active', role === 'student');
+  document.getElementById('roleTeacher').classList.toggle('active', role === 'teacher');
+  document.getElementById('classCodeGroup').classList.toggle('hidden', role === 'teacher');
+}
+
+function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!name || !pass) { showError('Please fill in all fields'); return; }
+
+  const data = loadData();
+  const user = data.users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.password === pass && u.role === selectedRole);
+  if (!user) { showError('User not found or wrong password'); return; }
+
+  // Migration for older accounts (add new fields if missing)
+  ensureUserShape(user);
+  currentUser = user;
+  showDashboard();
+}
+
+function ensureUserShape(user) {
+  if (!user.studied) user.studied = [];
+  if (!user.settings) user.settings = { tier: 'all', sortTimer: 8, speedTimer: 10, rate: 1.0, reverseSpeed: 'off', voice: '' };
+  if (typeof user.settings.voice === 'undefined') user.settings.voice = '';
+  if (!user.gameScores) user.gameScores = {};
+  ['hangman','speed','sort','story','battle','weak','set'].forEach(g => {
+    if (typeof user.gameScores[g] === 'undefined') user.gameScores[g] = 0;
+  });
+  if (!user.verbStats) user.verbStats = {};
+  if (!user.sets) user.sets = [];
+}
+
+function doRegister() {
+  const name = document.getElementById('loginName').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!name || !pass) { showError('Please fill in all fields'); return; }
+
+  const data = loadData();
+  if (data.users.find(u => u.name.toLowerCase() === name.toLowerCase() && u.role === selectedRole)) {
+    showError('This name is already taken'); return;
+  }
+
+  const user = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+    name, password: pass, role: selectedRole,
+    xp: 0, level: 1,
+    gamesPlayed: 0, totalCorrect: 0, totalAnswered: 0, bestStreak: 0,
+    studied: [],
+    verbStats: {},
+    sets: [],
+    gameScores: { hangman: 0, speed: 0, sort: 0, story: 0, battle: 0, weak: 0, set: 0 },
+    settings: { tier: 'all', sortTimer: 8, speedTimer: 10, rate: 1.0, reverseSpeed: 'off', voice: '' },
+    classCode: null,
+    lastActive: new Date().toISOString()
+  };
+
+  if (selectedRole === 'student') {
+    const code = document.getElementById('loginClassCode').value.trim().toUpperCase();
+    if (code) {
+      if (!data.classes[code]) { showError('Invalid class code'); return; }
+      user.classCode = code;
+    }
+  }
+
+  if (selectedRole === 'teacher') {
+    const classCode = generateClassCode();
+    user.classCode = classCode;
+    data.classes[classCode] = { teacherId: user.id, created: new Date().toISOString() };
+  }
+
+  data.users.push(user);
+  saveData(data);
+  currentUser = user;
+  showDashboard();
+}
+
+function generateClassCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function showError(msg) { document.getElementById('loginError').textContent = msg; }
+
+function logout() { currentUser = null; localStorage.removeItem('verbmaster_lastuser'); showScreen('loginScreen'); }
+
+function resetAllData() {
+  if (!confirm('This will delete ALL accounts, sets, and progress. Continue?')) return;
+  localStorage.removeItem('verbmaster_data');
+  localStorage.removeItem('verbmaster_lastuser');
+  currentUser = null;
+  showScreen('loginScreen');
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').textContent = '✓ All data cleared. Create a new account.';
+  document.getElementById('loginError').style.color = 'var(--green)';
+}
+
+// ===============================================
+// NAVIGATION
+// ===============================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showDashboard() {
+  localStorage.setItem('verbmaster_lastuser', currentUser.id);
+  if (currentUser.role === 'teacher') {
+    showScreen('teacherDashboard');
+    renderTeacherDashboard();
+  } else {
+    showScreen('studentDashboard');
+    renderStudentDashboard();
+  }
+}
+
+function backToDash() {
+  if (currentGame && currentGame.timer) clearInterval(currentGame.timer);
+  currentGame = null;
+  document.getElementById('resultsOverlay').classList.add('hidden');
+  showDashboard();
+}
+
+// ===============================================
+// STUDENT DASHBOARD
+// ===============================================
+function renderStudentDashboard() {
+  const u = currentUser;
+  document.getElementById('studentAvatar').textContent = u.name[0].toUpperCase();
+  document.getElementById('studentName').textContent = u.name;
+  document.getElementById('studentLevel').textContent = 'Lvl ' + u.level;
+
+  const xpForLevel = u.level * 100;
+  const xpInLevel = u.xp;
+  document.getElementById('studentXpFill').style.width = (xpInLevel / xpForLevel * 100) + '%';
+  document.getElementById('studentXpLabel').textContent = xpInLevel + ' / ' + xpForLevel + ' XP';
+
+  const studiedCount = (u.studied || []).length;
+  document.getElementById('statStudied').textContent = studiedCount + '/' + VERBS.length;
+  const masteredCount = Object.values(u.verbStats).filter(v => v.correct >= 5 && (v.total > 0) && (v.correct / v.total) >= 0.8).length;
+  document.getElementById('statMastered').textContent = masteredCount + '/' + VERBS.length;
+  const acc = u.totalAnswered > 0 ? Math.round(u.totalCorrect / u.totalAnswered * 100) : 0;
+  document.getElementById('statAccuracy').textContent = acc + '%';
+  document.getElementById('statStreak').textContent = u.bestStreak;
+
+  document.getElementById('studyProgress').textContent = studiedCount > 0 ? `📘 ${studiedCount} learned` : '👋 Start here!';
+
+  const gs = u.gameScores;
+  document.getElementById('bestHangman').textContent = gs.hangman ? '⭐ Best: ' + gs.hangman : '';
+  document.getElementById('bestSpeed').textContent = gs.speed ? '⭐ Best: ' + gs.speed : '';
+  document.getElementById('bestSort').textContent = gs.sort ? '⭐ Best: ' + gs.sort : '';
+  document.getElementById('bestStory').textContent = gs.story ? '⭐ Best: ' + gs.story : '';
+  document.getElementById('bestBattle').textContent = gs.battle ? '⭐ Best: ' + gs.battle + ' defeated' : '';
+  document.getElementById('bestWeak').textContent = gs.weak ? '⭐ Best: ' + gs.weak : '';
+
+  // Lock state
+  const enoughStudied = studiedCount >= MIN_STUDIED_TO_PLAY;
+  ['Hangman','Speed','Sort','Story','Battle','Weak'].forEach(g => {
+    const card = document.getElementById('card' + g);
+    const lock = document.getElementById('lock' + g);
+    if (!card) return;
+    if (!enoughStudied) {
+      card.classList.add('locked');
+      lock.classList.remove('hidden');
+      lock.textContent = `🔒 Study at least ${MIN_STUDIED_TO_PLAY} verbs to unlock`;
+    } else {
+      card.classList.remove('locked');
+      lock.classList.add('hidden');
+    }
+  });
+
+  // Weak Verbs needs at least one verbStat
+  const haveAnyStats = Object.keys(u.verbStats).length > 0;
+  const weakCard = document.getElementById('cardWeak');
+  const weakLock = document.getElementById('lockWeak');
+  if (enoughStudied && !haveAnyStats) {
+    weakCard.classList.add('locked');
+    weakLock.classList.remove('hidden');
+    weakLock.textContent = '🔒 Play any game first to identify weak verbs';
+  }
+
+  // Dashboard tier filter — apply saved tier (sync active pill + lock logic)
+  const savedTier = (u.settings && u.settings.tier) || 'all';
+  if (enoughStudied) setDashTier(savedTier, null);
+  else {
+    document.querySelectorAll('[data-dash-tier]').forEach(b => {
+      b.classList.toggle('active', b.dataset.dashTier === savedTier);
+    });
+  }
+
+  // Custom sets section
+  renderSetsSection();
+}
+
+function setDashTier(tier, btn) {
+  currentUser.settings.tier = tier;
+  saveProgress();
+  document.querySelectorAll('[data-dash-tier]').forEach(b => {
+    b.classList.toggle('active', b.dataset.dashTier === tier);
+  });
+  // Update lock messages based on whether the tier has enough studied verbs
+  const studiedInTier = getStudiedVerbs(tier).length;
+  ['Hangman','Speed','Sort','Story','Battle'].forEach(g => {
+    const card = document.getElementById('card' + g);
+    const lock = document.getElementById('lock' + g);
+    if (!card) return;
+    const need = (g === 'Battle') ? 4 : 1;
+    if (studiedInTier < need) {
+      card.classList.add('locked');
+      lock.classList.remove('hidden');
+      lock.textContent = tier === 'all'
+        ? `🔒 Study at least ${MIN_STUDIED_TO_PLAY} verbs to unlock`
+        : `🔒 No "${tier}" verbs studied yet`;
+    } else if ((currentUser.studied || []).length >= MIN_STUDIED_TO_PLAY) {
+      card.classList.remove('locked');
+      lock.classList.add('hidden');
+    }
+  });
+}
+
+// ===============================================
+// TEACHER DASHBOARD
+// ===============================================
+function renderTeacherDashboard() {
+  const u = currentUser;
+  document.getElementById('teacherAvatar').textContent = u.name[0].toUpperCase();
+  document.getElementById('teacherName').textContent = u.name;
+  document.getElementById('teacherClassCode').textContent = u.classCode || '------';
+
+  const data = loadData();
+  const students = data.users.filter(s => s.role === 'student' && s.classCode === u.classCode);
+  const tbody = document.getElementById('studentsTableBody');
+
+  if (students.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:40px;">No students linked yet. Share your class code!</td></tr>';
+  } else {
+    tbody.innerHTML = students.map(s => {
+      ensureUserShape(s);
+      const acc = s.totalAnswered > 0 ? Math.round(s.totalCorrect / s.totalAnswered * 100) : 0;
+      const studied = (s.studied || []).length;
+      const mastered = Object.values(s.verbStats).filter(v => v.correct >= 5 && v.total > 0 && (v.correct/v.total) >= 0.8).length;
+      const lastActive = s.lastActive ? new Date(s.lastActive).toLocaleDateString() : 'Never';
+      return `<tr onclick="showStudentDetail('${s.id}')" style="cursor:pointer">
+        <td><strong>${s.name}</strong></td>
+        <td>Lvl ${s.level}</td>
+        <td>${s.xp} XP</td>
+        <td>${studied}/${VERBS.length}</td>
+        <td>${mastered}/${VERBS.length}</td>
+        <td>${acc}%</td>
+        <td>${lastActive}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  renderClassVerbGrid(students);
+}
+
+function showStudentDetail(studentId) {
+  const data = loadData();
+  const student = data.users.find(u => u.id === studentId);
+  if (!student) return;
+  ensureUserShape(student);
+
+  const panel = document.getElementById('studentDetailPanel');
+  panel.classList.remove('hidden');
+  document.getElementById('detailStudentName').textContent = student.name + ' — Verb Details';
+
+  const studiedSetLocal = new Set(student.studied || []);
+  const html = VERBS.map(v => {
+    const stat = student.verbStats[v.v1];
+    let cls = 'new', label = 'New';
+    if (studiedSetLocal.has(v.v1)) { cls = 'studied'; label = 'Studied'; }
+    if (stat) {
+      const rate = stat.total > 0 ? stat.correct / stat.total : 0;
+      if (stat.correct >= 5 && rate >= 0.8) { cls = 'mastered'; label = Math.round(rate*100)+'%'; }
+      else if (stat.total > 0) { cls = 'learning'; label = Math.round(rate*100)+'%'; }
+    }
+    return `<div class="verb-chip ${cls}">${v.v1} <small>${label}</small></div>`;
+  }).join('');
+  document.getElementById('detailContent').innerHTML = '<div class="verb-progress-grid">' + html + '</div>';
+}
+
+function renderClassVerbGrid(students) {
+  const grid = document.getElementById('classVerbGrid');
+  grid.innerHTML = VERBS.map(v => {
+    let totalCorrect = 0, totalAttempts = 0;
+    students.forEach(s => {
+      const stat = (s.verbStats || {})[v.v1];
+      if (stat) { totalCorrect += stat.correct; totalAttempts += stat.total; }
+    });
+    let cls = 'new';
+    if (totalAttempts > 0) cls = (totalCorrect/totalAttempts >= 0.7) ? 'mastered' : 'learning';
+    const pct = totalAttempts > 0 ? Math.round(totalCorrect/totalAttempts*100) + '%' : '—';
+    return `<div class="verb-chip ${cls}">${v.v1} <small>${pct}</small></div>`;
+  }).join('');
+}
+
+function showTeacherTab(tab, btn) {
+  document.querySelectorAll('.teacher-tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('teacherTabStudents').classList.toggle('hidden', tab !== 'students');
+  document.getElementById('teacherTabVerbs').classList.toggle('hidden', tab !== 'verbs');
+  document.getElementById('teacherTabExport').classList.toggle('hidden', tab !== 'export');
+}
+
+function exportClassData() {
+  const data = loadData();
+  const students = data.users.filter(s => s.role === 'student' && s.classCode === currentUser.classCode);
+  const blob = new Blob([JSON.stringify(students, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'verbmaster_class_data.json';
+  a.click();
+}
+
+function importStudentData() {
+  const file = document.getElementById('importFile').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      const data = loadData();
+      const arr = Array.isArray(imported) ? imported : [imported];
+      arr.forEach(s => {
+        ensureUserShape(s);
+        s.classCode = currentUser.classCode;
+        const existing = data.users.findIndex(u => u.id === s.id);
+        if (existing >= 0) data.users[existing] = s;
+        else data.users.push(s);
+      });
+      saveData(data);
+      renderTeacherDashboard();
+      alert('Data imported successfully!');
+    } catch { alert('Invalid file format'); }
+  };
+  reader.readAsText(file);
+}
+
+// ===============================================
+// SAVE USER PROGRESS
+// ===============================================
+function saveProgress() {
+  const data = loadData();
+  const idx = data.users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) {
+    currentUser.lastActive = new Date().toISOString();
+    data.users[idx] = currentUser;
+    saveData(data);
+  }
+}
+
+function addXp(amount) {
+  currentUser.xp += amount;
+  while (currentUser.xp >= currentUser.level * 100) {
+    currentUser.xp -= currentUser.level * 100;
+    currentUser.level++;
+  }
+  saveProgress();
+}
+
+function recordVerbAttempt(verbV1, correct) {
+  if (!currentUser.verbStats[verbV1]) currentUser.verbStats[verbV1] = { correct: 0, total: 0, lastSeen: null };
+  currentUser.verbStats[verbV1].total++;
+  if (correct) currentUser.verbStats[verbV1].correct++;
+  currentUser.verbStats[verbV1].lastSeen = new Date().toISOString();
+  currentUser.totalAnswered++;
+  if (correct) currentUser.totalCorrect++;
+}
+
+// ===============================================
+// CUSTOM SETS
+// ===============================================
+let setEditorState = { editingId: null, selected: new Set(), forms: 'v2,v3', name: '' };
+
+function renderSetsSection() {
+  const grid = document.getElementById('setsGrid');
+  if (!grid) return;
+  const sets = currentUser.sets || [];
+  let html = `<div class="game-card set-card add-card" onclick="openSetEditor(null)">
+    <span class="game-icon">➕</span>
+    <h3>Create new set</h3>
+    <p>Pick specific verbs to drill (e.g. school list, week's homework).</p>
+  </div>`;
+  html += sets.map(s => {
+    const formsLabel = s.forms.length === 2 ? 'V2 + V3' : (s.forms[0] === 'v2' ? 'V2 only' : 'V3 only');
+    const lastPlayed = s.lastPlayed ? new Date(s.lastPlayed).toLocaleDateString() : 'never';
+    return `<div class="game-card set-card">
+      <div class="set-name">${escapeHtml(s.name || 'Untitled set')}</div>
+      <div class="set-summary">${s.verbs.length} verbs · played ${lastPlayed}</div>
+      <div class="set-meta">
+        <span class="set-chip">${formsLabel}</span>
+        <span class="set-chip">${s.verbs.slice(0,3).join(', ')}${s.verbs.length > 3 ? '…' : ''}</span>
+      </div>
+      <div class="set-actions">
+        <button class="btn btn-primary btn-small" onclick="event.stopPropagation();openSetPlay('${s.id}')">▶ Practice</button>
+        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();openSetEditor('${s.id}')">✏️ Edit</button>
+        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation();deleteSet('${s.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  grid.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function openSetEditor(setId) {
+  setEditorState = { editingId: setId, selected: new Set(), forms: 'v2,v3', name: '' };
+  if (setId) {
+    const s = currentUser.sets.find(x => x.id === setId);
+    if (s) {
+      setEditorState.selected = new Set(s.verbs);
+      setEditorState.forms = s.forms.join(',');
+      setEditorState.name = s.name;
+    }
+    document.getElementById('setEditorTitle').textContent = 'Edit set';
+  } else {
+    document.getElementById('setEditorTitle').textContent = 'Create set';
+  }
+  document.getElementById('setName').value = setEditorState.name;
+  document.getElementById('setFormsSelect').value = setEditorState.forms;
+  document.getElementById('setSearch').value = '';
+  document.getElementById('setEditorModal').classList.remove('hidden');
+  renderSetVerbList();
+}
+
+function closeSetEditor() {
+  document.getElementById('setEditorModal').classList.add('hidden');
+}
+
+function renderSetVerbList() {
+  const list = document.getElementById('setVerbList');
+  const query = (document.getElementById('setSearch').value || '').toLowerCase().trim();
+  const tiers = ['easy', 'medium', 'hard'];
+  let html = '';
+  tiers.forEach(tier => {
+    const verbs = VERBS.filter(v => v.tier === tier &&
+      (!query || v.v1.includes(query) || v.v2.includes(query) || v.v3.includes(query) || v.ru.toLowerCase().includes(query)));
+    if (!verbs.length) return;
+    html += `<div class="set-tier-group"><h4><span class="tier-badge ${tier}">${tier}</span> &nbsp; ${verbs.length} verbs</h4>`;
+    verbs.forEach(v => {
+      const checked = setEditorState.selected.has(v.v1) ? 'checked' : '';
+      html += `<label class="set-verb-row">
+        <input type="checkbox" data-v1="${v.v1}" ${checked} onchange="toggleSetVerb('${v.v1}', this.checked)">
+        <span class="svr-v1">${v.v1}</span>
+        <span class="svr-forms">— ${v.v2} — ${v.v3}</span>
+        <span class="svr-ru">${escapeHtml(v.ru)}</span>
+      </label>`;
+    });
+    html += `</div>`;
+  });
+  if (!html) html = '<div style="text-align:center;color:var(--text-dim);padding:20px;">No verbs match your search.</div>';
+  list.innerHTML = html;
+  updateSetCount();
+}
+
+function toggleSetVerb(v1, checked) {
+  if (checked) setEditorState.selected.add(v1);
+  else setEditorState.selected.delete(v1);
+  updateSetCount();
+}
+
+function updateSetCount() {
+  document.getElementById('setSelectedCount').textContent = setEditorState.selected.size;
+}
+
+function setEditorSelectTier(tier) {
+  VERBS.filter(v => v.tier === tier).forEach(v => setEditorState.selected.add(v.v1));
+  renderSetVerbList();
+}
+function setEditorSelectStudied() {
+  (currentUser.studied || []).forEach(v1 => setEditorState.selected.add(v1));
+  renderSetVerbList();
+}
+function setEditorClear() {
+  setEditorState.selected.clear();
+  renderSetVerbList();
+}
+
+function saveSet() {
+  const name = document.getElementById('setName').value.trim();
+  if (!name) { alert('Please name the set.'); return; }
+  if (setEditorState.selected.size < 2) { alert('Pick at least 2 verbs.'); return; }
+  const forms = document.getElementById('setFormsSelect').value.split(',');
+  if (!currentUser.sets) currentUser.sets = [];
+  if (setEditorState.editingId) {
+    const s = currentUser.sets.find(x => x.id === setEditorState.editingId);
+    if (s) {
+      s.name = name;
+      s.verbs = [...setEditorState.selected];
+      s.forms = forms;
+    }
+  } else {
+    currentUser.sets.push({
+      id: 'set_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+      name,
+      verbs: [...setEditorState.selected],
+      forms,
+      created: new Date().toISOString(),
+      lastPlayed: null
+    });
+  }
+  saveProgress();
+  closeSetEditor();
+  renderSetsSection();
+}
+
+function deleteSet(setId) {
+  if (!confirm('Delete this set?')) return;
+  currentUser.sets = (currentUser.sets || []).filter(s => s.id !== setId);
+  saveProgress();
+  renderSetsSection();
+}
+
+let activeSetPlay = null;
+
+function openSetPlay(setId) {
+  const s = (currentUser.sets || []).find(x => x.id === setId);
+  if (!s) return;
+  activeSetPlay = s;
+  const formsLabel = s.forms.length === 2 ? 'V2 + V3' : (s.forms[0] === 'v2' ? 'V2 only' : 'V3 only');
+  document.getElementById('setPlayTitle').textContent = s.name;
+  document.getElementById('setPlaySummary').textContent = `${s.verbs.length} verbs · ${formsLabel}`;
+  // Disable Story button if no sentences match the selected forms
+  const verbObjs = s.verbs.map(v1 => VERBS.find(v => v.v1 === v1)).filter(Boolean);
+  const hasStoryHits = verbObjs.some(v => v.sentences.some(sn => s.forms.includes(sn.form)));
+  document.getElementById('setPlayStoryBtn').disabled = !hasStoryHits;
+  // Disable Sort if all verbs are all-same OR if only one form is selected (nothing to categorise)
+  const sortable = verbObjs.some(v => dupPattern(v) !== 'all-same') && s.forms.length >= 2;
+  document.getElementById('setPlaySortBtn').disabled = !sortable;
+  // Disable Battle if too few verbs for distractors / fights
+  document.getElementById('setPlayBattleBtn').disabled = verbObjs.length < 4;
+  document.getElementById('setPlayModal').classList.remove('hidden');
+}
+
+function closeSetPlay() { document.getElementById('setPlayModal').classList.add('hidden'); }
+
+function playSet(gameType) {
+  if (!activeSetPlay) return;
+  const s = activeSetPlay;
+  s.lastPlayed = new Date().toISOString();
+  saveProgress();
+  const verbObjs = s.verbs.map(v1 => VERBS.find(v => v.v1 === v1)).filter(Boolean);
+  closeSetPlay();
+  const opts = { verbs: verbObjs, forms: s.forms, fromSet: true, setName: s.name };
+  switch (gameType) {
+    case 'hangman': initHangman(opts); break;
+    case 'speed': initSpeed(opts); break;
+    case 'sort': initSort(opts); break;
+    case 'story': initStory(opts); break;
+    case 'battle': initBattle(opts); break;
+  }
+}
+
+// ===============================================
+// SETTINGS
+// ===============================================
+function openSettings() {
+  const s = currentUser.settings;
+  document.getElementById('setTier').value = s.tier || 'all';
+  document.getElementById('setSortTimer').value = s.sortTimer || 8;
+  document.getElementById('setSpeedTimer').value = s.speedTimer || 10;
+  document.getElementById('setRate').value = s.rate || 1.0;
+  document.getElementById('setReverse').value = s.reverseSpeed || 'off';
+  // Build voice list
+  const voiceSelect = document.getElementById('setVoice');
+  voiceSelect.innerHTML = '<option value="">Auto (best available)</option>' +
+    _voicesCache.map(v => `<option value="${v.name}" ${s.voice === v.name ? 'selected' : ''}>${v.name} (${v.lang})</option>`).join('');
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+function closeSettings() { document.getElementById('settingsModal').classList.add('hidden'); }
+function testVoicePreview() {
+  if (typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance('She went to the shop and bought some bread.');
+  const voiceName = document.getElementById('setVoice').value;
+  const v = voiceName && _voicesCache.find(x => x.name === voiceName);
+  if (v) u.voice = v;
+  else if (_bestVoice) u.voice = _bestVoice;
+  u.rate = parseFloat(document.getElementById('setRate').value) || 1.0;
+  u.pitch = 1.0;
+  u.lang = (u.voice && u.voice.lang) || 'en-US';
+  speechSynthesis.speak(u);
+}
+function saveSettings() {
+  currentUser.settings = {
+    tier: document.getElementById('setTier').value,
+    sortTimer: parseInt(document.getElementById('setSortTimer').value, 10) || 8,
+    speedTimer: parseInt(document.getElementById('setSpeedTimer').value, 10) || 10,
+    rate: parseFloat(document.getElementById('setRate').value) || 1.0,
+    reverseSpeed: document.getElementById('setReverse').value,
+    voice: document.getElementById('setVoice').value
+  };
+  saveProgress();
+  closeSettings();
+  renderStudentDashboard();
+}
+
+// ===============================================
+// UTILITY
+// ===============================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+function pickRandom(arr, n) { return shuffle(arr).slice(0, n); }
+
+function showResults(title, score, detail, xp, playAgainFn) {
+  const icon = xp > 30 ? '🏆' : xp > 15 ? '⭐' : '👍';
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultDetail').textContent = detail;
+  document.getElementById('resultXp').textContent = '+' + xp + ' XP';
+  document.getElementById('resultsOverlay').classList.remove('hidden');
+  document.getElementById('resultPlayAgain').onclick = function() {
+    document.getElementById('resultsOverlay').classList.add('hidden');
+    playAgainFn();
+  };
+  addXp(xp);
+  currentUser.gamesPlayed++;
+  saveProgress();
+}
+
+// ===============================================
+// GAME ROUTER
+// ===============================================
+function startGame(type) {
+  if (type === 'study') { initStudy(); return; }
+  // gate: need MIN_STUDIED_TO_PLAY studied verbs
+  const studied = (currentUser.studied || []).length;
+  if (studied < MIN_STUDIED_TO_PLAY) {
+    alert(`Study at least ${MIN_STUDIED_TO_PLAY} verbs first using the 📖 Study card.`);
+    return;
+  }
+  switch(type) {
+    case 'hangman': initHangman(); break;
+    case 'speed': initSpeed({ weakOnly: false }); break;
+    case 'sort': initSort({ weakOnly: false }); break;
+    case 'story': initStory({ weakOnly: false }); break;
+    case 'battle': initBattle({ weakOnly: false }); break;
+    case 'weak': initWeakDrill(); break;
+  }
+}
+
+// ===============================================
+// GAME: STUDY (FLASHCARDS)
+// ===============================================
+let studyState = { tier: 'all', deck: [], idx: 0, flipped: false };
+let currentStudy = { verb: null };
+
+function initStudy() {
+  showScreen('gameStudy');
+  studyState = { tier: 'all', deck: [], idx: 0, flipped: false };
+  setStudyTier('all', document.querySelector('.tier-filter button[data-tier="all"]'));
+}
+
+function setStudyTier(tier, btn) {
+  studyState.tier = tier;
+  document.querySelectorAll('.tier-filter button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let pool;
+  if (tier === 'not-studied') {
+    const set = studiedSet();
+    pool = VERBS.filter(v => !set.has(v.v1));
+  } else if (tier === 'all') {
+    pool = [...VERBS];
+  } else {
+    pool = VERBS.filter(v => v.tier === tier);
+  }
+  studyState.deck = pool;
+  studyState.idx = 0;
+  studyState.flipped = false;
+  renderFlashcard();
+  updateStudyCount();
+}
+
+function updateStudyCount() {
+  document.getElementById('studyCount').textContent = (currentUser.studied || []).length;
+  document.getElementById('studyTotal').textContent = VERBS.length;
+}
+
+function renderFlashcard() {
+  const card = document.getElementById('flashcard');
+  const empty = document.getElementById('studyEmpty');
+  const front = document.getElementById('fcFront');
+  const back = document.getElementById('fcBack');
+
+  if (!studyState.deck.length) {
+    empty.classList.remove('hidden');
+    front.classList.add('hidden');
+    back.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  front.classList.remove('hidden');
+
+  const v = studyState.deck[studyState.idx];
+  currentStudy.verb = v;
+  card.classList.toggle('flipped', studyState.flipped);
+
+  // front
+  document.getElementById('fcV1').textContent = v.v1;
+  document.getElementById('fcTier').textContent = v.tier;
+  document.getElementById('fcTier').className = 'tier-badge ' + v.tier;
+
+  // back — show alternates inline if present
+  const altLine = (alts) => alts && alts.length
+    ? `<div style="font-size:11px;color:var(--text-dim);font-weight:400;margin-top:2px;">also: ${alts.join(', ')}</div>`
+    : '';
+  document.getElementById('fcV1Back').innerHTML = v.v1 + altLine(v.altV1);
+  document.getElementById('fcV2').innerHTML = v.v2 + altLine(v.altV2);
+  document.getElementById('fcV3').innerHTML = v.v3 + altLine(v.altV3);
+  document.getElementById('fcRu').textContent = '🇷🇺 ' + v.ru;
+  const ex = v.sentences && v.sentences[0] ? v.sentences[0].s.replace('___', `<strong>${v.sentences[0].answer}</strong>`) : '';
+  document.getElementById('fcExample').innerHTML = ex || '—';
+  document.getElementById('fcTierBack').textContent = v.tier;
+  document.getElementById('fcTierBack').className = 'tier-badge ' + v.tier;
+
+  // duplicate-form note
+  const dup = dupPattern(v);
+  const noteEl = document.getElementById('fcDupNote');
+  const v2cell = document.getElementById('fcV2Cell');
+  const v3cell = document.getElementById('fcV3Cell');
+  v2cell.classList.remove('dup');
+  v3cell.classList.remove('dup');
+  noteEl.classList.add('hidden');
+  if (dup === 'all-same') {
+    noteEl.textContent = '⚠ All three forms are identical (read the spelling, but pronunciation differs!)';
+    noteEl.classList.remove('hidden');
+    v2cell.classList.add('dup'); v3cell.classList.add('dup');
+  } else if (dup === 'v2v3-same') {
+    noteEl.textContent = '⚠ V2 and V3 are the same form';
+    noteEl.classList.remove('hidden');
+    v2cell.classList.add('dup'); v3cell.classList.add('dup');
+  } else if (dup === 'v1v3-same') {
+    noteEl.textContent = '⚠ V1 and V3 are the same form (only V2 changes)';
+    noteEl.classList.remove('hidden');
+    v3cell.classList.add('dup');
+  }
+
+  // Mark study buttons
+  const isStudied = (currentUser.studied || []).includes(v.v1);
+  document.getElementById('btnStudied').textContent = isStudied ? '✓ Already learned' : '✓ I know it';
+  document.getElementById('btnStudied').disabled = isStudied;
+  document.getElementById('btnUnstudy').classList.toggle('hidden', !isStudied);
+}
+
+function flipFlashcard() {
+  if (!studyState.deck.length) return;
+  studyState.flipped = !studyState.flipped;
+  document.getElementById('flashcard').classList.toggle('flipped', studyState.flipped);
+}
+
+function nextFlashcard() {
+  if (!studyState.deck.length) return;
+  studyState.idx = (studyState.idx + 1) % studyState.deck.length;
+  studyState.flipped = false;
+  renderFlashcard();
+}
+function prevFlashcard() {
+  if (!studyState.deck.length) return;
+  studyState.idx = (studyState.idx - 1 + studyState.deck.length) % studyState.deck.length;
+  studyState.flipped = false;
+  renderFlashcard();
+}
+
+function markStudied() {
+  if (!studyState.deck.length) return;
+  const v = studyState.deck[studyState.idx];
+  if (!currentUser.studied) currentUser.studied = [];
+  const wasNew = !currentUser.studied.includes(v.v1);
+  if (wasNew) {
+    currentUser.studied.push(v.v1);
+    saveProgress();
+  }
+  updateStudyCount();
+  // If filter is "not-studied", remove this verb from the deck instead of advancing
+  if (studyState.tier === 'not-studied' && wasNew) {
+    studyState.deck.splice(studyState.idx, 1);
+    if (studyState.idx >= studyState.deck.length) studyState.idx = 0;
+    studyState.flipped = false;
+    renderFlashcard();
+    return;
+  }
+  // Otherwise advance immediately to next card (no flicker on disabled button)
+  nextFlashcard();
+}
+
+function markUnstudied() {
+  if (!studyState.deck.length) return;
+  const v = studyState.deck[studyState.idx];
+  currentUser.studied = (currentUser.studied || []).filter(x => x !== v.v1);
+  saveProgress();
+  updateStudyCount();
+  renderFlashcard();
+}
+
+// ===============================================
+// GAME: HANGMAN
+// ===============================================
+let hangmanState = {};
+
+function initHangman(opts) {
+  showScreen('gameHangman');
+  opts = opts || {};
+  // Pull from custom verbs, weak pool, or studied pool. Always exclude `was/were`-style entries.
+  let pool;
+  if (opts.verbs) pool = opts.verbs.slice();
+  else if (opts.weakOnly) pool = getWeakVerbs(40);
+  else pool = getStudiedVerbs();
+  pool = pool.filter(v => !(v.v2 && v.v2.includes('/')));
+  if (pool.length === 0) {
+    alert('No suitable verbs (skipping `be` because of "was/were"). Pick more verbs!');
+    backToDash(); return;
+  }
+  const allowedForms = opts.forms || ['v2', 'v3'];
+  const totalRounds = Math.min(8, pool.length * 2);
+  const rounds = [];
+  for (let i = 0; i < totalRounds; i++) {
+    const v = pool[Math.floor(Math.random() * pool.length)];
+    // Pick form respecting allowedForms and duplicate patterns
+    const dup = dupPattern(v);
+    let candidateForms = allowedForms.slice();
+    if (dup === 'v1v3-same' && candidateForms.includes('v2') && candidateForms.length > 1) {
+      // prefer V2 (the distinct one) for verbs like come/came/come
+      if (Math.random() < 0.7) candidateForms = ['v2'];
+    }
+    const form = candidateForms[Math.floor(Math.random() * candidateForms.length)];
+    rounds.push({ verb: v, form });
+  }
+
+  hangmanState = {
+    rounds, current: 0, score: 0, round: null, ruShown: false, fromSet: !!opts.fromSet, setName: opts.setName, _opts: opts
+  };
+  currentGame = hangmanState;
+  document.getElementById('hangmanScore').textContent = '0';
+  loadHangmanRound();
+}
+
+function loadHangmanRound() {
+  const hs = hangmanState;
+  if (hs.current >= hs.rounds.length) { finishHangman(); return; }
+
+  const round = hs.rounds[hs.current];
+  hs.round = round;
+  hs.guessed = new Set();
+  hs.wrong = [];
+  hs.lives = 6;
+  hs.ruShown = false;
+
+  // Pick one variant per round (e.g. learnt vs learned). Length acts as the implicit hint.
+  const col = round.form === 'v2' ? 1 : 2;
+  const target = pickFormForCol(round.verb, col).toLowerCase();
+  hs.target = target;
+
+  document.getElementById('hangmanRound').textContent = (hs.current + 1) + '/' + hs.rounds.length;
+  document.getElementById('hangmanV1').textContent = round.verb.v1;
+  document.getElementById('hangmanFormLabel').textContent = '→ ' + formLabel(round.form);
+  document.getElementById('hangmanLives').textContent = hs.lives;
+  document.getElementById('hangmanWrong').textContent = '—';
+  document.getElementById('hangmanFeedback').textContent = '';
+  document.getElementById('hangmanRu').textContent = '🇷🇺 ' + round.verb.ru;
+  document.getElementById('hangmanRu').classList.add('hidden');
+
+  // word display
+  renderHangmanWord();
+
+  // keyboard
+  const kb = document.getElementById('hangmanKeyboard');
+  kb.innerHTML = '';
+  for (let i = 0; i < 26; i++) {
+    const ch = String.fromCharCode(97 + i); // a-z
+    const btn = document.createElement('button');
+    btn.className = 'hangman-key';
+    btn.textContent = ch;
+    btn.onclick = () => guessLetter(ch, btn);
+    kb.appendChild(btn);
+  }
+
+  // reset stickman
+  ['hmHead','hmBody','hmArmL','hmArmR','hmLegL','hmLegR'].forEach(id => {
+    document.getElementById(id).classList.remove('shown');
+  });
+}
+
+function renderHangmanWord() {
+  const hs = hangmanState;
+  const wordEl = document.getElementById('hangmanWord');
+  wordEl.innerHTML = '';
+  for (const ch of hs.target) {
+    const span = document.createElement('span');
+    if (/[a-z]/.test(ch)) {
+      span.className = 'hangman-letter' + (hs.guessed.has(ch) ? ' revealed' : '');
+      span.textContent = hs.guessed.has(ch) ? ch : '';
+    } else {
+      span.className = 'hangman-letter space';
+      span.textContent = ch;
+    }
+    wordEl.appendChild(span);
+  }
+}
+
+function guessLetter(ch, btn) {
+  const hs = hangmanState;
+  if (hs.guessed.has(ch) || hs.wrong.includes(ch) || hs.lives <= 0) return;
+  if (hs.target.includes(ch)) {
+    hs.guessed.add(ch);
+    btn.classList.add('correct');
+    btn.disabled = true;
+    renderHangmanWord();
+    // Win check
+    const allLetters = [...hs.target].filter(c => /[a-z]/.test(c));
+    if (allLetters.every(c => hs.guessed.has(c))) {
+      hs.score += hs.lives * 10 + 30;
+      document.getElementById('hangmanScore').textContent = hs.score;
+      document.getElementById('hangmanFeedback').innerHTML = `<span style="color:var(--green)">✓ Solved! +${hs.lives * 10 + 30}</span>`;
+      recordVerbAttempt(hs.round.verb.v1, true);
+      hs.current++;
+      setTimeout(loadHangmanRound, 1600);
+    }
+  } else {
+    hs.wrong.push(ch);
+    hs.lives--;
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    document.getElementById('hangmanLives').textContent = hs.lives;
+    document.getElementById('hangmanWrong').textContent = hs.wrong.join(' ').toUpperCase();
+    // Reveal next stickman part
+    const parts = ['hmHead','hmBody','hmArmL','hmArmR','hmLegL','hmLegR'];
+    const idx = 6 - hs.lives - 1;
+    if (parts[idx]) document.getElementById(parts[idx]).classList.add('shown');
+    if (hs.lives <= 0) {
+      document.getElementById('hangmanFeedback').innerHTML = `<span style="color:var(--red)">✗ Out of lives! → ${hs.target}</span>`;
+      // reveal full word
+      hs.guessed = new Set([...hs.target].filter(c => /[a-z]/.test(c)));
+      renderHangmanWord();
+      recordVerbAttempt(hs.round.verb.v1, false);
+      hs.current++;
+      setTimeout(loadHangmanRound, 2200);
+    }
+  }
+}
+
+function toggleHangmanRu() {
+  hangmanState.ruShown = !hangmanState.ruShown;
+  document.getElementById('hangmanRu').classList.toggle('hidden', !hangmanState.ruShown);
+}
+
+function finishHangman() {
+  const hs = hangmanState;
+  if (hs.score > currentUser.gameScores.hangman) currentUser.gameScores.hangman = hs.score;
+  const detail = hs.fromSet ? `Set: ${hs.setName} · ${hs.rounds.length} rounds` : `${hs.rounds.length} rounds played`;
+  showResults('Hangman Complete!', hs.score, detail, Math.round(hs.score / 5), () => initHangman(hs._opts));
+}
+
+// ===============================================
+// GAME: SPEED QUIZ (with reverse direction)
+// ===============================================
+let speedState = {};
+
+function initSpeed(opts) {
+  showScreen('gameSpeed');
+  opts = opts || {};
+  let pool;
+  if (opts.verbs) pool = opts.verbs;
+  else if (opts.weakOnly) pool = getWeakVerbs(15);
+  else pool = getStudiedVerbs();
+  if (pool.length < 1) { alert('Not enough verbs.'); backToDash(); return; }
+  const verbs = pickRandom(pool, Math.min(15, pool.length));
+  const allowedForms = opts.forms || ['v2', 'v3'];
+  const reverseEnabled = !opts.verbs && (currentUser.settings.reverseSpeed === 'on');
+  const rounds = verbs.map(v => {
+    let askForm;
+    if (reverseEnabled && Math.random() < 0.33) {
+      askForm = 'v1'; // shown V2 or V3, ask V1
+    } else {
+      askForm = allowedForms[Math.floor(Math.random() * allowedForms.length)];
+    }
+    let shownForm, shownWord;
+    if (askForm === 'v1') {
+      shownForm = Math.random() < 0.5 ? 'v2' : 'v3';
+      shownWord = pickDisplayForm(shownForm === 'v2' ? v.v2 : v.v3);
+    } else {
+      shownForm = 'v1';
+      shownWord = v.v1;
+    }
+    return { verb: v, askForm, shownForm, shownWord };
+  });
+
+  const timerSec = currentUser.settings.speedTimer || 10;
+  speedState = { rounds, current: 0, score: 0, streak: 0, maxStreak: 0, timeLeft: timerSec, timerSec, timer: null, round: null, ruShown: false, fromSet: !!opts.fromSet, setName: opts.setName, _opts: opts };
+  currentGame = speedState;
+
+  document.getElementById('speedScore').textContent = '0';
+  document.getElementById('speedStreak').textContent = '0';
+  document.getElementById('speedFeedback').textContent = '';
+  loadSpeedRound();
+}
+
+function loadSpeedRound() {
+  const ss = speedState;
+  if (ss.current >= ss.rounds.length) { finishSpeed(); return; }
+
+  const round = ss.rounds[ss.current];
+  ss.round = round;
+  ss.ruShown = false;
+  document.getElementById('speedRound').textContent = (ss.current + 1) + '/' + ss.rounds.length;
+  document.getElementById('speedWord').textContent = round.shownWord;
+  document.getElementById('speedRu').textContent = '🇷🇺 ' + round.verb.ru;
+  document.getElementById('speedRu').classList.add('hidden');
+  document.getElementById('speedPrompt').textContent = `Write the ${round.askForm.toUpperCase()} form of:`;
+  document.getElementById('speedFormLabel').textContent = '→ ' + formLabel(round.askForm);
+  document.getElementById('speedFeedback').textContent = '';
+
+  const input = document.getElementById('speedInput');
+  input.value = '';
+  input.className = 'speed-input';
+  input.focus();
+  input.onkeydown = function(e) { if (e.key === 'Enter') checkSpeedAnswer(); };
+
+  ss.timeLeft = ss.timerSec;
+  document.getElementById('speedTimer').style.width = '100%';
+  if (ss.timer) clearInterval(ss.timer);
+  ss.timer = setInterval(() => {
+    ss.timeLeft -= 0.1;
+    document.getElementById('speedTimer').style.width = Math.max(0, ss.timeLeft / ss.timerSec * 100) + '%';
+    if (ss.timeLeft <= 0) {
+      clearInterval(ss.timer);
+      speedTimeout();
+    }
+  }, 100);
+}
+
+function checkSpeedAnswer() {
+  const ss = speedState;
+  const round = ss.round;
+  const input = document.getElementById('speedInput');
+  clearInterval(ss.timer);
+  const ok = isAnswerCorrect(input.value, round.verb, round.askForm);
+  if (ok) {
+    input.className = 'speed-input correct';
+    ss.score += Math.round(10 + ss.timeLeft * 5);
+    ss.streak++;
+    if (ss.streak > ss.maxStreak) ss.maxStreak = ss.streak;
+    document.getElementById('speedFeedback').innerHTML = '<span style="color:var(--green)">✓ Correct!</span>';
+    recordVerbAttempt(round.verb.v1, true);
+  } else {
+    input.className = 'speed-input wrong';
+    ss.streak = 0;
+    document.getElementById('speedFeedback').innerHTML = `<span style="color:var(--red)">✗ ${displayAllForms(round.verb, round.askForm)}</span>`;
+    recordVerbAttempt(round.verb.v1, false);
+  }
+  document.getElementById('speedScore').textContent = ss.score;
+  document.getElementById('speedStreak').textContent = ss.streak;
+  ss.current++;
+  setTimeout(loadSpeedRound, 1200);
+}
+
+function speedTimeout() {
+  const ss = speedState;
+  const round = ss.round;
+  document.getElementById('speedInput').className = 'speed-input wrong';
+  ss.streak = 0;
+  document.getElementById('speedFeedback').innerHTML = `<span style="color:var(--red)">⏰ Time's up! → ${displayAllForms(round.verb, round.askForm)}</span>`;
+  document.getElementById('speedStreak').textContent = '0';
+  recordVerbAttempt(round.verb.v1, false);
+  ss.current++;
+  setTimeout(loadSpeedRound, 1500);
+}
+
+function toggleSpeedRu() {
+  speedState.ruShown = !speedState.ruShown;
+  document.getElementById('speedRu').classList.toggle('hidden', !speedState.ruShown);
+}
+
+function finishSpeed() {
+  const ss = speedState;
+  if (ss.score > currentUser.gameScores.speed) currentUser.gameScores.speed = ss.score;
+  if (ss.maxStreak > currentUser.bestStreak) currentUser.bestStreak = ss.maxStreak;
+  const detail = ss.fromSet ? `Set: ${ss.setName} · Best streak: ${ss.maxStreak} 🔥` : `Best streak: ${ss.maxStreak} 🔥`;
+  showResults('Speed Demon!', ss.score, detail, Math.round(ss.score / 5), () => initSpeed(ss._opts));
+}
+
+// ===============================================
+// GAME: SORT IT OUT (with dup-form awareness)
+// ===============================================
+let sortState = {};
+
+function initSort(opts) {
+  showScreen('gameSort');
+  opts = opts || {};
+  let pool;
+  if (opts.verbs) pool = opts.verbs;
+  else if (opts.weakOnly) pool = getWeakVerbs(20);
+  else pool = getStudiedVerbs();
+  if (pool.length < 1) { alert('Not enough verbs.'); backToDash(); return; }
+
+  // Build items: pick a form per verb. Skip 'read' (all-same) and verbs where chosen form is ambiguous in a non-helpful way.
+  // For dup-form verbs we accept multiple correct columns.
+  const verbs = pickRandom(pool, Math.min(20, pool.length));
+  // If forms restricted (from a custom set), only ask those columns
+  const allowedCols = opts.forms ? opts.forms.map(f => f === 'v1' ? 0 : f === 'v2' ? 1 : 2) : [0,1,2];
+  const items = [];
+  verbs.forEach(v => {
+    const dup = dupPattern(v);
+    if (dup === 'all-same') return; // skip
+    const formIdx = allowedCols[Math.floor(Math.random() * allowedCols.length)];
+    const word = pickFormForCol(v, formIdx);
+    if (!word) return;
+    items.push({ word, chosenCol: formIdx, verb: v });
+  });
+  if (items.length < 3) { alert('Need more verbs (some skipped due to identical forms).'); backToDash(); return; }
+
+  const timerSec = currentUser.settings.sortTimer || 8;
+  sortState = { items, current: 0, score: 0, timeLeft: timerSec, timerSec, timer: null, item: null, fromSet: !!opts.fromSet, setName: opts.setName, _opts: opts, allowedCols };
+  // Show only allowed-form buttons (for restricted sets)
+  const sortBtns = document.querySelectorAll('#gameSort .sort-btn');
+  sortBtns.forEach((b, i) => {
+    b.style.display = allowedCols.includes(i) ? '' : 'none';
+  });
+  // Adjust grid layout for visible buttons
+  const visibleCount = allowedCols.length;
+  document.querySelector('#gameSort .sort-buttons').style.gridTemplateColumns = `repeat(${Math.max(visibleCount, 1)}, 1fr)`;
+  currentGame = sortState;
+  document.getElementById('sortScore').textContent = '0';
+  loadSortRound();
+}
+
+function loadSortRound() {
+  const ss = sortState;
+  if (ss.current >= ss.items.length) { finishSort(); return; }
+  const item = ss.items[ss.current];
+  ss.item = item;
+  document.getElementById('sortRound').textContent = (ss.current + 1) + '/' + ss.items.length;
+  document.getElementById('sortWord').textContent = item.word;
+  document.getElementById('sortFeedback').textContent = '';
+  document.querySelectorAll('.sort-btn').forEach(b => b.className = 'sort-btn');
+
+  ss.timeLeft = ss.timerSec;
+  document.getElementById('sortTimer').style.width = '100%';
+  if (ss.timer) clearInterval(ss.timer);
+  ss.timer = setInterval(() => {
+    ss.timeLeft -= 0.1;
+    document.getElementById('sortTimer').style.width = Math.max(0, ss.timeLeft / ss.timerSec * 100) + '%';
+    if (ss.timeLeft <= 0) { clearInterval(ss.timer); sortAnswer(-1); }
+  }, 100);
+}
+
+function sortAnswer(col) {
+  const ss = sortState;
+  if (ss.current >= ss.items.length) return;
+  clearInterval(ss.timer);
+  const item = ss.item;
+  const btns = document.querySelectorAll('.sort-btn');
+  // Accept any column whose form matches the displayed word (handles dup forms)
+  const validCols = formsForWord(item.verb, item.word);
+  const formNames = ['V1 (Base)', 'V2 (Past Simple)', 'V3 (Past Participle)'];
+
+  if (validCols.includes(col)) {
+    btns[col].classList.add('correct');
+    ss.score += Math.round(10 + ss.timeLeft * 3);
+    const acceptedNote = validCols.length > 1 ? ` (also valid: ${validCols.filter(c=>c!==col).map(c=>formNames[c].split(' ')[0]).join(', ')})` : '';
+    document.getElementById('sortFeedback').innerHTML = `<span style="color:var(--green)">✓ Correct! "${item.word}" is ${formNames[col]} of "${item.verb.v1}"${acceptedNote}</span>`;
+    recordVerbAttempt(item.verb.v1, true);
+  } else {
+    if (col >= 0) btns[col].classList.add('wrong');
+    validCols.forEach(c => btns[c].classList.add('correct'));
+    const validLabels = validCols.map(c => formNames[c]).join(' or ');
+    const formsLine = `${item.verb.v1} — ${displayAllForms(item.verb, 'v2')} — ${displayAllForms(item.verb, 'v3')}`;
+    document.getElementById('sortFeedback').innerHTML = `<span style="color:var(--red)">✗ "${item.word}" is ${validLabels} of "${item.verb.v1}" (${formsLine})</span>`;
+    recordVerbAttempt(item.verb.v1, false);
+  }
+  document.getElementById('sortScore').textContent = ss.score;
+  ss.current++;
+  setTimeout(loadSortRound, 1900);
+}
+
+function finishSort() {
+  const ss = sortState;
+  if (ss.score > currentUser.gameScores.sort) currentUser.gameScores.sort = ss.score;
+  const detail = ss.fromSet ? `Set: ${ss.setName} · ${ss.items.length} forms` : `Sorted ${ss.items.length} verb forms`;
+  showResults('Great Sorting!', ss.score, detail, Math.round(ss.score / 5), () => initSort(ss._opts));
+}
+
+// ===============================================
+// GAME: STORY DETECTIVE (preserved as Dasha requested)
+// ===============================================
+let storyState = {};
+
+function initStory(opts) {
+  showScreen('gameStory');
+  opts = opts || {};
+  let verbPool;
+  if (opts.verbs) verbPool = opts.verbs;
+  else if (opts.weakOnly) verbPool = getWeakVerbs(12);
+  else verbPool = getStudiedVerbs();
+  if (verbPool.length < 1) { alert('Not enough verbs.'); backToDash(); return; }
+  const allowedForms = opts.forms || ['v2','v3'];
+  const sentencePool = [];
+  verbPool.forEach(v => v.sentences.forEach(s => {
+    if (allowedForms.includes(s.form)) sentencePool.push({ verb: v, ...s });
+  }));
+  if (!sentencePool.length) { alert('No sentences match this set\'s form selection.'); backToDash(); return; }
+  const rounds = pickRandom(sentencePool, Math.min(12, sentencePool.length));
+
+  storyState = { rounds, current: 0, score: 0, fromSet: !!opts.fromSet, setName: opts.setName, _opts: opts };
+  currentGame = storyState;
+  document.getElementById('storyScore').textContent = '0';
+  loadStoryRound();
+}
+
+function loadStoryRound() {
+  const ss = storyState;
+  if (ss.current >= ss.rounds.length) { finishStory(); return; }
+  const round = ss.rounds[ss.current];
+  document.getElementById('storyRound').textContent = (ss.current + 1) + '/' + ss.rounds.length;
+  document.getElementById('storyNum').textContent = `Case ${ss.current + 1} of ${ss.rounds.length}`;
+
+  const sentenceHtml = round.s.replace('___', '<span class="blank">???</span>');
+  document.getElementById('storySentence').innerHTML = sentenceHtml;
+
+  const fLabel = formLabel(round.form);
+  document.getElementById('storyHint').innerHTML =
+    `Verb: <strong>${round.verb.v1}</strong> → Write the <strong>${fLabel}</strong> form ` +
+    `<button class="icon-btn small" onclick="speakWord('${round.verb.v1.replace(/'/g,"\\'")}')">🔊</button>`;
+
+  const opts = shuffle(round.options);
+  const optsEl = document.getElementById('storyOptions');
+  optsEl.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'story-option';
+    btn.textContent = o;
+    btn.onclick = () => storyAnswer(btn, o, round.answer);
+    optsEl.appendChild(btn);
+  });
+  document.getElementById('storyFeedback').textContent = '';
+}
+
+function storyAnswer(btn, chosen, correct) {
+  const ss = storyState;
+  const round = ss.rounds[ss.current];
+  const allBtns = document.querySelectorAll('.story-option');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    ss.score += 15;
+    document.getElementById('storyFeedback').innerHTML = '<span style="color:var(--green)">✓ Correct!</span>';
+    recordVerbAttempt(round.verb.v1, true);
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    document.getElementById('storyFeedback').innerHTML = `<span style="color:var(--red)">✗ The correct answer is: ${correct}</span>`;
+    recordVerbAttempt(round.verb.v1, false);
+  }
+  const blank = document.querySelector('.blank');
+  if (blank) {
+    blank.textContent = correct;
+    blank.style.color = chosen === correct ? 'var(--green)' : 'var(--red)';
+  }
+  document.getElementById('storyScore').textContent = ss.score;
+  ss.current++;
+  setTimeout(loadStoryRound, 2000);
+}
+
+function finishStory() {
+  const ss = storyState;
+  if (ss.score > currentUser.gameScores.story) currentUser.gameScores.story = ss.score;
+  const detail = ss.fromSet ? `Set: ${ss.setName} · ${ss.rounds.length} cases` : `Handled ${ss.rounds.length} cases!`;
+  showResults('Case Solved!', ss.score, detail, Math.round(ss.score / 3), () => initStory(ss._opts));
+}
+
+// ===============================================
+// GAME: VERB BATTLE (with N-defeated win condition)
+// ===============================================
+let battleState = {};
+
+const ENEMIES = [
+  { name: 'Goblin', sprite: '👹', hp: 50 },
+  { name: 'Skeleton', sprite: '💀', hp: 60 },
+  { name: 'Dark Wizard', sprite: '🧛', hp: 75 },
+  { name: 'Dragon', sprite: '🐉', hp: 100 },
+  { name: 'Demon Lord', sprite: '😈', hp: 120 },
+];
+const BATTLE_TARGET = 5;
+
+function initBattle(opts) {
+  showScreen('gameBattle');
+  opts = opts || {};
+  let pool;
+  if (opts.verbs) pool = opts.verbs;
+  else if (opts.weakOnly) pool = getWeakVerbs(40);
+  else pool = getStudiedVerbs();
+  if (pool.length < 4) { alert('Need at least 4 verbs for Battle.'); backToDash(); return; }
+
+  battleState = {
+    playerHp: 100, playerMaxHp: 100,
+    enemyIdx: 0, enemyHp: 0, enemyMaxHp: 0,
+    defeated: 0, score: 0, pool,
+    target: BATTLE_TARGET,
+    round: null, ruShown: false,
+    allowedForms: opts.forms || ['v2','v3'],
+    fromSet: !!opts.fromSet, setName: opts.setName, _opts: opts
+  };
+  currentGame = battleState;
+
+  document.getElementById('playerBattleName').textContent = currentUser.name;
+  document.getElementById('battleDefeated').textContent = '0';
+  document.getElementById('battleTotal').textContent = BATTLE_TARGET;
+  spawnEnemy();
+}
+
+function spawnEnemy() {
+  const bs = battleState;
+  const enemy = ENEMIES[Math.min(bs.enemyIdx, ENEMIES.length - 1)];
+  bs.enemyHp = enemy.hp + bs.enemyIdx * 10;
+  bs.enemyMaxHp = bs.enemyHp;
+  document.getElementById('enemySprite').textContent = enemy.sprite;
+  document.getElementById('enemyName').textContent = enemy.name;
+  updateBattleHp();
+  loadBattleQuestion();
+}
+
+function updateBattleHp() {
+  const bs = battleState;
+  document.getElementById('playerHp').style.width = (bs.playerHp / bs.playerMaxHp * 100) + '%';
+  document.getElementById('playerHpText').textContent = bs.playerHp + '/' + bs.playerMaxHp;
+  document.getElementById('enemyHp').style.width = (bs.enemyHp / bs.enemyMaxHp * 100) + '%';
+  document.getElementById('enemyHpText').textContent = bs.enemyHp + '/' + bs.enemyMaxHp;
+}
+
+function loadBattleQuestion() {
+  const bs = battleState;
+  const pool = bs.pool;
+  const verb = pool[Math.floor(Math.random() * pool.length)];
+  const askForm = bs.allowedForms[Math.floor(Math.random() * bs.allowedForms.length)];
+  const answer = pickDisplayForm(askForm === 'v2' ? verb.v2 : verb.v3);
+  bs.round = { verb, askForm, answer, shownWord: verb.v1 };
+  bs.ruShown = false;
+
+  document.getElementById('battleWord').textContent = verb.v1;
+  document.getElementById('battleRu').textContent = '🇷🇺 ' + verb.ru;
+  document.getElementById('battleRu').classList.add('hidden');
+  document.getElementById('battleForm').textContent = '→ ' + formLabel(askForm);
+  document.getElementById('battleLog').textContent = '';
+
+  // Generate options from any verb (not just pool) for variety
+  const wrongOptions = VERBS.filter(v => v.v1 !== verb.v1)
+    .map(v => pickDisplayForm(askForm === 'v2' ? v.v2 : v.v3))
+    .filter(w => w && w !== answer);
+  const opts = shuffle([answer, ...pickRandom(wrongOptions, 3)]);
+
+  const optsEl = document.getElementById('battleOptions');
+  optsEl.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'battle-opt';
+    btn.textContent = o;
+    btn.onclick = () => battleAnswer(btn, o, answer, verb.v1);
+    optsEl.appendChild(btn);
+  });
+}
+
+function battleAnswer(btn, chosen, correct, verbV1) {
+  const bs = battleState;
+  const allBtns = document.querySelectorAll('.battle-opt');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+  const playerSprite = document.getElementById('playerSprite');
+  const enemySprite = document.getElementById('enemySprite');
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    const dmg = 20 + Math.floor(Math.random() * 10);
+    bs.enemyHp = Math.max(0, bs.enemyHp - dmg);
+    playerSprite.classList.add('attack');
+    setTimeout(() => { enemySprite.classList.add('hurt'); }, 200);
+    document.getElementById('battleLog').innerHTML = `<span style="color:var(--green)">✓ You deal ${dmg} damage!</span>`;
+    recordVerbAttempt(verbV1, true);
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    const dmg = 15 + Math.floor(Math.random() * 10);
+    bs.playerHp = Math.max(0, bs.playerHp - dmg);
+    enemySprite.classList.add('attack');
+    setTimeout(() => { playerSprite.classList.add('hurt'); }, 200);
+    document.getElementById('battleLog').innerHTML = `<span style="color:var(--red)">✗ Enemy hits you for ${dmg}! Answer: ${correct}</span>`;
+    recordVerbAttempt(verbV1, false);
+  }
+
+  updateBattleHp();
+  setTimeout(() => {
+    playerSprite.classList.remove('attack', 'hurt');
+    enemySprite.classList.remove('attack', 'hurt');
+  }, 600);
+
+  setTimeout(() => {
+    if (bs.playerHp <= 0) {
+      finishBattle('defeat');
+    } else if (bs.enemyHp <= 0) {
+      bs.defeated++;
+      bs.enemyIdx++;
+      document.getElementById('battleDefeated').textContent = bs.defeated;
+      if (bs.defeated >= bs.target) {
+        finishBattle('victory'); return;
+      }
+      bs.playerHp = Math.min(bs.playerMaxHp, bs.playerHp + 20);
+      document.getElementById('battleLog').innerHTML = `<span style="color:var(--green)">🎉 Enemy defeated! +20 HP!</span>`;
+      updateBattleHp();
+      setTimeout(spawnEnemy, 1400);
+    } else {
+      loadBattleQuestion();
+    }
+  }, 1100);
+}
+
+function toggleBattleRu() {
+  battleState.ruShown = !battleState.ruShown;
+  document.getElementById('battleRu').classList.toggle('hidden', !battleState.ruShown);
+}
+
+function finishBattle(outcome) {
+  const bs = battleState;
+  if (bs.defeated > currentUser.gameScores.battle) currentUser.gameScores.battle = bs.defeated;
+  if (bs.defeated > currentUser.bestStreak) currentUser.bestStreak = bs.defeated;
+  const tag = bs.fromSet ? `Set: ${bs.setName} · ` : '';
+  if (outcome === 'victory') {
+    showResults('🏆 Victory!', bs.defeated + ' enemies', `${tag}Defeated ${BATTLE_TARGET} monsters with ${bs.playerHp}/${bs.playerMaxHp} HP left!`, bs.defeated * 15, () => initBattle(bs._opts));
+  } else {
+    showResults('Defeated', bs.defeated + ' enemies', `${tag}You fought bravely. Try again!`, bs.defeated * 8, () => initBattle(bs._opts));
+  }
+}
+
+// ===============================================
+// MY WEAK VERBS — pick a random game with weak-only pool
+// ===============================================
+function initWeakDrill() {
+  const weak = getWeakVerbs(20);
+  if (weak.length < 3) { alert('Play a few games first so we know which verbs you struggle with.'); return; }
+  // Pick a random format
+  const formats = ['speed', 'sort', 'story', 'battle'];
+  const choice = formats[Math.floor(Math.random() * formats.length)];
+  const opts = { weakOnly: true };
+  if (choice === 'speed') initSpeed(opts);
+  else if (choice === 'sort') initSort(opts);
+  else if (choice === 'story') initStory(opts);
+  else initBattle(opts);
+}
+
+// ===============================================
+// INIT
+// ===============================================
+document.addEventListener('DOMContentLoaded', () => {
+  const data = loadData();
+  const lastUser = localStorage.getItem('verbmaster_lastuser');
+  if (lastUser) {
+    const user = data.users.find(u => u.id === lastUser);
+    if (user) { ensureUserShape(user); currentUser = user; showDashboard(); return; }
+  }
+  showScreen('loginScreen');
+});
+</script>
+
+<!-- PWA bootstrap: registers service worker for offline + install support.
+     Doesn't interfere with the legacy code above — just adds PWA capability. -->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

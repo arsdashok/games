@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable icon: full-bleed background, design within central 80% safe zone -->
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="text" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f3e8ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full square background (mask rounds corners as needed) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Lightning bolt in the safe zone (slightly smaller for padding) -->
+  <g transform="translate(256 256) scale(0.85)">
+    <path d="M -30 -130 L 30 -130 L 0 -20 L 60 -20 L -30 130 L 0 20 L -60 20 Z"
+          fill="url(#text)"
+          stroke="rgba(0,0,0,0.15)"
+          stroke-width="3"
+          stroke-linejoin="round"/>
+  </g>
+</svg>

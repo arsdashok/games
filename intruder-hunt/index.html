@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Intruder Hunt! - Subtraction with Exchange</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #1a3a1a;
+    font-family: 'Nunito', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCRATCH PAD PANEL ===== */
+  .scratch-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 200;
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #8B4513, #a0682a);
+    color: #ffd700;
+    border: 3px solid #6b3a12;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+  }
+  .scratch-toggle:hover { transform: scale(1.05); }
+
+  .scratch-panel {
+    position: fixed;
+    top: 0;
+    right: -480px;
+    width: 470px;
+    height: 100vh;
+    z-index: 150;
+    background: linear-gradient(180deg, #fdf6e3, #fef9ef);
+    border-left: 5px solid #c4893b;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.4);
+    transition: right 0.4s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .scratch-panel.open { right: 0; }
+
+  .scratch-header {
+    background: linear-gradient(135deg, #8B4513, #a0682a);
+    color: #ffd700;
+    padding: 14px 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .scratch-close {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 5px;
+  }
+
+  .scratch-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  /* Column subtraction working area */
+  .work-area {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .work-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    color: #8B4513;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .work-badge {
+    font-size: 11px;
+    background: #fde68a;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+  }
+  .work-badge.done {
+    background: #bbf7d0;
+    color: #14532d;
+  }
+
+  /* Grid for column subtraction */
+  .column-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: 'Fredoka One', cursive;
+  }
+  .col-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .col-cell {
+    width: 42px;
+    height: 42px;
+    text-align: center;
+    font-size: 22px;
+    color: #3a2a10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .col-cell.op {
+    font-size: 20px;
+    color: #c0392b;
+    width: 30px;
+  }
+
+  /* Exchange row - small cells on top */
+  .exchange-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: -2px;
+  }
+  .exchange-cell {
+    width: 42px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .exchange-cell input {
+    width: 28px;
+    height: 22px;
+    border: 1.5px dashed #c4b5fd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    color: #7c3aed;
+    background: #faf8ff;
+    outline: none;
+  }
+  .exchange-cell input:focus {
+    border-color: #7c3aed;
+    background: #ede9fe;
+  }
+  .exchange-spacer { width: 30px; height: 24px; }
+
+  /* Answer row */
+  .answer-row {
+    display: flex;
+    gap: 0;
+    border-top: 3px solid #3a2a10;
+    padding-top: 4px;
+  }
+  .answer-cell {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .answer-cell input {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #e0d5b0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 22px;
+    font-family: 'Fredoka One', cursive;
+    color: #27ae60;
+    background: #fefef6;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .answer-cell input:focus {
+    border-color: #f39c12;
+    background: #fffde6;
+  }
+  .answer-cell input.correct-digit {
+    background: #d5f5e3;
+    border-color: #27ae60;
+    color: #1e8449;
+  }
+  .answer-cell input.wrong-digit {
+    background: #fadbd8;
+    border-color: #e74c3c;
+    color: #c0392b;
+  }
+  .answer-spacer { width: 30px; height: 42px; }
+
+  .check-btn {
+    margin-top: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    color: #5a3000;
+    border: 2px solid #d4880f;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .check-btn:hover { transform: scale(1.04); }
+
+  .work-feedback {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    min-height: 22px;
+  }
+
+  /* ===== GAME BOARD ===== */
+  .game-board {
+    position: relative;
+    width: 1300px;
+    min-height: 1000px;
+    margin: 0 auto;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(34,120,50,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(34,120,50,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(20,80,30,0.5) 0%, transparent 70%),
+      linear-gradient(180deg, #1e4d2b 0%, #153a1f 30%, #0f2d16 60%, #1a3a1a 100%);
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  .jungle-bg {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  }
+  .jungle-bg::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 120px;
+    background: linear-gradient(180deg, rgba(10,50,10,0.8) 0%, transparent 100%);
+  }
+  .vine {
+    position: absolute; width: 4px;
+    background: linear-gradient(180deg, #2d5a1e, #4a8a2a); border-radius: 2px;
+  }
+  .vine::after { content: '\1F343'; position: absolute; bottom: -5px; left: -8px; font-size: 20px; }
+  .vine:nth-child(1) { left: 5%; top: 0; height: 80px; transform: rotate(5deg); }
+  .vine:nth-child(2) { left: 15%; top: 0; height: 110px; transform: rotate(-3deg); }
+  .vine:nth-child(3) { right: 8%; top: 0; height: 95px; transform: rotate(4deg); }
+  .vine:nth-child(4) { right: 20%; top: 0; height: 70px; transform: rotate(-6deg); }
+
+  .tree-emoji { position: absolute; font-size: 40px; opacity: 0.5; z-index: 0; }
+
+  .title-banner { position: relative; z-index: 2; text-align: center; margin-bottom: 15px; }
+  .title-banner h1 {
+    font-family: 'Fredoka One', cursive; font-size: 52px; color: #ffd700;
+    text-shadow: 3px 3px 0 #8B4513, -1px -1px 0 #8B4513, 1px -1px 0 #8B4513, -1px 1px 0 #8B4513, 0 5px 10px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #ffd700, #ff8c00);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(3px 4px 2px rgba(0,0,0,0.6));
+  }
+  .title-sub {
+    font-family: 'Nunito', sans-serif; font-size: 18px; color: #a8d5a0;
+    font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-top: 2px;
+  }
+
+  .station {
+    position: absolute; z-index: 10; display: flex; flex-direction: column;
+    align-items: center; transition: transform 0.2s;
+  }
+  .station:hover { transform: scale(1.03); }
+  .station-number {
+    font-family: 'Fredoka One', cursive; font-size: 32px; color: #ffd700;
+    text-shadow: 2px 2px 0 #5a3000, 0 0 10px rgba(255,165,0,0.5); margin-bottom: 2px;
+  }
+  .station-label {
+    font-family: 'Fredoka One', cursive; font-size: 14px; color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 4px; letter-spacing: 1px;
+  }
+
+  .problem-card {
+    background: linear-gradient(145deg, #fff9e6, #fff3cc, #ffeeb3);
+    border: 3px solid #c4893b; border-radius: 10px; padding: 10px 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.8);
+    min-width: 260px;
+  }
+
+  .option-row {
+    display: flex; align-items: center; margin: 5px 0; padding: 6px 10px;
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    border: 2px solid transparent; position: relative;
+  }
+  .option-row:hover { background: rgba(255, 200, 50, 0.2); border-color: #e6a820; }
+
+  .option-letter {
+    font-family: 'Fredoka One', cursive; font-size: 20px; margin-right: 10px;
+    width: 30px; height: 30px; display: flex; align-items: center;
+    justify-content: center; border-radius: 50%; color: white;
+  }
+  .option-a .option-letter { background: #e74c3c; }
+  .option-b .option-letter { background: #3498db; }
+
+  .option-expression { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #3a2a10; }
+  .option-answer { font-family: 'Fredoka One', cursive; font-size: 22px; margin-left: auto; padding-left: 10px; }
+  .option-a .option-answer { color: #c0392b; }
+  .option-b .option-answer { color: #2980b9; }
+
+  .option-row.correct { background: rgba(46, 204, 113, 0.25); border-color: #27ae60; }
+  .option-row.correct::after { content: '\2713'; font-size: 24px; color: #27ae60; font-weight: 900; margin-left: 8px; }
+  .option-row.intruder-found { background: rgba(231, 76, 60, 0.2); border-color: #e74c3c; }
+  .option-row.intruder-found::after { content: '\2717'; font-size: 28px; color: #e74c3c; font-weight: 900; margin-left: 8px; }
+  .option-row.wrong-pick { background: rgba(231, 76, 60, 0.15); border-color: #e67e22; animation: shake 0.5s ease; }
+
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  @keyframes glow-pulse { 0%, 100% { box-shadow: 0 0 5px rgba(255,215,0,0.3); } 50% { box-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 30px rgba(255,165,0,0.4); } }
+  .station.active .problem-card { animation: glow-pulse 2s infinite; }
+
+  .marker {
+    position: absolute; z-index: 15; font-family: 'Fredoka One', cursive;
+    padding: 8px 20px; border-radius: 10px; font-size: 22px; text-align: center;
+  }
+  .start-marker {
+    background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff;
+    border: 3px solid #922b21; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    top: 100px; left: 30px;
+  }
+  .start-marker::before { content: '\1F525'; display: block; font-size: 30px; margin-bottom: 2px; }
+  .treasure-marker {
+    background: linear-gradient(135deg, #f39c12, #f1c40f); color: #5a3000;
+    border: 3px solid #d4880f; box-shadow: 0 4px 15px rgba(241,196,15,0.5);
+    top: 50px; right: 30px;
+  }
+  .treasure-marker::before { content: '\1F4B0'; display: block; font-size: 36px; margin-bottom: 2px; }
+  .treasure-marker { transition: transform 0.2s, box-shadow 0.2s; }
+  .treasure-marker:hover { transform: scale(1.08); box-shadow: 0 4px 25px rgba(241,196,15,0.8); }
+
+  .score-panel {
+    position: absolute; z-index: 20; top: 15px; left: 50%;
+    transform: translateX(-50%); display: flex; gap: 20px; align-items: center;
+  }
+  .score-box {
+    background: rgba(0,0,0,0.5); border: 2px solid #4a8a2a; border-radius: 10px;
+    padding: 6px 18px; color: #a8d5a0; font-weight: 700; font-size: 15px;
+    backdrop-filter: blur(5px);
+  }
+  .score-box span { color: #ffd700; font-family: 'Fredoka One', cursive; font-size: 20px; margin-left: 5px; }
+
+  svg.path-lines { position: absolute; inset: 0; z-index: 1; pointer-events: none; width: 100%; height: 100%; }
+
+  .victory-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+  }
+  .victory-overlay.show { display: flex; }
+  .victory-card {
+    background: linear-gradient(145deg, #fff9e6, #fff3cc); border: 5px solid #f1c40f;
+    border-radius: 20px; padding: 40px 60px; text-align: center;
+    box-shadow: 0 0 60px rgba(241,196,15,0.4); animation: victory-pop 0.5s ease;
+  }
+  @keyframes victory-pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .victory-card h2 { font-family: 'Fredoka One', cursive; font-size: 42px; color: #f39c12; text-shadow: 2px 2px 0 #c0392b; }
+  .victory-card p { font-size: 20px; color: #5a3000; margin-top: 10px; font-weight: 700; }
+  .victory-card .trophy { font-size: 80px; display: block; margin: 15px 0; }
+  .reset-btn {
+    margin-top: 20px; font-family: 'Fredoka One', cursive; font-size: 20px;
+    padding: 12px 30px; background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white; border: 3px solid #1e8449; border-radius: 12px; cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .reset-btn:hover { transform: scale(1.05); }
+
+  .waterfall { position: absolute; font-size: 28px; opacity: 0.6; z-index: 0; animation: waterfall-flow 2s ease-in-out infinite; }
+  @keyframes waterfall-flow { 0%, 100% { opacity: 0.5; transform: translateY(0); } 50% { opacity: 0.8; transform: translateY(3px); } }
+  .danger-sign {
+    position: absolute; z-index: 5; font-family: 'Fredoka One', cursive;
+    color: #e74c3c; font-size: 14px; background: rgba(0,0,0,0.5);
+    padding: 4px 10px; border-radius: 5px; border: 2px solid #c0392b;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  .danger-sign:hover { transform: scale(1.1); }
+
+  /* Quicksand overlay */
+  .quicksand-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(60,30,0,0.85); align-items: center; justify-content: center;
+  }
+  .quicksand-overlay.show { display: flex; }
+  .quicksand-card {
+    background: linear-gradient(145deg, #f5e6c8, #e8d4a8);
+    border: 5px solid #8B4513; border-radius: 20px;
+    padding: 30px 40px; text-align: center; max-width: 500px;
+    box-shadow: 0 0 60px rgba(139,69,19,0.6); animation: quicksand-drop 0.4s ease;
+  }
+  @keyframes quicksand-drop {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .quicksand-card h2 {
+    font-family: 'Fredoka One', cursive; font-size: 28px;
+    color: #8B4513; margin-bottom: 6px;
+  }
+  .quicksand-card .qs-sub {
+    font-size: 15px; color: #6b3a12; font-weight: 700; margin-bottom: 16px;
+  }
+  .qs-problem {
+    font-family: 'Fredoka One', cursive; font-size: 32px; color: #5a3000;
+    margin: 12px 0;
+  }
+  .qs-input {
+    font-family: 'Fredoka One', cursive; font-size: 28px; width: 140px;
+    text-align: center; padding: 8px; border: 3px solid #c4893b;
+    border-radius: 10px; outline: none; color: #5a3000; background: #fffde6;
+  }
+  .qs-input:focus { border-color: #f39c12; background: #fff; }
+  .qs-submit {
+    display: block; margin: 14px auto 0; font-family: 'Fredoka One', cursive;
+    font-size: 18px; padding: 10px 28px;
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    color: white; border: 3px solid #d35400; border-radius: 10px;
+    cursor: pointer; transition: transform 0.15s;
+  }
+  .qs-submit:hover { transform: scale(1.05); }
+  .qs-feedback {
+    margin-top: 10px; font-size: 16px; font-weight: 800; min-height: 24px;
+  }
+  .qs-progress {
+    display: flex; gap: 8px; justify-content: center; margin: 12px 0;
+  }
+  .qs-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #ddd; border: 2px solid #c4893b; transition: background 0.3s;
+  }
+  .qs-dot.done { background: #27ae60; }
+  .qs-dot.wrong { background: #e74c3c; }
+  .qs-dot.current { background: #f39c12; animation: glow-pulse 1s infinite; }
+  .qs-timer {
+    font-family: 'Fredoka One', cursive; font-size: 16px; color: #c0392b;
+    margin-top: 6px;
+  }
+
+  @media print {
+    body { background: white; }
+    .game-board { background: white; width: 100%; page-break-inside: avoid; }
+    .option-row { cursor: default; }
+    .score-panel { display: none; }
+    .jungle-bg { display: none; }
+    .scratch-toggle { display: none; }
+    .scratch-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Scratch Pad Toggle Button -->
+<button class="scratch-toggle" id="scratchBtn" onclick="toggleScratch()">&#128221; Scratch Pad</button>
+
+<!-- Scratch Pad Panel -->
+<div class="scratch-panel" id="scratchPanel">
+  <div class="scratch-header">
+    <span>&#128221; Working Out Area</span>
+    <button class="scratch-close" onclick="toggleScratch()">&times;</button>
+  </div>
+  <div class="scratch-body" id="scratchBody">
+    <!-- Work areas will be generated by JS -->
+  </div>
+</div>
+
+<div class="game-board" id="gameBoard">
+  <div class="jungle-bg">
+    <div class="vine"></div><div class="vine"></div><div class="vine"></div><div class="vine"></div>
+  </div>
+
+  <div class="tree-emoji" style="left:2%;top:35%">&#127796;</div>
+  <div class="tree-emoji" style="left:8%;top:55%">&#127807;</div>
+  <div class="tree-emoji" style="right:3%;top:25%">&#127796;</div>
+  <div class="tree-emoji" style="right:10%;top:60%">&#127807;</div>
+  <div class="tree-emoji" style="left:45%;top:8%">&#128009;</div>
+  <div class="tree-emoji" style="left:50%;top:85%;font-size:30px">&#128128;</div>
+  <div class="tree-emoji" style="left:88%;top:85%;font-size:30px">&#128010;</div>
+  <div class="waterfall" style="left:32%;top:40%">&#128167;</div>
+  <div class="waterfall" style="right:25%;top:50%">&#128167;</div>
+
+  <div class="danger-sign" style="left:42%;top:88%" onclick="openQuicksand()">QUICKSAND!</div>
+  <div class="danger-sign" style="left:5%;top:74%">ALMOST THERE!</div>
+
+  <div class="title-banner">
+    <h1>The Intruder Hunt!</h1>
+    <div class="title-sub">Subtraction with Exchange &#8212; Spot the wrong answer!</div>
+  </div>
+
+  <div class="score-panel">
+    <div class="score-box">Intruders Found: <span id="scoreDisplay">0</span> / 6</div>
+  </div>
+
+  <svg class="path-lines" viewBox="0 0 1300 1000">
+    <path d="M 120 200 Q 250 180 370 170 Q 500 155 620 200 Q 740 250 800 200 Q 870 150 940 170 L 1050 180" stroke="#8B6914" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.4" stroke-dasharray="5,15"/>
+    <path d="M 1050 200 Q 1100 320 1050 400 Q 1000 480 900 480 Q 780 480 680 500" stroke="#8B6914" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.4" stroke-dasharray="5,15"/>
+    <path d="M 650 520 Q 550 560 450 580 Q 350 600 280 650 Q 200 710 200 750" stroke="#8B6914" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.4" stroke-dasharray="5,15"/>
+    <path d="M 220 770 Q 350 800 500 790 Q 650 780 780 750 Q 900 720 980 680" stroke="#8B6914" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.4" stroke-dasharray="5,15"/>
+  </svg>
+
+  <div class="marker start-marker">START</div>
+  <div class="marker treasure-marker" onclick="clickTreasure()" style="cursor:pointer;">TREASURE!</div>
+
+  <!-- Station 1 -->
+  <div class="station active" id="station1" style="left: 60px; top: 160px;">
+    <div class="station-number">1</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(1, 'a')" id="s1a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">832 &minus; 467 =</div>
+        <div class="option-answer">465</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(1, 'b')" id="s1b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">832 &minus; 467 =</div>
+        <div class="option-answer">365</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station 2 -->
+  <div class="station" id="station2" style="left: 540px; top: 110px;">
+    <div class="station-number">2</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(2, 'a')" id="s2a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">5041 &minus; 2678 =</div>
+        <div class="option-answer">2363</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(2, 'b')" id="s2b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">5041 &minus; 2678 =</div>
+        <div class="option-answer">2463</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station 3 -->
+  <div class="station" id="station3" style="right: 60px; top: 290px;">
+    <div class="station-number">3</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(3, 'a')" id="s3a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">7000 &minus; 3254 =</div>
+        <div class="option-answer">3846</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(3, 'b')" id="s3b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">7000 &minus; 3254 =</div>
+        <div class="option-answer">3746</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station 4 -->
+  <div class="station" id="station4" style="left: 450px; top: 430px;">
+    <div class="station-number">4</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(4, 'a')" id="s4a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">40302 &minus; 18547 =</div>
+        <div class="option-answer">21755</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(4, 'b')" id="s4b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">40302 &minus; 18547 =</div>
+        <div class="option-answer">21855</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station 5 -->
+  <div class="station" id="station5" style="left: 50px; top: 600px;">
+    <div class="station-number">5</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(5, 'a')" id="s5a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">63010 &minus; 28463 =</div>
+        <div class="option-answer">34447</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(5, 'b')" id="s5b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">63010 &minus; 28463 =</div>
+        <div class="option-answer">34547</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Station 6 -->
+  <div class="station" id="station6" style="right: 80px; top: 650px;">
+    <div class="station-number">6</div>
+    <div class="station-label">Spot the Intruder!</div>
+    <div class="problem-card">
+      <div class="option-row option-a" onclick="checkAnswer(6, 'a')" id="s6a">
+        <div class="option-letter">A</div>
+        <div class="option-expression">500200 &minus; 267845 =</div>
+        <div class="option-answer">232355</div>
+      </div>
+      <div class="option-row option-b" onclick="checkAnswer(6, 'b')" id="s6b">
+        <div class="option-letter">B</div>
+        <div class="option-expression">500200 &minus; 267845 =</div>
+        <div class="option-answer">232455</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Victory overlay -->
+<div class="victory-overlay" id="victoryOverlay">
+  <div class="victory-card">
+    <span class="trophy">&#127942;</span>
+    <h2>TREASURE FOUND!</h2>
+    <p>You spotted all 6 intruders! Amazing work, explorer!</p>
+    <p style="margin-top:14px; font-size:17px; color:#7c3aed; background:#f3f0ff; padding:12px 18px; border-radius:10px; border:2px solid #c4b5fd;">
+      &#127912; <b>Bonus reward:</b> Now let's generate a picture together!<br>
+      <span style="font-size:14px;">Tell your teacher what treasure scene you'd like to draw with AI!</span>
+    </p>
+    <button class="reset-btn" onclick="resetGame()">Play Again</button>
+  </div>
+</div>
+
+<!-- Quicksand overlay -->
+<div class="quicksand-overlay" id="quicksandOverlay">
+  <div class="quicksand-card">
+    <h2>&#9888;&#65039; QUICKSAND! &#9888;&#65039;</h2>
+    <div class="qs-sub">Solve 10 multiplications to escape! (1 mistake allowed)</div>
+    <div class="qs-progress" id="qsProgress"></div>
+    <div class="qs-problem" id="qsProblem"></div>
+    <input type="text" class="qs-input" id="qsInput" maxlength="6"
+           onkeydown="if(event.key==='Enter') checkQuicksand()" autocomplete="off">
+    <button class="qs-submit" onclick="checkQuicksand()">GO!</button>
+    <div class="qs-feedback" id="qsFeedback"></div>
+    <div class="qs-timer" id="qsTimer"></div>
+  </div>
+</div>
+
+<script>
+  // Problem data: [top number, bottom number, correct answer]
+  const problems = [
+    { top: 832,    bot: 467,    ans: 365 },
+    { top: 5041,   bot: 2678,   ans: 2363 },
+    { top: 7000,   bot: 3254,   ans: 3746 },
+    { top: 40302,  bot: 18547,  ans: 21755 },
+    { top: 63010,  bot: 28463,  ans: 34547 },
+    { top: 500200, bot: 267845, ans: 232355 },
+  ];
+
+  const intruders = { 1:'a', 2:'b', 3:'a', 4:'b', 5:'a', 6:'b' };
+  let score = 0;
+  let solved = {};
+
+  // Build scratch pad working areas
+  function buildScratchPad() {
+    const body = document.getElementById('scratchBody');
+    body.innerHTML = '';
+
+    problems.forEach((p, i) => {
+      const num = i + 1;
+      const topStr = String(p.top).split('');
+      const botStr = String(p.bot).padStart(topStr.length, ' ').split('');
+      const ansStr = String(p.ans).split('');
+      const len = topStr.length;
+
+      let html = `<div class="work-area" id="work${num}">`;
+      html += `<div class="work-title">Station ${num} <span class="work-badge" id="badge${num}">Not solved</span></div>`;
+      html += `<div class="column-grid">`;
+
+      // Exchange row (small inputs for carrying/borrowing notes)
+      html += `<div class="exchange-row"><div class="exchange-spacer"></div>`;
+      for (let j = 0; j < len; j++) {
+        html += `<div class="exchange-cell"><input type="text" maxlength="2" id="ex${num}_${j}" tabindex="${num*100+j}"></div>`;
+      }
+      html += `</div>`;
+
+      // Top number row
+      html += `<div class="col-row"><div class="col-cell op"></div>`;
+      for (let j = 0; j < len; j++) {
+        html += `<div class="col-cell">${topStr[j]}</div>`;
+      }
+      html += `</div>`;
+
+      // Bottom number row (with minus sign)
+      html += `<div class="col-row"><div class="col-cell op">&minus;</div>`;
+      for (let j = 0; j < len; j++) {
+        html += `<div class="col-cell">${botStr[j] === ' ' ? '' : botStr[j]}</div>`;
+      }
+      html += `</div>`;
+
+      // Answer row (input fields)
+      html += `<div class="answer-row"><div class="answer-spacer"></div>`;
+      for (let j = 0; j < len; j++) {
+        html += `<div class="answer-cell"><input type="text" maxlength="1" id="ans${num}_${j}" tabindex="${num*100+50+j}" oninput="autoAdvance(this, ${num}, ${j}, ${len})"></div>`;
+      }
+      html += `</div>`;
+
+      html += `</div>`; // end column-grid
+
+      html += `<button class="check-btn" onclick="checkWork(${num})">Check My Answer</button>`;
+      html += `<div class="work-feedback" id="feedback${num}"></div>`;
+
+      html += `</div>`; // end work-area
+      body.innerHTML += html;
+    });
+  }
+
+  // Auto-advance to next input
+  function autoAdvance(el, station, idx, len) {
+    if (el.value.length === 1 && idx < len - 1) {
+      document.getElementById(`ans${station}_${idx + 1}`).focus();
+    }
+  }
+
+  // Check working answer
+  function checkWork(station) {
+    const p = problems[station - 1];
+    const ansStr = String(p.ans).split('');
+    const len = String(p.top).length;
+    let allCorrect = true;
+    let userAnswer = '';
+
+    for (let j = 0; j < len; j++) {
+      const input = document.getElementById(`ans${station}_${j}`);
+      const expected = ansStr[j] || '';
+      // Pad answer with leading spaces
+      const paddedAns = String(p.ans).padStart(len, ' ').split('');
+
+      if (input.value === paddedAns[j] || (paddedAns[j] === ' ' && input.value === '')) {
+        input.classList.remove('wrong-digit');
+        input.classList.add('correct-digit');
+      } else {
+        input.classList.remove('correct-digit');
+        input.classList.add('wrong-digit');
+        allCorrect = false;
+      }
+      userAnswer += input.value;
+    }
+
+    const fb = document.getElementById(`feedback${station}`);
+    if (allCorrect) {
+      fb.innerHTML = '<span style="color:#27ae60">&#10004; Correct! Now find the intruder on the map!</span>';
+      document.getElementById(`badge${station}`).textContent = 'Solved!';
+      document.getElementById(`badge${station}`).classList.add('done');
+    } else {
+      fb.innerHTML = '<span style="color:#e74c3c">Not quite &#8212; check the red digits and try again!</span>';
+    }
+  }
+
+  // Toggle scratch panel
+  function toggleScratch() {
+    document.getElementById('scratchPanel').classList.toggle('open');
+  }
+
+  // Game logic
+  function checkAnswer(station, picked) {
+    if (solved[station]) return;
+    const intruder = intruders[station];
+    const pickedEl = document.getElementById(`s${station}${picked}`);
+    const otherEl = document.getElementById(`s${station}${picked === 'a' ? 'b' : 'a'}`);
+
+    if (picked === intruder) {
+      solved[station] = true;
+      score++;
+      document.getElementById('scoreDisplay').textContent = score;
+      pickedEl.classList.add('intruder-found');
+      otherEl.classList.add('correct');
+      pickedEl.style.cursor = 'default';
+      otherEl.style.cursor = 'default';
+      document.getElementById(`station${station}`).classList.remove('active');
+      if (station < 6) document.getElementById(`station${station + 1}`).classList.add('active');
+      if (score === 6) setTimeout(() => document.getElementById('victoryOverlay').classList.add('show'), 800);
+    } else {
+      pickedEl.classList.add('wrong-pick');
+      setTimeout(() => pickedEl.classList.remove('wrong-pick'), 1000);
+    }
+  }
+
+  function resetGame() {
+    score = 0; solved = {};
+    document.getElementById('scoreDisplay').textContent = '0';
+    document.getElementById('victoryOverlay').classList.remove('show');
+    for (let i = 1; i <= 6; i++) {
+      ['a','b'].forEach(l => {
+        const el = document.getElementById(`s${i}${l}`);
+        el.classList.remove('intruder-found','correct','wrong-pick');
+        el.style.cursor = 'pointer';
+      });
+      document.getElementById(`station${i}`).classList.remove('active');
+    }
+    document.getElementById('station1').classList.add('active');
+    buildScratchPad();
+  }
+
+  // ===== QUICKSAND MINI-GAME (Multiplication Tables: 6, 7, 8) =====
+  // Generate all multiplication problems for 6, 7, 8 (× 2..12)
+  const qsAllProblems = [];
+  [6, 7, 8].forEach(n => {
+    for (let m = 2; m <= 12; m++) {
+      qsAllProblems.push([n + ' &#215; ' + m, n * m]);
+    }
+  });
+
+  let qsCurrent = [];
+  let qsIndex = 0;
+  let qsMistakes = 0;
+  let qsStartTime = 0;
+  let qsTimerInterval = null;
+  const QS_TOTAL = 10;
+  const QS_MAX_MISTAKES = 1; // allowed 1, on 2nd mistake = restart
+
+  function openQuicksand() {
+    startQuicksand();
+  }
+
+  function startQuicksand() {
+    // Pick 10 random problems
+    const shuffled = [...qsAllProblems].sort(() => Math.random() - 0.5);
+    qsCurrent = shuffled.slice(0, QS_TOTAL);
+    qsIndex = 0;
+    qsMistakes = 0;
+    qsStartTime = Date.now();
+
+    // Build progress dots
+    const prog = document.getElementById('qsProgress');
+    prog.innerHTML = '';
+    for (let i = 0; i < QS_TOTAL; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'qs-dot' + (i === 0 ? ' current' : '');
+      dot.id = 'qsDot' + i;
+      prog.appendChild(dot);
+    }
+
+    // Update subtitle
+    document.querySelector('.qs-sub').innerHTML = 'Solve 10 multiplications to escape! (1 mistake allowed)';
+    document.getElementById('qsFeedback').textContent = '';
+
+    // Reset input/button state
+    const input = document.getElementById('qsInput');
+    input.style.display = '';
+    input.value = '';
+    const btn = document.querySelector('.qs-submit');
+    btn.textContent = 'GO!';
+    btn.onclick = checkQuicksand;
+
+    showQsQuestion();
+    document.getElementById('quicksandOverlay').classList.add('show');
+    input.focus();
+
+    // Start timer
+    clearInterval(qsTimerInterval);
+    updateQsTimer();
+    qsTimerInterval = setInterval(updateQsTimer, 100);
+  }
+
+  function showQsQuestion() {
+    document.getElementById('qsProblem').innerHTML = qsCurrent[qsIndex][0] + ' = ?';
+    document.getElementById('qsInput').value = '';
+    document.getElementById('qsInput').focus();
+  }
+
+  function updateQsTimer() {
+    const elapsed = ((Date.now() - qsStartTime) / 1000).toFixed(1);
+    document.getElementById('qsTimer').innerHTML = elapsed + 's &nbsp; | &nbsp; Mistakes: ' + qsMistakes + '/' + (QS_MAX_MISTAKES + 1);
+  }
+
+  function checkQuicksand() {
+    const input = document.getElementById('qsInput');
+    const userVal = parseInt(input.value.trim());
+    const correct = qsCurrent[qsIndex][1];
+    const dot = document.getElementById('qsDot' + qsIndex);
+
+    if (isNaN(userVal)) { input.focus(); return; }
+
+    if (userVal === correct) {
+      dot.classList.remove('current');
+      dot.classList.add('done');
+      qsIndex++;
+
+      if (qsIndex >= QS_TOTAL) {
+        // Escaped!
+        clearInterval(qsTimerInterval);
+        const totalTime = ((Date.now() - qsStartTime) / 1000).toFixed(1);
+        document.getElementById('qsFeedback').innerHTML =
+          '<span style="color:#27ae60">&#127939; You ESCAPED in ' + totalTime + 's! Well done!</span>';
+        document.getElementById('qsProblem').innerHTML = '&#127881; FREE!';
+        input.style.display = 'none';
+        document.querySelector('.qs-submit').textContent = 'Close';
+        document.querySelector('.qs-submit').onclick = function() {
+          document.getElementById('quicksandOverlay').classList.remove('show');
+        };
+      } else {
+        const nextDot = document.getElementById('qsDot' + qsIndex);
+        nextDot.classList.add('current');
+        document.getElementById('qsFeedback').innerHTML = '<span style="color:#27ae60">&#10003; Correct!</span>';
+        setTimeout(() => {
+          document.getElementById('qsFeedback').textContent = '';
+          showQsQuestion();
+        }, 600);
+      }
+    } else {
+      qsMistakes++;
+      dot.classList.add('wrong');
+      updateQsTimer();
+
+      if (qsMistakes > QS_MAX_MISTAKES) {
+        // 2 mistakes — restart!
+        clearInterval(qsTimerInterval);
+        document.getElementById('qsFeedback').innerHTML =
+          '<span style="color:#e74c3c;font-size:18px;">&#128560; 2 mistakes! Quicksand pulls you back in! Restarting...</span>';
+        input.style.display = 'none';
+        setTimeout(() => {
+          startQuicksand();
+        }, 2000);
+      } else {
+        document.getElementById('qsFeedback').innerHTML = '<span style="color:#e74c3c">&#10007; Wrong! Be careful &#8212; one more mistake and you restart!</span>';
+        setTimeout(() => {
+          dot.classList.remove('wrong');
+          dot.classList.add('done');
+          dot.style.background = '#e74c3c';
+          qsIndex++;
+          if (qsIndex >= QS_TOTAL) {
+            // Edge case: last question wrong but still within mistakes
+            clearInterval(qsTimerInterval);
+            const totalTime = ((Date.now() - qsStartTime) / 1000).toFixed(1);
+            document.getElementById('qsFeedback').innerHTML =
+              '<span style="color:#27ae60">&#127939; You ESCAPED in ' + totalTime + 's! Close call!</span>';
+            document.getElementById('qsProblem').innerHTML = '&#127881; FREE!';
+            input.style.display = 'none';
+            document.querySelector('.qs-submit').textContent = 'Close';
+            document.querySelector('.qs-submit').onclick = function() {
+              document.getElementById('quicksandOverlay').classList.remove('show');
+            };
+          } else {
+            const nextDot = document.getElementById('qsDot' + qsIndex);
+            nextDot.classList.add('current');
+            showQsQuestion();
+          }
+        }, 1000);
+      }
+    }
+  }
+
+  // Treasure click handler
+  function clickTreasure() {
+    if (score === 6) {
+      document.getElementById('victoryOverlay').classList.add('show');
+    } else {
+      const remaining = 6 - score;
+      const marker = document.querySelector('.treasure-marker');
+      marker.style.animation = 'shake 0.5s ease';
+      setTimeout(() => marker.style.animation = '', 600);
+      // Show a floating hint
+      let hint = document.getElementById('treasureHint');
+      if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'treasureHint';
+        hint.style.cssText = 'position:absolute;z-index:25;top:120px;right:20px;background:rgba(0,0,0,0.75);color:#ffd700;font-family:Fredoka One,cursive;font-size:16px;padding:10px 18px;border-radius:10px;border:2px solid #f39c12;transition:opacity 0.5s;';
+        document.getElementById('gameBoard').appendChild(hint);
+      }
+      hint.innerHTML = '&#128274; Find ' + remaining + ' more intruder' + (remaining > 1 ? 's' : '') + ' first!';
+      hint.style.opacity = '1';
+      setTimeout(() => hint.style.opacity = '0', 2000);
+    }
+  }
+
+  // Init
+  buildScratchPad();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Number Pop</title>
+<style>
+  :root {
+    --bg-1: #0b0f1a;
+    --bg-2: #131a2e;
+    --accent: #e8eefc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(circle at 30% 20%, var(--bg-2), var(--bg-1) 70%);
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    overflow: hidden;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  #stage {
+    position: fixed;
+    inset: 0;
+  }
+  .hint {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent);
+    opacity: 0.35;
+    font-size: clamp(16px, 3.5vw, 28px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    font-weight: 500;
+  }
+  .hint.gone { opacity: 0; }
+
+  .pop {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    will-change: transform, opacity;
+    animation: pop-life 5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes pop-life {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+    6%   { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+    14%  { transform: translate(-50%, -54%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -150%) scale(0.9); }
+  }
+
+  .ring {
+    position: fixed;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border: 2px solid currentColor;
+    animation: ring-life 0.9s ease-out forwards;
+  }
+  @keyframes ring-life {
+    0%   { width: 8px; height: 8px; opacity: 0.7; }
+    100% { width: 130px; height: 130px; opacity: 0; }
+  }
+
+  /* ---------- settings (teacher) ---------- */
+  #gear {
+    position: fixed; top: 12px; left: 12px; z-index: 20;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid rgba(232, 238, 252, 0.25);
+    background: rgba(19, 26, 46, 0.82); color: var(--accent);
+    font-size: 22px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  #gear:hover { background: rgba(19, 26, 46, 0.98); }
+
+  #settings {
+    position: fixed; top: 68px; left: 12px; z-index: 20;
+    width: min(430px, 92vw); max-height: 82vh; overflow: auto;
+    background: rgba(11, 15, 26, 0.97);
+    border: 1px solid rgba(232, 238, 252, 0.18); border-radius: 14px;
+    padding: 18px; color: var(--accent);
+    cursor: auto; user-select: auto; -webkit-user-select: auto;
+    box-shadow: 0 14px 46px rgba(0, 0, 0, 0.6);
+  }
+  #settings[hidden] { display: none; }
+  #settings h2 {
+    font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.85; margin-bottom: 14px; font-weight: 600;
+  }
+  .srow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; }
+  #settings input {
+    width: 66px; background: #0b0f1a; border: 1px solid rgba(232, 238, 252, 0.28);
+    color: var(--accent); border-radius: 6px; padding: 7px; font: inherit; text-align: center;
+  }
+  .sbtn {
+    font: inherit; font-size: 13px; border: 1px solid rgba(232, 238, 252, 0.22);
+    background: rgba(232, 238, 252, 0.08); color: var(--accent);
+    border-radius: 6px; padding: 7px 13px; cursor: pointer;
+  }
+  .sbtn:hover { background: rgba(232, 238, 252, 0.16); }
+  .sbtn.go { background: hsl(152 60% 46%); border-color: transparent; color: #06120a; font-weight: 700; }
+  #count { margin-left: auto; opacity: 0.85; font-size: 13px; white-space: nowrap; }
+  #grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 4px; }
+  .cell {
+    font: inherit; font-size: 12px; padding: 7px 0; text-align: center;
+    border: 1px solid rgba(232, 238, 252, 0.15); background: rgba(232, 238, 252, 0.04);
+    color: rgba(232, 238, 252, 0.7); border-radius: 5px; cursor: pointer;
+  }
+  .cell:hover { background: rgba(232, 238, 252, 0.12); }
+  .cell.on { background: hsl(188 90% 60%); color: #04141a; border-color: transparent; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="hint" id="hint">Click anywhere</div>
+
+<button id="gear" title="Which numbers pop?" aria-label="Settings">⚙</button>
+<div id="settings" hidden>
+  <h2>Which numbers pop?</h2>
+  <div class="srow">
+    <label>From <input id="from" type="number" min="1" max="100" value="10"></label>
+    <label>To <input id="to" type="number" min="1" max="100" value="15"></label>
+    <button class="sbtn go" id="setRange">Set range</button>
+  </div>
+  <div class="srow">
+    <button class="sbtn" id="clear">Clear</button>
+    <button class="sbtn" id="all">All 1–100</button>
+    <span id="count"></span>
+  </div>
+  <div id="grid"></div>
+  <p style="font-size:12px; opacity:.6; margin-top:12px; line-height:1.5;">
+    Use From/To for a range, or tap single numbers for any custom set (they can skip, e.g. 10, 12, 15). Your choice is saved.
+  </p>
+</div>
+
+<script>
+  const stage = document.getElementById("stage");
+  const hint = document.getElementById("hint");
+  let dismissed = false;
+
+  // Pleasant, varied hues; saturated but legible on dark bg.
+  const HUES = [188, 152, 48, 12, 280, 330, 214, 96];
+
+  /* ---------- which numbers are active ---------- */
+  const MAX = 100;
+  const KEY = "numberpop.selection";
+
+  function loadSelection() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) return new Set(arr);
+      }
+    } catch (e) {}
+    const s = new Set();
+    for (let i = 1; i <= MAX; i++) s.add(i); // default: all 1..100 (original behaviour)
+    return s;
+  }
+  function saveSelection() {
+    try { localStorage.setItem(KEY, JSON.stringify([...selected].sort((a, b) => a - b))); } catch (e) {}
+  }
+
+  let selected = loadSelection();
+
+  /* ---------- settings UI ---------- */
+  const gear = document.getElementById("gear");
+  const settings = document.getElementById("settings");
+  const grid = document.getElementById("grid");
+  const fromIn = document.getElementById("from");
+  const toIn = document.getElementById("to");
+  const countEl = document.getElementById("count");
+
+  for (let n = 1; n <= MAX; n++) {
+    const c = document.createElement("button");
+    c.className = "cell";
+    c.type = "button";
+    c.textContent = n;
+    c.dataset.n = n;
+    c.addEventListener("click", () => {
+      if (selected.has(n)) selected.delete(n); else selected.add(n);
+      c.classList.toggle("on");
+      saveSelection();
+      updateCount();
+    });
+    grid.appendChild(c);
+  }
+  const cellEls = Array.from(grid.children);
+
+  function paintGrid() {
+    cellEls.forEach(c => c.classList.toggle("on", selected.has(+c.dataset.n)));
+    updateCount();
+  }
+  function updateCount() {
+    const n = selected.size;
+    countEl.textContent = n + (n === 1 ? " number" : " numbers");
+  }
+
+  function clampRange() {
+    let a = parseInt(fromIn.value, 10), b = parseInt(toIn.value, 10);
+    if (isNaN(a)) a = 1;
+    if (isNaN(b)) b = MAX;
+    a = Math.min(Math.max(a, 1), MAX);
+    b = Math.min(Math.max(b, 1), MAX);
+    if (a > b) { const t = a; a = b; b = t; }
+    fromIn.value = a; toIn.value = b;
+    return [a, b];
+  }
+
+  document.getElementById("setRange").addEventListener("click", () => {
+    const [a, b] = clampRange();
+    selected = new Set();
+    for (let n = a; n <= b; n++) selected.add(n);
+    paintGrid(); saveSelection();
+  });
+  document.getElementById("clear").addEventListener("click", () => {
+    selected = new Set(); paintGrid(); saveSelection();
+  });
+  document.getElementById("all").addEventListener("click", () => {
+    selected = new Set();
+    for (let n = 1; n <= MAX; n++) selected.add(n);
+    paintGrid(); saveSelection();
+  });
+  gear.addEventListener("click", () => { settings.hidden = !settings.hidden; });
+
+  paintGrid();
+
+  /* ---------- the pop ---------- */
+  function spawn(x, y) {
+    const nums = [...selected];
+    if (!nums.length) return; // nothing selected -> nothing to pop
+
+    if (!dismissed) {
+      dismissed = true;
+      hint.classList.add("gone");
+      setTimeout(() => hint.remove(), 700);
+    }
+
+    const n = nums[Math.floor(Math.random() * nums.length)];
+    const hue = HUES[Math.floor(Math.random() * HUES.length)];
+    const color = `hsl(${hue} 90% 68%)`;
+
+    const el = document.createElement("div");
+    el.className = "pop";
+    el.textContent = n;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.color = color;
+    el.style.fontSize = "clamp(48px, 9vw, 120px)";
+    el.style.textShadow = `0 0 22px hsl(${hue} 90% 60% / 0.55), 0 4px 18px rgba(0,0,0,0.4)`;
+    el.style.transform = `translate(-50%, -50%) rotate(${(Math.random() * 16 - 8).toFixed(1)}deg)`;
+    stage.appendChild(el);
+    el.addEventListener("animationend", () => el.remove());
+
+    const ring = document.createElement("div");
+    ring.className = "ring";
+    ring.style.left = x + "px";
+    ring.style.top = y + "px";
+    ring.style.color = color;
+    stage.appendChild(ring);
+    ring.addEventListener("animationend", () => ring.remove());
+  }
+
+  function handle(e) {
+    // don't pop when tapping the settings panel or the gear button
+    if (e.target.closest("#settings") || e.target.closest("#gear")) return;
+    const t = e.touches && e.touches[0];
+    const x = t ? t.clientX : e.clientX;
+    const y = t ? t.clientY : e.clientY;
+    spawn(x, y);
+  }
+
+  window.addEventListener("pointerdown", handle);
+</script>
+</body>
+</html>

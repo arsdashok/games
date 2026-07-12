@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Unpopular Opinions Show: Comparatives & Superlatives</title>
+<style>
+@page { size: A4 landscape; margin: 10mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; color: #222; background: #fff; padding: 12px; max-width: 1000px; margin: auto; }
+
+.teacher-notes {
+  background: #fef9c3; border: 2px dashed #ca8a04; border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 16px; font-size: 13px; line-height: 1.6;
+}
+.teacher-notes h2 { color: #92400e; font-size: 15px; margin-bottom: 6px; }
+.teacher-notes b { color: #78350f; }
+
+.slide { page-break-after: always; border: 3px solid #6c63ff; border-radius: 14px; padding: 0; overflow: hidden; margin-bottom: 20px; }
+.slide-header { background: linear-gradient(135deg, #6c63ff, #a78bfa); color: white; padding: 14px 22px; }
+.slide-header h1 { font-size: 26px; }
+.slide-header .sub { font-size: 14px; opacity: 0.9; margin-top: 2px; }
+.slide-body { padding: 18px 22px; min-height: 400px; }
+
+.round-title { font-size: 22px; font-weight: 700; color: #4c1d95; margin-bottom: 12px; }
+.round-sub { font-size: 14px; color: #6b7280; margin-bottom: 14px; }
+
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.adj-card {
+  border: 2px solid #c4b5fd; border-radius: 10px; padding: 14px;
+  text-align: center; background: #faf8ff;
+}
+.adj-card .word { font-size: 28px; font-weight: 700; color: #4c1d95; }
+.adj-card .type { font-size: 11px; color: #7c3aed; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.adj-card .hint { font-size: 13px; color: #6b7280; margin-top: 6px; font-style: italic; }
+
+.vs-box {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  margin: 14px 0; flex-wrap: wrap;
+}
+.vs-item {
+  border: 2px solid #e0d7fc; border-radius: 12px; padding: 16px 24px;
+  text-align: center; background: #faf8ff; min-width: 140px;
+}
+.vs-item .emoji { font-size: 36px; }
+.vs-item .name { font-size: 16px; font-weight: 700; color: #4c1d95; margin-top: 4px; }
+.vs-text { font-size: 28px; font-weight: 900; color: #dc2626; }
+
+.prompt-box {
+  background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 0 8px 8px 0;
+  padding: 10px 16px; margin: 10px 0; font-size: 15px;
+}
+.prompt-box .label { font-weight: 700; color: #166534; font-size: 12px; text-transform: uppercase; margin-bottom: 3px; }
+
+.rule-box {
+  background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0;
+  padding: 10px 16px; margin: 10px 0; font-size: 14px;
+}
+
+.award-card {
+  border: 3px solid #fbbf24; border-radius: 12px; padding: 16px;
+  text-align: center; background: linear-gradient(135deg, #fffbeb, #fef3c7);
+}
+.award-card .trophy { font-size: 40px; }
+.award-card .category { font-size: 16px; font-weight: 700; color: #92400e; margin-top: 6px; }
+.award-card .blank { border-bottom: 2px solid #d97706; min-width: 160px; display: inline-block; min-height: 20px; margin-top: 8px; }
+
+.score-row { display: flex; gap: 20px; justify-content: center; margin-top: 14px; }
+.score-box { border: 2px solid #c4b5fd; border-radius: 8px; padding: 10px 20px; text-align: center; background: #faf8ff; }
+.score-box .who { font-weight: 700; color: #4c1d95; }
+.score-box .pts { font-size: 24px; font-weight: 900; color: #6c63ff; margin-top: 4px; }
+
+/* ---- Round 4 quiz ---- */
+.howto {
+  background: #eef2ff; border-left: 4px solid #6366f1; border-radius: 0 8px 8px 0;
+  padding: 10px 16px; margin-bottom: 14px; font-size: 14px; line-height: 1.6;
+}
+.howto .label { font-weight: 700; color: #3730a3; font-size: 12px; text-transform: uppercase; display:block; margin-bottom: 3px; }
+.howto b { color: #3730a3; }
+
+.quiz-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; }
+.q-item {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 14px; line-height: 1.4; padding: 5px 0;
+  border-bottom: 1px dashed #e0d7fc;
+}
+.q-item .q-num { font-weight: 700; color: #6c63ff; min-width: 26px; }
+.adj-chip {
+  background: #ede9fe; border: 1px solid #c4b5fd; border-radius: 6px;
+  padding: 0 7px; font-weight: 700; color: #4c1d95; white-space: nowrap;
+}
+.q-blank { border-bottom: 2px solid #6c63ff; min-width: 64px; display: inline-block; }
+
+.ans-head {
+  background: #fee2e2; border: 2px solid #ef4444; border-radius: 10px;
+  padding: 8px 14px; margin-bottom: 12px; font-size: 13px; color: #991b1b;
+}
+.ans-head b { color: #7f1d1d; }
+.ans-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 22px; }
+.ans-item {
+  font-size: 13.5px; line-height: 1.35; padding: 4px 0;
+  border-bottom: 1px dotted #e5e7eb;
+}
+.ans-item .anum { font-weight: 700; color: #6c63ff; }
+.ans-item .form { font-weight: 700; color: #16a34a; }
+.ans-item .fact { color: #4c1d95; }
+.ans-item .tag {
+  font-size: 10px; color: #7c3aed; background: #f3f0ff;
+  border-radius: 4px; padding: 0 5px; white-space: nowrap;
+}
+
+@media print {
+  .teacher-notes { display: none; }
+  .slide { page-break-inside: avoid; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======== TEACHER NOTES (hidden in print) ======== -->
+<div class="teacher-notes">
+  <h2>Teacher Guide: The Unpopular Opinions Show</h2>
+  <p><b>Student:</b> Alina/Player (Preply, A2) &nbsp;|&nbsp; <b>Time:</b> ~20 min &nbsp;|&nbsp; <b>Topic:</b> Comparative & superlative adjectives</p>
+  <p><b>Pain point:</b> 2-syllable adjectives: when -er/-est vs more/most. She knows the short/long rule but can't apply it under pressure, gets frustrated.</p>
+  <p><b>Vibe:</b> NO drilling, NO "fill the gap". This is a TALK SHOW. She's the host, you're the guest (or vice versa). She produces sentences naturally while chatting. Correct gently by echoing the right form, don't stop the flow.</p>
+  <p><b>Structure:</b></p>
+  <p>1. <b>Slide 1 (Title)</b> - introduce the show, assign roles (2 min)</p>
+  <p>2. <b>Round 1: Quick Fire</b> - she sees adjective, says comparative + superlative. Fun buzzer energy (4 min)</p>
+  <p>3. <b>Round 2: Unpopular Opinions Debate</b> - she makes wild comparative claims, you argue back (8 min)</p>
+  <p>4. <b>Round 3: The Awards Ceremony</b> - she presents awards using superlatives (6 min)</p>
+  <p>5. <b>Round 4: Quiz Master</b> (the big one, 15+ min) - SHE is the host. She reads each prompt, puts the adjective into the right form, and asks YOU the trivia question. You answer (be wrong sometimes, it's funnier). She checks you with the <b>Answer Card</b> and awards/removes points. The Answer Card has FACTS ONLY (no grammar forms) on purpose: she must produce the comparative/superlative herself before asking. Don't rush: let her wrestle the 2-syllable ones, hint verbally with the -y trick if she's stuck.</p>
+  <p><b>Quiz tip:</b> the trivia is loaded with 1-syllable easies (confidence) plus the tricky split: <b>-y → -ier/-iest</b> (heavier, busier, busiest, heaviest) vs <b>more/most</b> (more expensive, more dangerous, most popular) plus one irregular (better). UAE hooks: tallest building = Burj Khalifa, busiest airport = Dubai.</p>
+  <p><b>Part 3 (Q21-25) is her exact weak spot:</b> 2-syllable words that look short but take <b>more / the most</b> (boring, modern, famous, crowded, careful) NOT -er/-est. The whole point: "boring → more boring", never "boringer". Q24 and Q25 are opinion questions (no fact to check), so it's pure chat plus form practice, which she enjoys.</p>
+  <p><b>Correction style:</b> If she says "more funny", just naturally repeat "funnier, yes!" and keep going. If she self-corrects, celebrate it. Never say "wrong".</p>
+  <p><b>Key rule to sneak in:</b> 2-syllable + ends in <b>-y</b> = change to -ier/-iest (busy, funny, easy, happy). Other 2-syllable = more/most (boring, stylish, famous).</p>
+</div>
+
+
+<!-- ======== SLIDE 1: TITLE ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>The Unpopular Opinions Show</h1>
+    <div class="sub">Season 1, Episode 1: "Who is BETTER, WORSE, and THE MOST INTERESTING?"</div>
+  </div>
+  <div class="slide-body" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <p style="font-size: 60px; margin-bottom: 20px;">🎙️</p>
+    <p style="font-size: 20px; color: #4c1d95; text-align:center;">Welcome to the show where<br>every opinion is wrong<br>and the points don't matter!</p>
+    <div class="score-row" style="margin-top: 30px;">
+      <div class="score-box"><div class="who">Host</div><div class="pts">0</div></div>
+      <div class="score-box"><div class="who">Guest</div><div class="pts">0</div></div>
+    </div>
+    <p style="font-size: 13px; color: #6b7280; margin-top: 20px;">+1 point for each correct comparative or superlative in a sentence</p>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 2: ROUND 1 - QUICK FIRE ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 1: Quick Fire!</h1>
+    <div class="sub">Say the comparative AND superlative. Fast! 🔥</div>
+  </div>
+  <div class="slide-body">
+    <div class="round-sub">I show you a word. You say both forms. Ready?</div>
+
+    <div class="card-grid three">
+      <div class="adj-card">
+        <div class="word">funny</div>
+        <div class="type">2 syllables, ends in -y</div>
+        <div class="hint">funni... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">expensive</div>
+        <div class="type">3 syllables</div>
+        <div class="hint">more... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">big</div>
+        <div class="type">1 syllable</div>
+        <div class="hint">bigg... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">boring</div>
+        <div class="type">2 syllables, ends in -ing</div>
+        <div class="hint">more... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">busy</div>
+        <div class="type">2 syllables, ends in -y</div>
+        <div class="hint">busi... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">good</div>
+        <div class="type">irregular</div>
+        <div class="hint">bett... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">stylish</div>
+        <div class="type">2 syllables, ends in -ish</div>
+        <div class="hint">more... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">fast</div>
+        <div class="type">1 syllable</div>
+        <div class="hint">fast... ?</div>
+      </div>
+      <div class="adj-card">
+        <div class="word">bad</div>
+        <div class="type">irregular</div>
+        <div class="hint">wors... ?</div>
+      </div>
+    </div>
+
+    <div class="rule-box" style="margin-top: 14px;">
+      <b>The -y trick:</b> 2 syllables + ends in <b>-y</b>? Change -y to <b>-ier / -iest</b> (funny → funnier, busy → busier). Other 2-syllable words? Use <b>more / most</b> (boring → more boring, stylish → more stylish).
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 3: ROUND 2 - UNPOPULAR OPINIONS ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 2: Unpopular Opinions! 🤯</h1>
+    <div class="sub">Make a CRAZY comparison. The other person argues back!</div>
+  </div>
+  <div class="slide-body">
+    <div class="prompt-box">
+      <div class="label">How to play</div>
+      Pick two things. Say something NOBODY agrees with. Use a comparative.<br>
+      The other person says "No way!" and argues back with a comparative or superlative.
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin: 12px 0 8px;">Example:</p>
+    <div style="background: #f3f0ff; border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.8; margin-bottom: 14px;">
+      🎙️ "I think homework is <b>more exciting</b> than parties!"<br>
+      🗣️ "No way! Parties are <b>the most exciting</b> thing in the world! Homework is <b>more boring</b> than watching paint dry!"<br>
+      🎙️ "But doing homework makes you <b>smarter</b>! Being smart is <b>better</b> than dancing!"
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin-bottom: 8px;">Debate cards (pick one pair, make a wild claim):</p>
+    <div class="card-grid">
+      <div class="vs-box">
+        <div class="vs-item"><div class="emoji">🍕</div><div class="name">Pizza</div></div>
+        <div class="vs-text">VS</div>
+        <div class="vs-item"><div class="emoji">🍣</div><div class="name">Sushi</div></div>
+      </div>
+      <div class="vs-box">
+        <div class="vs-item"><div class="emoji">🏖️</div><div class="name">Beach</div></div>
+        <div class="vs-text">VS</div>
+        <div class="vs-item"><div class="emoji">🏔️</div><div class="name">Mountains</div></div>
+      </div>
+      <div class="vs-box">
+        <div class="vs-item"><div class="emoji">📱</div><div class="name">Phone</div></div>
+        <div class="vs-text">VS</div>
+        <div class="vs-item"><div class="emoji">💻</div><div class="name">Computer</div></div>
+      </div>
+      <div class="vs-box">
+        <div class="vs-item"><div class="emoji">🐱</div><div class="name">Cats</div></div>
+        <div class="vs-text">VS</div>
+        <div class="vs-item"><div class="emoji">🐶</div><div class="name">Dogs</div></div>
+      </div>
+    </div>
+
+    <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">Use these adjectives: expensive, boring, dangerous, exciting, funny, fast, good, bad, big, small, stylish, busy, interesting, organised</p>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 4: ROUND 3 - AWARDS ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 3: The Awards Ceremony! 🏆</h1>
+    <div class="sub">You are the presenter. Give the award and explain WHY!</div>
+  </div>
+  <div class="slide-body">
+    <div class="prompt-box">
+      <div class="label">How to play</div>
+      Read the award category. Decide who/what wins. Say: "And the award goes to... [name]! Because they are the [superlative]!"<br>
+      Then explain in 2-3 sentences using comparatives.
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin: 10px 0 6px;">Example:</p>
+    <div style="background: #f3f0ff; border-radius: 8px; padding: 10px; font-size: 14px; line-height: 1.7; margin-bottom: 12px;">
+      🏆 <b>The Most Boring Film:</b> "And the award goes to... that maths documentary! It was <b>more boring</b> than watching my cat sleep. My cat is <b>funnier</b> than that film. It was <b>the worst</b> film I have ever seen!"
+    </div>
+
+    <div class="card-grid">
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Most Dangerous Sport</div>
+        <div class="blank"></div>
+      </div>
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Funniest Person You Know</div>
+        <div class="blank"></div>
+      </div>
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Most Expensive Thing You Want</div>
+        <div class="blank"></div>
+      </div>
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Busiest Day of Your Week</div>
+        <div class="blank"></div>
+      </div>
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Most Exciting Place to Visit</div>
+        <div class="blank"></div>
+      </div>
+      <div class="award-card">
+        <div class="trophy">🏆</div>
+        <div class="category">The Worst Food in the World</div>
+        <div class="blank"></div>
+      </div>
+    </div>
+
+    <div class="rule-box" style="margin-top: 12px;">
+      <b>Remember:</b> -y words = <b>-iest</b> (funniest, busiest). Long words = <b>the most</b> (the most dangerous, the most expensive). Irregulars: the <b>best</b>, the <b>worst</b>.
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 5: ROUND 4 PART 1 - COMPARATIVES ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 4: Quiz Master! 🎤</h1>
+    <div class="sub">Part 1: Compare two things. YOU ask, I answer!</div>
+  </div>
+  <div class="slide-body">
+
+    <div class="howto">
+      <span class="label">How to play</span>
+      You are the <b>quiz master</b>. Read the question, put the word in the <b>( brackets )</b> into the correct form, and ask me. I answer, you check me with your <b>Answer Card</b>. <b>+1</b> for me if I'm right, <b>-1</b> if I'm wrong!
+    </div>
+
+    <div class="quiz-list">
+      <div class="q-item"><span class="q-num">1</span><div><span class="adj-chip">high</span> Which is <span class="q-blank"></span>, Mount Everest or Mont Blanc?</div></div>
+      <div class="q-item"><span class="q-num">2</span><div><span class="adj-chip">big</span> Which is <span class="q-blank"></span>, Russia or Canada?</div></div>
+      <div class="q-item"><span class="q-num">3</span><div><span class="adj-chip">fast</span> Which is <span class="q-blank"></span>, a cheetah or a racehorse?</div></div>
+      <div class="q-item"><span class="q-num">4</span><div><span class="adj-chip">heavy</span> Which is <span class="q-blank"></span>, an elephant or a hippo?</div></div>
+      <div class="q-item"><span class="q-num">5</span><div><span class="adj-chip">long</span> Which is <span class="q-blank"></span>, the Nile or the Thames?</div></div>
+      <div class="q-item"><span class="q-num">6</span><div><span class="adj-chip">old</span> Which is <span class="q-blank"></span>, the Pyramids or the Colosseum?</div></div>
+      <div class="q-item"><span class="q-num">7</span><div><span class="adj-chip">expensive</span> Which is usually <span class="q-blank"></span>, gold or silver?</div></div>
+      <div class="q-item"><span class="q-num">8</span><div><span class="adj-chip">busy</span> Which is <span class="q-blank"></span>, a city centre or a small village?</div></div>
+      <div class="q-item"><span class="q-num">9</span><div><span class="adj-chip">dangerous</span> Which is <span class="q-blank"></span> for people, a lion or a mosquito?</div></div>
+      <div class="q-item"><span class="q-num">10</span><div><span class="adj-chip">good</span> Which is <span class="q-blank"></span> for you, water or cola?</div></div>
+    </div>
+
+    <div class="rule-box" style="margin-top: 12px;">
+      <b>Comparative:</b> 1 syllable → add <b>-er</b> (high → higher). 2 syllables ending in <b>-y</b> → <b>-ier</b> (heavy → heavier, busy → busier). Other 2-syllable words → <b>more</b> (boring → more boring, modern → more modern). Long words → <b>more</b> (more expensive). Irregular: good → <b>better</b>.
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 6: ROUND 4 PART 2 - SUPERLATIVES ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 4: The World's MOST! 🌍</h1>
+    <div class="sub">Part 2: Superlatives. YOU ask, I answer!</div>
+  </div>
+  <div class="slide-body">
+
+    <div class="howto">
+      <span class="label">Same rules</span>
+      Put the word in <b>( brackets )</b> into the <b>superlative</b> form (don't forget <b>the</b>!) and ask me. Then check me with your Answer Card.
+    </div>
+
+    <div class="quiz-list">
+      <div class="q-item"><span class="q-num">11</span><div><span class="adj-chip">tall</span> What is <span class="q-blank"></span> building in the world?</div></div>
+      <div class="q-item"><span class="q-num">12</span><div><span class="adj-chip">small</span> What is <span class="q-blank"></span> country in the world?</div></div>
+      <div class="q-item"><span class="q-num">13</span><div><span class="adj-chip">tall</span> Who was <span class="q-blank"></span> man in history?</div></div>
+      <div class="q-item"><span class="q-num">14</span><div><span class="adj-chip">big</span> What is <span class="q-blank"></span> ocean on Earth?</div></div>
+      <div class="q-item"><span class="q-num">15</span><div><span class="adj-chip">hot</span> What is <span class="q-blank"></span> planet in the Solar System?</div></div>
+      <div class="q-item"><span class="q-num">16</span><div><span class="adj-chip">heavy</span> What is <span class="q-blank"></span> animal that has ever lived?</div></div>
+      <div class="q-item"><span class="q-num">17</span><div><span class="adj-chip">busy</span> What is <span class="q-blank"></span> airport in the world for international flights?</div></div>
+      <div class="q-item"><span class="q-num">18</span><div><span class="adj-chip">popular</span> What is <span class="q-blank"></span> sport in the world?</div></div>
+      <div class="q-item"><span class="q-num">19</span><div><span class="adj-chip">deep</span> What is <span class="q-blank"></span> place in the ocean?</div></div>
+      <div class="q-item"><span class="q-num">20</span><div><span class="adj-chip">old</span> Who is <span class="q-blank"></span> person who has ever lived?</div></div>
+    </div>
+
+    <div class="rule-box" style="margin-top: 12px;">
+      <b>Superlative:</b> 1 syllable → <b>the …-est</b> (tall → the tallest). 2 syllables ending in <b>-y</b> → <b>the …-iest</b> (heavy → the heaviest, busy → the busiest). Other 2-syllable words → <b>the most</b> (the most boring, the most modern). Long words → <b>the most</b> (the most popular).
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 7: ROUND 4 PART 3 - 2-SYLLABLE "MORE" TRAP ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Round 4: The 2-Syllable Trap! ⚠️</h1>
+    <div class="sub">Part 3: short-looking words that STILL need more / the most</div>
+  </div>
+  <div class="slide-body">
+
+    <div class="howto">
+      <span class="label">Watch out</span>
+      Some 2-syllable words look short but still take <b>more / the most</b>: <b>boring, modern, famous, careful, crowded, helpful, nervous, foolish, tiring, stylish, honest, pleasant</b>. We say <b>more boring</b>, never "boringer"! Only 2-syllable words ending in <b>-y</b> take -ier/-iest (busy → busier).
+    </div>
+
+    <div class="quiz-list">
+      <div class="q-item"><span class="q-num">21</span><div><span class="adj-chip">modern</span> Which is <span class="q-blank"></span>, Dubai or Rome?</div></div>
+      <div class="q-item"><span class="q-num">22</span><div><span class="adj-chip">crowded</span> Which is <span class="q-blank"></span>, central Tokyo or the Sahara Desert?</div></div>
+      <div class="q-item"><span class="q-num">23</span><div><span class="adj-chip">famous</span> What is <span class="q-blank"></span> painting in the world?</div></div>
+      <div class="q-item"><span class="q-num">24</span><div><span class="adj-chip">boring</span> In your opinion, what is <span class="q-blank"></span> job in the world?</div></div>
+      <div class="q-item"><span class="q-num">25</span><div><span class="adj-chip">careful</span> Who is <span class="q-blank"></span> with money, you or me?</div></div>
+    </div>
+
+    <div class="rule-box" style="margin-top: 12px;">
+      <b>The trap in one line:</b> 2 syllables + <b>-y</b> → <b>-ier/-iest</b> (busy → busier). Every other 2-syllable word → <b>more / the most</b> (boring → the most boring).
+    </div>
+  </div>
+</div>
+
+
+<!-- ======== SLIDE 8: ANSWER CARD (FOR THE HOST) ======== -->
+<div class="slide">
+  <div class="slide-header">
+    <h1>Quiz Master's Answer Card 🔑</h1>
+    <div class="sub">For Player (the host): the answers, to check my replies</div>
+  </div>
+  <div class="slide-body">
+
+    <div class="ans-head">
+      <b>These are just the answers</b>, so you can check if I'm right. The grammar form is <b>your job</b>: work out the comparative or superlative yourself before you ask me!
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin-bottom:6px;">Part 1: Compare two things</p>
+    <div class="ans-list">
+      <div class="ans-item"><span class="anum">1.</span> <span class="fact">Mount Everest (8,849 m)</span></div>
+      <div class="ans-item"><span class="anum">2.</span> <span class="fact">Russia (17.1 m km²)</span></div>
+      <div class="ans-item"><span class="anum">3.</span> <span class="fact">a cheetah (~110 km/h)</span></div>
+      <div class="ans-item"><span class="anum">4.</span> <span class="fact">an elephant (~6 tonnes)</span></div>
+      <div class="ans-item"><span class="anum">5.</span> <span class="fact">the Nile (~6,650 km)</span></div>
+      <div class="ans-item"><span class="anum">6.</span> <span class="fact">the Pyramids (~4,500 yrs)</span></div>
+      <div class="ans-item"><span class="anum">7.</span> <span class="fact">gold</span></div>
+      <div class="ans-item"><span class="anum">8.</span> <span class="fact">a city centre</span></div>
+      <div class="ans-item"><span class="anum">9.</span> <span class="fact">a mosquito (surprise!)</span></div>
+      <div class="ans-item"><span class="anum">10.</span> <span class="fact">water</span></div>
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin:12px 0 6px;">Part 2: The world's MOST</p>
+    <div class="ans-list">
+      <div class="ans-item"><span class="anum">11.</span> <span class="fact">Burj Khalifa, Dubai (828 m)</span></div>
+      <div class="ans-item"><span class="anum">12.</span> <span class="fact">Vatican City (~0.49 km²)</span></div>
+      <div class="ans-item"><span class="anum">13.</span> <span class="fact">Robert Wadlow (2.72 m)</span></div>
+      <div class="ans-item"><span class="anum">14.</span> <span class="fact">the Pacific Ocean</span></div>
+      <div class="ans-item"><span class="anum">15.</span> <span class="fact">Venus (~465°C)</span></div>
+      <div class="ans-item"><span class="anum">16.</span> <span class="fact">the blue whale (~150 tonnes)</span></div>
+      <div class="ans-item"><span class="anum">17.</span> <span class="fact">Dubai (DXB)</span></div>
+      <div class="ans-item"><span class="anum">18.</span> <span class="fact">football / soccer</span></div>
+      <div class="ans-item"><span class="anum">19.</span> <span class="fact">the Mariana Trench (~11 km)</span></div>
+      <div class="ans-item"><span class="anum">20.</span> <span class="fact">Jeanne Calment (122 yrs)</span></div>
+    </div>
+
+    <p style="font-weight:700; color:#4c1d95; margin:12px 0 6px;">Part 3: The 2-syllable trap</p>
+    <div class="ans-list">
+      <div class="ans-item"><span class="anum">21.</span> <span class="fact">Dubai</span></div>
+      <div class="ans-item"><span class="anum">22.</span> <span class="fact">central Tokyo</span></div>
+      <div class="ans-item"><span class="anum">23.</span> <span class="fact">the Mona Lisa</span></div>
+      <div class="ans-item"><span class="anum">24.</span> <span class="fact">(your opinion, no fact to check)</span></div>
+      <div class="ans-item"><span class="anum">25.</span> <span class="fact">(your opinion, no fact to check)</span></div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

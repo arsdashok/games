@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Find the cell! 🔍</title>
+<style>
+@page { size: A4 landscape; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; background: #f7f7f2; }
+.page { width: 297mm; height: 210mm; padding: 12mm 16mm; page-break-after: always;
+        display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+h1 { font-size: 34px; color: #333; text-align: center; margin-bottom: 18px; }
+
+.chips { display: flex; justify-content: center; gap: 14px; margin-bottom: 14px; }
+.chip { background: white; border: 3px solid #E8820C; border-radius: 24px;
+        padding: 8px 18px; font-size: 22px; font-weight: bold; color: #333;
+        box-shadow: 2px 2px 0 rgba(0,0,0,0.15); }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; flex: 1; }
+.cell { background: white; border-radius: 12px; display: flex; align-items: center;
+        justify-content: center; padding: 8px; }
+.cell img { max-width: 100%; max-height: 105px; object-fit: contain; }
+.r0 { border: 5px solid #7D3C98; } .r1 { border: 5px solid #2E7D32; }
+.r2 { border: 5px solid #283593; } .r3 { border: 5px solid #E91E63; }
+</style></head><body><div class="page">
+<h1>Find the cell! 🔍</h1><div class="chips"><div class="chip">By plane.</div><div class="chip">To the park.</div><div class="chip">My book.</div><div class="chip">School bus.</div><div class="chip">In my bag.</div></div><div class="grid"><div class="cell r0"><img src="../21/car.png"></div><div class="cell r0"><img src="../21/bus.png"></div><div class="cell r0"><img src="../21/train.png"></div><div class="cell r0"><img src="../21/plane.png"></div><div class="cell r0"><img src="../21/bike.png"></div><div class="cell r1"><img src="../22/home.png"></div><div class="cell r1"><img src="../22/school.png"></div><div class="cell r1"><img src="../22/park.png"></div><div class="cell r1"><img src="../22/shop.png"></div><div class="cell r1"><img src="../22/library.png"></div><div class="cell r2"><img src="../23/book.png"></div><div class="cell r2"><img src="../23/pencil.png"></div><div class="cell r2"><img src="../23/pen.png"></div><div class="cell r2"><img src="../23/bag.png"></div><div class="cell r2"><img src="../23/ruler.png"></div></div>
+</div></body></html>
