@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apostrophes in English — Contractions & Possessive ’s</title>
+  <style>
+    :root{
+      --bg:#f8fafc;        /* light background */
+      --card:#ffffff;      /* white card */
+      --ink:#1f2937;       /* gray-800 text */
+      --accent:#16a34a;    /* green-600 */
+      --accent-2:#dc2626;  /* red-600 */
+      --muted:#64748b;     /* slate-500 */
+      --btn:#e2e8f0;       /* gray-200 */
+      --btn-ink:#111827;   /* gray-900 */
+      --focus:#0284c7;     /* sky-600 */
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;min-height:100%}
+    .wrap{max-width:900px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    h1{font-size:clamp(1.25rem,2.5vw,1.75rem);margin:0}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;padding:20px;box-shadow:0 6px 16px rgba(0,0,0,.1)}
+    .row{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .progress{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#16a34a,#86efac);transition:width .25s ease}
+    .q{font-size:1.1rem;margin:8px 0 16px}
+    ul.choices{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+    .choice{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;cursor:pointer;transition:transform .04s ease,border-color .2s ease,background .2s ease}
+    .choice:hover{transform:translateY(-1px);border-color:#cbd5e1}
+    .choice input{accent-color:var(--accent)}
+    .choice.correct{border-color:var(--accent);background:#dcfce7}
+    .choice.wrong{border-color:var(--accent-2);background:#fee2e2}
+    .hint{color:var(--muted);margin-top:8px;font-size:.95rem}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    button{background:var(--btn);color:var(--btn-ink);border:1px solid #cbd5e1;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    button.primary{background:#f1f5f9;border-color:#cbd5e1}
+    button.accent{background:#dcfce7;border-color:#86efac}
+    .pill{padding:6px 10px;border-radius:999px;background:#f1f5f9;border:1px solid #e2e8f0;font-size:.9rem}
+    .footer{color:var(--muted);font-size:.9rem;margin-top:12px}
+    .hidden{display:none}
+    .score{font-size:1.1rem;font-weight:700}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;background:#f1f5f9;border:1px solid #e2e8f0;border-bottom-width:2px;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Apostrophes in English — Contractions &amp; Possessive ’s</h1>
+    <div class="pill" id="score-pill" aria-live="polite">Score: 0/10</div>
+  </header>
+
+  <div class="card" role="region" aria-labelledby="q-label">
+    <div class="row" style="gap:12px;margin-bottom:10px">
+      <div class="progress" style="flex:1" aria-label="Progress">
+        <div class="bar" id="bar"></div>
+      </div>
+      <div class="pill" id="progress-pill">Q 1 / 10</div>
+    </div>
+
+    <div id="q-area"></div>
+
+    <div class="controls">
+      <button id="hint-btn" title="Show a hint">Hint</button>
+      <button id="check-btn" class="primary" disabled>Check</button>
+      <button id="next-btn" class="accent" disabled>Next</button>
+      <button id="restart-btn" class="" style="margin-left:auto">Restart</button>
+    </div>
+    <div class="footer">Tip: use <span class="kbd">←</span>/<span class="kbd">→</span> to move, <span class="kbd">1–4</span> to choose.</div>
+  </div>
+</div>
+
+<script>
+const QUIZ = {
+  title: "Apostrophes in English — Contractions & Possessive ’s",
+  questions: [
+    { q: "What does the apostrophe show in \\"don't\\"?", choices: ["Possession","Contraction","Plural","Emphasis"], correct: 1, hint: "It's short for “do not”." },
+    { q: "Which is correct for possession?", choices: ["The cats toy","The cat's toy","The cats's toy","The cat toy's"], correct: 1, hint: "It belongs to one cat." },
+    { q: "Which sentence shows a plural, not possession?", choices: ["The girls' shoes are new.","The girl's shoes are new.","The girls are playing outside.","The girl's playing outside."], correct: 2, hint: "No apostrophe needed for a simple plural." },
+    { q: "Which is correct for something belonging to James?", choices: ["James's book","James' book","Both can be correct","Neither"], correct: 2, hint: "Style guides differ: both accepted." },
+    { q: "What does the apostrophe show in \\"it's raining\\"?", choices: ["Possession","Contraction","Plural","Emphasis"], correct: 1, hint: "Short for “it is”." },
+    { q: "Which is correct for possession by plural cats?", choices: ["The cats' toys","The cat's toys","The cats toys","The cats toy's"], correct: 0, hint: "Apostrophe after plural -s." },
+    { q: "Which is correct for a contraction of “they are”?", choices: ["Theyre","They'are","They're","Theirs"], correct: 2, hint: "The apostrophe replaces missing letters." },
+    { q: "Which is correct for possession by a child?", choices: ["The childs toy","The child's toy","The childs' toy","The child toy"], correct: 1, hint: "Singular possessive adds ’s." },
+    { q: "What does the apostrophe show in \\"teacher's desk\\"?", choices: ["Plural","Possession","Contraction","Past tense"], correct: 1, hint: "The desk belongs to the teacher." },
+    { q: "Which is correct for a contraction of \\"we will\\"?", choices: ["We'll","Well'","We will'","Were'll"], correct: 0, hint: "The apostrophe replaces letters in “will”." }
+  ]
+};
+
+const state = {
+  i: 0,
+  answered: Array(QUIZ.questions.length).fill(false),
+  selected: Array(QUIZ.questions.length).fill(null),
+  score: 0
+};
+
+const els = {
+  bar: document.getElementById('bar'),
+  progressPill: document.getElementById('progress-pill'),
+  scorePill: document.getElementById('score-pill'),
+  qArea: document.getElementById('q-area'),
+  hintBtn: document.getElementById('hint-btn'),
+  checkBtn: document.getElementById('check-btn'),
+  nextBtn: document.getElementById('next-btn'),
+  restartBtn: document.getElementById('restart-btn')
+};
+
+function renderQuestion() {
+  const { q, choices, hint } = QUIZ.questions[state.i];
+  els.qArea.innerHTML = `
+    <div id="q" class="q" aria-live="polite"><span id="q-label"><strong>Q${state.i+1}.</strong></span> ${q}</div>
+    <ul class="choices" role="listbox" aria-label="choices">
+      ${choices.map((c,idx)=>`
+        <li class="choice" data-idx="${idx}" tabindex="0">
+          <input type="radio" name="opt" id="opt${idx}" ${state.selected[state.i]==idx?'checked':''}>
+          <label for="opt${idx}">${c}</label>
+        </li>
+      `).join('')}
+    </ul>
+    <div class="hint hidden" id="hint">${hint}</div>
+  `;
+  els.progressPill.textContent = `Q ${state.i+1} / ${QUIZ.questions.length}`;
+  els.bar.style.width = `${(state.i)/QUIZ.questions.length*100}%`;
+
+  els.hintBtn.disabled = false;
+  els.checkBtn.disabled = state.selected[state.i] === null;
+  els.nextBtn.disabled = !state.answered[state.i];
+
+  [...els.qArea.querySelectorAll('.choice')].forEach(node=>{
+    node.addEventListener('click', ()=> select(parseInt(node.dataset.idx)));
+  });
+}
+
+function select(idx){
+  state.selected[state.i] = idx;
+  els.checkBtn.disabled = false;
+  document.querySelectorAll('.choice').forEach((el,i)=>{
+    el.classList.remove('correct','wrong');
+    el.style.outline = i===idx ? `2px solid var(--focus)` : 'none';
+    el.style.outlineOffset = '2px';
+  });
+}
+
+function check(){
+  if (state.answered[state.i]) return;
+  const selected = state.selected[state.i];
+  if (selected===null) return;
+  const correct = QUIZ.questions[state.i].correct;
+  const nodes = document.querySelectorAll('.choice');
+  nodes.forEach((el,i)=>{
+    el.classList.toggle('correct', i===correct);
+    el.classList.toggle('wrong', i===selected && selected!==correct);
+  });
+  if (selected===correct) state.score++;
+  state.answered[state.i] = true;
+  els.scorePill.textContent = `Score: ${state.score}/${QUIZ.questions.length}`;
+  els.nextBtn.disabled = false;
+  els.checkBtn.disabled = true;
+}
+
+function next(){
+  if (state.i < QUIZ.questions.length-1){
+    state.i++;
+    renderQuestion();
+  } else {
+    finish();
+  }
+}
+
+function finish(){
+  els.bar.style.width = '100%';
+  els.qArea.innerHTML = `
+    <div class="q" style="margin-bottom:12px"><strong>All done!</strong></div>
+    <p class="score">You scored ${state.score} / ${QUIZ.questions.length}</p>
+    <p class="hint">Tip: “its” = possessive (no apostrophe). “It’s” = “it is / it has”.</p>
+  `;
+  els.hintBtn.disabled = true;
+  els.checkBtn.disabled = true;
+  els.nextBtn.disabled = true;
+  els.progressPill.textContent = `Finished`;
+}
+
+function restart(){
+  state.i = 0;
+  state.answered = Array(QUIZ.questions.length).fill(false);
+  state.selected = Array(QUIZ.questions.length).fill(null);
+  state.score = 0;
+  els.scorePill.textContent = `Score: 0/${QUIZ.questions.length}`;
+  renderQuestion();
+}
+
+els.hintBtn.addEventListener('click', ()=>{
+  const h = document.getElementById('hint');
+  if (!h) return;
+  h.classList.toggle('hidden');
+});
+els.checkBtn.addEventListener('click', check);
+els.nextBtn.addEventListener('click', next);
+els.restartBtn.addEventListener('click', restart);
+
+// initial render
+renderQuestion();
+</script>
+</body>
+</html>

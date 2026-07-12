@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Letter Tracer — Tobi</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Andika', 'Comic Sans MS', sans-serif;
+    background: linear-gradient(160deg, #eef2ff, #e0f2f1);
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100%; padding: 14px; color: #333;
+    touch-action: manipulation;
+  }
+  header { text-align: center; margin-bottom: 6px; }
+  .title { font-size: 28px; font-weight: 700; color: #5e35b1; }
+  .cue {
+    font-size: 30px; font-weight: 700; color: #00838F;
+    background: #fff; border: 3px solid #b2dfdb; border-radius: 16px;
+    padding: 8px 22px; margin: 8px auto 0; display: inline-block; min-height: 52px;
+  }
+  .cue .ch { color: #E8820C; }
+
+  .stage { position: relative; width: min(760px, 96vw); aspect-ratio: 760 / 560; margin: 12px 0; }
+  .card {
+    position: absolute; inset: 0;
+    background: #fff; border: 6px solid #7c3aed; border-radius: 26px;
+    box-shadow: 0 8px 0 rgba(124,58,237,0.18);
+    overflow: hidden;
+  }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #bg { pointer-events: none; }
+  #fg { touch-action: none; cursor: crosshair; }
+
+  .flash {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 48px; font-weight: 700; pointer-events: none; opacity: 0; transition: opacity .15s;
+    text-align: center; flex-direction: column; gap: 6px;
+  }
+  .flash.show { opacity: 1; }
+  .flash.win { color: #2e7d32; }
+  .flash .big { font-size: 90px; }
+  .spark {
+    position: absolute; font-size: 46px; line-height: 1; pointer-events: none;
+    opacity: 0; transform: translate(-50%, -50%) scale(0.5);
+    transition: opacity .16s ease, transform .16s ease;
+  }
+  .spark.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  .tabs { display: flex; gap: 10px; justify-content: center; margin: 8px 0 2px; }
+  .tab {
+    font-family: inherit; font-size: 20px; font-weight: 700; color: #5e35b1;
+    background: #ede9fe; border: 3px solid #c4b5fd; border-radius: 14px; padding: 8px 20px; cursor: pointer;
+  }
+  .tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+  button {
+    font-family: inherit; font-size: 20px; font-weight: 700; color: #fff;
+    border: none; border-radius: 16px; padding: 12px 18px; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+  }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+  .nav { background: #7c3aed; min-width: 64px; font-size: 26px; }
+  .letterbadge {
+    font-size: 40px; font-weight: 700; color: #5e35b1; background: #ede9fe;
+    border: 3px solid #c4b5fd; border-radius: 16px; padding: 4px 18px; min-width: 70px; text-align: center;
+  }
+  .mode { background: #00897B; }
+  .mode.write { background: #E8820C; }
+  .clear { background: #ef5350; }
+  .done { background: #43a047; }
+  .hint { font-size: 14px; color: #888; margin-top: 8px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">✏️ Letter Tracer 🦕</div>
+  <div class="tabs">
+    <button class="tab active" id="tabLetters">Aa Letters</button>
+    <button class="tab" id="tabWords">📖 Words</button>
+  </div>
+  <div class="cue" id="cue">…</div>
+</header>
+
+<div class="stage">
+  <div class="card" id="card">
+    <canvas id="bg"></canvas>
+    <canvas id="fg"></canvas>
+    <div class="flash" id="flash"></div>
+    <div class="spark" id="spark">✨</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="nav" id="prev">◀</button>
+  <div class="letterbadge" id="badge">m</div>
+  <button class="nav" id="next">▶</button>
+  <button class="mode" id="mode">✏️ Trace</button>
+  <button class="clear" id="clear">↺ Clear</button>
+  <button class="done" id="done">✓ Done</button>
+</div>
+<div class="hint">Stay in the white lane between the lines — the grey areas are out of bounds (too tall / too low). Small letters sit between the dashed and pink lines; tall letters reach the blue line; g p q y hang down to the dotted line. Switch to Write to do it solo.</div>
+
+<script>
+// ---- Letters + stroke cues (starter set: Tobi's phonics letters; expand from the formation file) ----
+const LETTERS = [
+  { ch: 'a', cue: 'Round, then a line down' },
+  { ch: 'b', cue: 'Tall line down, then round on the right' },
+  { ch: 'c', cue: 'Curl round, like a smile' },
+  { ch: 'd', cue: 'Round first, like c, then a tall line' },
+  { ch: 'e', cue: 'Round like c, with a line across the middle' },
+  { ch: 'f', cue: 'Curve over the top, long line down, then a cross' },
+  { ch: 'g', cue: 'Round first, like c, then down and a hook' },
+  { ch: 'h', cue: 'Tall line down, then jump over' },
+  { ch: 'i', cue: 'Line down, then a dot' },
+  { ch: 'j', cue: 'Down, hook, then a dot' },
+  { ch: 'k', cue: 'Tall line down, then a kick' },
+  { ch: 'l', cue: 'One tall line down' },
+  { ch: 'm', cue: 'Line down, jump, jump' },
+  { ch: 'n', cue: 'Line down, jump' },
+  { ch: 'o', cue: 'Round and round' },
+  { ch: 't', cue: 'Line down, then a cross' },
+  { ch: 'M', cue: 'Down. Back to top. Down, up, down' },
+  { ch: 'N', cue: 'Down. Back to top. Slant down, up' },
+  { ch: 'G', cue: 'Round like a C, then a line in' },
+  { ch: 'I', cue: 'Tall line down. No dot!' },
+  { ch: 'K', cue: 'Big line down, then a kick' },
+  { ch: 'J', cue: 'Big line down, hook. No dot!' },
+];
+
+// ---- Words Tobi has learned (sight words), coloured by his palette. play + little are recent. ----
+// Tobi's known sight words only (so the "read it, then write it" step never lands on an unknown word)
+const WORDS = [
+  { ch: 'I', c: '#CC3333' },   { ch: 'a', c: '#E91E63' },    { ch: 'see', c: '#2E75B6' },  { ch: 'the', c: '#548235' },
+  { ch: 'my', c: '#D4AC0D' },  { ch: 'like', c: '#00897B' }, { ch: 'have', c: '#7D3C98' }, { ch: 'want', c: '#E8820C' },
+  { ch: 'big', c: '#C62828' }, { ch: 'go', c: '#2E7D32' },   { ch: 'can', c: '#C2185B' },  { ch: 'look', c: '#1565C0' },
+  { ch: 'here', c: '#6D4C41' },{ ch: 'it', c: '#F4511E' },   { ch: 'is', c: '#5E35B1' },   { ch: 'jump', c: '#7c3aed' },
+  { ch: 'up', c: '#2E7D32' },  { ch: 'down', c: '#C62828' }, { ch: 'in', c: '#00897B' },   { ch: 'little', c: '#1565C0' },
+  { ch: 'play', c: '#E8820C' },
+];
+
+const W = 760, H = 560;
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+const bg = document.getElementById('bg'), bgx = bg.getContext('2d');
+const fg = document.getElementById('fg'), fgx = fg.getContext('2d');
+const cueEl = document.getElementById('cue'), badgeEl = document.getElementById('badge');
+const card = document.getElementById('card'), flash = document.getElementById('flash');
+const modeBtn = document.getElementById('mode');
+const tabLetters = document.getElementById('tabLetters'), tabWords = document.getElementById('tabWords');
+
+let idx = 0, mode = 'trace', section = 'letters';
+const BOX = { x: 22, y: 22, w: W - 44, h: H - 44 };  // horizontal bounds + card extent
+let LINES = null;   // current item's line geometry + allowed vertical band (set by computeLines)
+const TOL = 16;     // px of forgiveness so a stroke may just touch the boundary lines
+function items() { return section === 'letters' ? LETTERS : WORDS; }
+function cur() { return items()[idx]; }
+function fontSizeFor(text) {
+  if (section === 'letters') return 360;
+  const maxW = BOX.w - 90, maxSize = 240;
+  bgx.font = '700 100px Andika, "Comic Sans MS", sans-serif';
+  const w = bgx.measureText(text).width || 60;
+  return Math.max(60, Math.min(maxSize, Math.floor(100 * maxW / w)));
+}
+
+[bg, fg].forEach(c => { c.width = W * DPR; c.height = H * DPR; });
+bgx.scale(DPR, DPR); fgx.scale(DPR, DPR);
+fgx.lineWidth = 12; fgx.lineCap = 'round'; fgx.lineJoin = 'round'; fgx.strokeStyle = '#3949ab';
+
+// line geometry + the allowed vertical band for the CURRENT item, snapped to the printed lines
+function computeLines() {
+  const baseline = H * 0.64, size = fontSizeFor(cur().ch);
+  bgx.font = '700 ' + size + 'px Andika, "Comic Sans MS", sans-serif';
+  bgx.textAlign = 'center'; bgx.textBaseline = 'alphabetic';
+  const m = (s, k) => { const mm = bgx.measureText(s); return mm[k] != null ? mm[k] : null; };
+  const ascent = m('h', 'actualBoundingBoxAscent') || size * 0.70;
+  const xh     = m('x', 'actualBoundingBoxAscent') || size * 0.48;
+  const desc   = m('g', 'actualBoundingBoxDescent') || size * 0.20;
+  const topLine = baseline - ascent, midLine = baseline - xh, descLine = baseline + desc;
+  // measure the current letter/word itself → does it reach the ascender? hang below the baseline?
+  const t = cur().ch;
+  const ascT  = m(t, 'actualBoundingBoxAscent')  || xh;
+  const descT = m(t, 'actualBoundingBoxDescent') || 0;
+  const top    = (ascT  > (xh + ascent) / 2) ? topLine : midLine;   // tall letters / dots / capitals → blue line; x-height → dashed
+  const bottom = (descT > desc * 0.4)        ? descLine : baseline;  // g p q y j → dotted line; the rest → pink baseline
+  LINES = { size: size, baseline: baseline, topLine: topLine, midLine: midLine, descLine: descLine, band: { top: top, bottom: bottom } };
+  return LINES;
+}
+
+function drawBackground() {
+  bgx.clearRect(0, 0, W, H);
+  const Ln = computeLines();
+  const lx = 50, rx = W - 50, padX = 14;
+  // grey semi-transparent "out of bounds" fields — above the band and below it, so only the correct lane stays white
+  bgx.fillStyle = 'rgba(96,102,128,0.15)';
+  const topH = Math.max(0, Ln.band.top - BOX.y);
+  const botY = Ln.band.bottom, botH = Math.max(0, (BOX.y + BOX.h) - botY);
+  bgx.fillRect(BOX.x + padX, BOX.y, BOX.w - padX * 2, topH);
+  bgx.fillRect(BOX.x + padX, botY, BOX.w - padX * 2, botH);
+  // guide lines on top of the shading
+  const line = (y, color, dash) => {
+    bgx.beginPath(); bgx.setLineDash(dash || []); bgx.lineWidth = 2.5; bgx.strokeStyle = color;
+    bgx.moveTo(lx, y); bgx.lineTo(rx, y); bgx.stroke(); bgx.setLineDash([]);
+  };
+  line(Ln.topLine, '#90caf9');           // top (ascender) line — blue
+  line(Ln.midLine, '#9e9e9e', [10, 8]);  // dashed mid (x-height)
+  line(Ln.baseline, '#ef9a9a');          // baseline — red / pink
+  line(Ln.descLine, '#cfcfcf', [6, 8]);  // descender line — dotted
+  if (mode === 'trace') {
+    bgx.fillStyle = '#dcdce4';
+    bgx.font = '700 ' + Ln.size + 'px Andika, "Comic Sans MS", sans-serif';
+    bgx.textAlign = 'center'; bgx.textBaseline = 'alphabetic';
+    bgx.fillText(cur().ch, W / 2, Ln.baseline);
+  }
+}
+
+function refresh() {
+  const it = cur();
+  if (section === 'letters') {
+    cueEl.innerHTML = '<span class="ch">' + it.ch + '</span> &nbsp; ' + it.cue;
+  } else {
+    cueEl.innerHTML = '<span class="ch" style="color:' + (it.c || '#5e35b1') + '">' + it.ch +
+      '</span> &nbsp; <span style="color:#888;font-size:22px">Read it, then write it</span>';
+  }
+  badgeEl.textContent = it.ch;
+  clearDraw();
+  drawBackground();
+}
+function setSection(s) {
+  section = s; idx = 0;
+  tabLetters.classList.toggle('active', s === 'letters');
+  tabWords.classList.toggle('active', s === 'words');
+  refresh();
+}
+
+function clearDraw() { fgx.clearRect(0, 0, W, H); }
+
+// ---- pointer drawing: block the ink at the lane edge, never erase what's drawn ----
+let drawing = false, lastX = 0, lastY = 0;
+function pos(e) {
+  const r = fg.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
+}
+// valid = inside the card horizontally AND inside the current letter's vertical lane (with a little grace)
+function inBounds(x, y) {
+  if (!LINES) computeLines();
+  const b = LINES.band;
+  return x >= BOX.x && x <= BOX.x + BOX.w && y >= b.top - TOL && y <= b.bottom + TOL;
+}
+
+fg.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const p = pos(e); if (!inBounds(p.x, p.y)) return;
+  drawing = true; lastX = p.x; lastY = p.y;
+  fgx.beginPath(); fgx.arc(p.x, p.y, 6, 0, Math.PI * 2); fgx.fillStyle = '#3949ab'; fgx.fill();
+});
+fg.addEventListener('pointermove', e => {
+  if (!drawing) return; e.preventDefault();
+  const c = clampToBounds(pos(e));   // ink stops at the lane edge; nothing already drawn is erased
+  fgx.beginPath(); fgx.moveTo(lastX, lastY); fgx.lineTo(c.x, c.y); fgx.stroke();
+  lastX = c.x; lastY = c.y;
+});
+function endStroke(spark) { if (!drawing) return; drawing = false; if (spark) sparkle(lastX, lastY); }
+fg.addEventListener('pointerup', () => endStroke(true));
+fg.addEventListener('pointercancel', () => endStroke(false));
+fg.addEventListener('pointerleave', () => endStroke(false));  // leaving the card just ends the stroke — never erases
+
+let flashTimer = null;
+function showFlash(html, cls, ms) {
+  flash.innerHTML = html; flash.className = 'flash show ' + cls;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { flash.className = 'flash'; }, ms || 1100);
+}
+// keep every point inside the card + the current letter's vertical lane (the "wall")
+function clampToBounds(p) {
+  if (!LINES) computeLines();
+  const b = LINES.band;
+  return {
+    x: Math.max(BOX.x, Math.min(BOX.x + BOX.w, p.x)),
+    y: Math.max(b.top - TOL, Math.min(b.bottom + TOL, p.y))
+  };
+}
+// gentle positive when a stroke finishes — a small sparkle at the pen, no satiating fanfare
+const sparkEl = document.getElementById('spark');
+let sparkTimer = null;
+function sparkle(x, y) {
+  if (!sparkEl) return;
+  sparkEl.style.left = (x / W * 100) + '%';
+  sparkEl.style.top  = (y / H * 100) + '%';
+  sparkEl.classList.add('show');
+  clearTimeout(sparkTimer);
+  sparkTimer = setTimeout(() => sparkEl.classList.remove('show'), 430);
+}
+function done() {
+  showFlash('<span class="big">🦕⭐</span><span>Well done, Tobi!</span>', 'win', 1400);
+}
+
+// ---- controls ----
+document.getElementById('prev').onclick = () => { idx = (idx - 1 + items().length) % items().length; refresh(); };
+document.getElementById('next').onclick = () => { idx = (idx + 1) % items().length; refresh(); };
+tabLetters.onclick = () => setSection('letters');
+tabWords.onclick = () => setSection('words');
+document.getElementById('clear').onclick = () => clearDraw();
+document.getElementById('done').onclick = () => done();
+modeBtn.onclick = () => {
+  mode = (mode === 'trace') ? 'write' : 'trace';
+  modeBtn.textContent = (mode === 'trace') ? '✏️ Trace' : '✍️ Write';
+  modeBtn.classList.toggle('write', mode === 'write');
+  clearDraw(); drawBackground();
+};
+
+// init (wait for the font so the grey letter shapes are right)
+function start() { refresh(); }
+if (document.fonts && document.fonts.ready) { document.fonts.ready.then(start); setTimeout(start, 600); }
+else { window.addEventListener('load', start); }
+</script>
+</body>
+</html>

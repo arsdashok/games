@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>99 Nights in the Forest · English (A1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Fredoka', system-ui, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #14532d 0%, #0b2e1a 60%, #06160d 100%);
+    color: #fff; padding-bottom: 60px;
+  }
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: rgba(6,22,13,.92); backdrop-filter: blur(6px);
+    padding: 12px 20px; border-bottom: 2px solid rgba(255,255,255,.12);
+  }
+  .navttl { font-weight: 700; font-size: 20px; }
+  .dots { display: flex; gap: 7px; flex-wrap: wrap; }
+  .dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 700; font-size: 15px;
+    color: #fff; text-decoration: none;
+    background: linear-gradient(135deg, var(--d1), var(--d2));
+    box-shadow: 0 2px 6px rgba(0,0,0,.35); transition: transform .12s;
+  }
+  .dot:hover { transform: scale(1.18); }
+  .intro { text-align: center; padding: 30px 20px 6px; }
+  .intro h1 { font-size: 38px; margin: 0 0 6px; }
+  .intro p { font-size: 19px; opacity: .85; margin: 4px 0; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 16px; }
+  .card {
+    background: rgba(255,255,255,.06); border: 2px solid rgba(255,255,255,.1);
+    border-radius: 22px; margin: 26px 0; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4); scroll-margin-top: 70px;
+  }
+  .head {
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+    padding: 20px 26px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .badge {
+    background: rgba(0,0,0,.28); padding: 5px 14px; border-radius: 999px;
+    font-weight: 700; font-size: 16px; letter-spacing: .3px;
+  }
+  .bigemoji { font-size: 40px; line-height: 1; }
+  .head h2 { font-size: 30px; margin: 0; flex: 1; }
+  .sayit { font-size: 15px; background: rgba(255,255,255,.2); padding: 5px 12px; border-radius: 999px; }
+  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; padding: 24px 24px 6px; }
+  .tile {
+    background: rgba(255,255,255,.95); color: #0b2e1a; border-radius: 16px;
+    padding: 16px 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 138px; transition: transform .12s;
+  }
+  .tile:hover { transform: translateY(-4px); }
+  .emoji { font-size: 46px; line-height: 1.05; }
+  .pic { height: 58px; width: auto; max-width: 86%; object-fit: contain; display: block; }
+  .pic.big { height: 92px; }
+  .chip-pic { height: 26px; vertical-align: middle; display: inline-block; }
+  .word { font-weight: 600; font-size: 16px; margin-top: 9px; line-height: 1.25; }
+  .ex {
+    margin: 16px 24px 0; background: rgba(255,255,255,.1);
+    border: 2px solid rgba(255,255,255,.28); border-radius: 16px; padding: 16px 20px;
+  }
+  .exttl { font-weight: 700; font-size: 17px; opacity: .95; }
+  .frame { font-size: 26px; font-weight: 600; margin: 8px 0 12px; }
+  .blank { color: #fde047; letter-spacing: 1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    background: rgba(255,255,255,.95); color: #0b2e1a; font-weight: 600; font-size: 19px;
+    padding: 8px 16px; border-radius: 999px; box-shadow: 0 3px 8px rgba(0,0,0,.25);
+  }
+  .play {
+    margin: 16px 24px 24px; background: rgba(0,0,0,.35);
+    border: 2px dashed rgba(255,255,255,.3); border-radius: 16px; padding: 16px 20px;
+  }
+  .playttl { font-weight: 700; font-size: 18px; }
+  .play p { font-size: 20px; margin: 8px 0 0; line-height: 1.4; }
+  @media (max-width: 760px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .head h2 { font-size: 24px; }
+    .frame { font-size: 22px; }
+  }
+</style></head>
+<body>
+  <div class="nav"><span class="navttl">🌲 99 Nights · A1</span><div class="dots"><a class="dot" href="#l1" style="--d1:#f59e0b;--d2:#d97706">1</a><a class="dot" href="#l2" style="--d1:#ef4444;--d2:#dc2626">2</a><a class="dot" href="#l3" style="--d1:#a16207;--d2:#854d0e">3</a><a class="dot" href="#l4" style="--d1:#ea580c;--d2:#c2410c">4</a><a class="dot" href="#l5" style="--d1:#4f46e5;--d2:#3730a3">5</a><a class="dot" href="#l6" style="--d1:#e11d48;--d2:#9f1239">6</a><a class="dot" href="#l7" style="--d1:#78716c;--d2:#57534e">7</a><a class="dot" href="#l8" style="--d1:#ca8a04;--d2:#a16207">8</a><a class="dot" href="#l9" style="--d1:#0d9488;--d2:#0f766e">9</a><a class="dot" href="#l10" style="--d1:#7c3aed;--d2:#6d28d9">10</a></div></div>
+  <div class="intro">
+    <h1>🌲 99 Nights in the Forest 🔥</h1>
+    <p><b>English Phrases A1 · 10 lessons · 5 phrases &amp; patterns each</b></p>
+    <p>Learn 5 phrases → practise → play 10 minutes and use them!</p>
+  </div>
+  <div class="wrap">
+    <section class="card" id="l1" style="--c1:#f59e0b;--c2:#d97706">
+      <div class="head">
+        <span class="badge">Lesson 1</span>
+        <span class="bigemoji">🔥</span>
+        <h2>Wood &amp; Fire</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🌲</div><div class="word">Find a tree</div></div><div class="tile"><div class="emoji ">🪵</div><div class="word">Chop the wood</div></div><div class="tile"><div class="emoji ">🪓</div><div class="word">I found an axe</div></div><div class="tile"><div class="emoji ">🔥</div><div class="word">Light the fire</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Let&#x27;s chop wood!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">I found a / an <span class="blank">_____</span></div><div class="chips"><span class="chip">🪓&nbsp;axe</span><span class="chip">🌲&nbsp;tree</span><span class="chip">🪵&nbsp;log</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Chop wood and light the campfire. Tell your friend: “Let's chop wood!”</p>
+      </div>
+    </section>
+    <section class="card" id="l2" style="--c1:#ef4444;--c2:#dc2626">
+      <div class="head">
+        <span class="badge">Lesson 2</span>
+        <span class="bigemoji">🍎</span>
+        <h2>Food &amp; Hunger</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🍖</div><div class="word">I need food</div></div><div class="tile"><div class="emoji ">🍎</div><div class="word">Can I have an apple?</div></div><div class="tile"><div class="emoji ">🫐</div><div class="word">Eat the berries</div></div><div class="tile"><div class="emoji ">😫</div><div class="word">I&#x27;m so hungry!</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Here, eat this!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">Can I have a / an <span class="blank">_____</span>?</div><div class="chips"><span class="chip">🍎&nbsp;apple</span><span class="chip">🥕&nbsp;carrot</span><span class="chip">🐟&nbsp;fish</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Collect food. Tell your friend “I'm hungry!” and “Here, eat this!”</p>
+      </div>
+    </section>
+    <section class="card" id="l3" style="--c1:#a16207;--c2:#854d0e">
+      <div class="head">
+        <span class="badge">Lesson 3</span>
+        <span class="bigemoji">🐺</span>
+        <h2>Animals &amp; Hunting</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🐾</div><div class="word">I see an animal</div></div><div class="tile"><div class="emoji ">🐺</div><div class="word">Look! A wolf!</div></div><div class="tile"><div class="emoji ">🐻</div><div class="word">I can see a bear</div></div><div class="tile"><div class="emoji ">🏹</div><div class="word">Let&#x27;s hunt</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Look out, a bear!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">I can see a / an <span class="blank">_____</span></div><div class="chips"><span class="chip">🐺&nbsp;wolf</span><span class="chip">🐻&nbsp;bear</span><span class="chip">🐾&nbsp;animal</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Hunt an animal. Shout “Look! A wolf!” when you see one.</p>
+      </div>
+    </section>
+    <section class="card" id="l4" style="--c1:#ea580c;--c2:#c2410c">
+      <div class="head">
+        <span class="badge">Lesson 4</span>
+        <span class="bigemoji">🍳</span>
+        <h2>Cooking</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🍖</div><div class="word">Cook the meat</div></div><div class="tile"><div class="emoji ">🐟</div><div class="word">I&#x27;m cooking fish</div></div><div class="tile"><div class="emoji ">🍳</div><div class="word">Put it on the fire</div></div><div class="tile"><div class="emoji ">🔥</div><div class="word">It&#x27;s very hot!</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">The food is ready!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">Can you cook the <span class="blank">_____</span>?</div><div class="chips"><span class="chip">🍖&nbsp;meat</span><span class="chip">🐟&nbsp;fish</span><span class="chip">🍎&nbsp;apple</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Cook meat and fish. Say “Put it on the fire” and “The food is ready!”</p>
+      </div>
+    </section>
+    <section class="card" id="l5" style="--c1:#4f46e5;--c2:#3730a3">
+      <div class="head">
+        <span class="badge">Lesson 5</span>
+        <span class="bigemoji">🌙</span>
+        <h2>Day &amp; Night</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">☀️</div><div class="word">It&#x27;s daytime</div></div><div class="tile"><div class="emoji ">🌙</div><div class="word">It&#x27;s night now</div></div><div class="tile"><div class="emoji ">🌑</div><div class="word">It&#x27;s getting dark</div></div><div class="tile"><div class="emoji ">🔥</div><div class="word">Stay near the fire</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Don&#x27;t go out at night!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">It&#x27;s <span class="blank">_____</span> now</div><div class="chips"><span class="chip">☀️&nbsp;day</span><span class="chip">🌙&nbsp;night</span><span class="chip">🌑&nbsp;dark</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>When night comes, say “It's getting dark, stay near the fire!”</p>
+      </div>
+    </section>
+    <section class="card" id="l6" style="--c1:#e11d48;--c2:#9f1239">
+      <div class="head">
+        <span class="badge">Lesson 6</span>
+        <span class="bigemoji">🦌</span>
+        <h2>Danger!</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><img src="img/deer.webp" alt="" class="pic "><div class="word">The Deer is here!</div></div><div class="tile"><div class="emoji ">🐺</div><div class="word">There&#x27;s a wolf!</div></div><div class="tile"><div class="emoji ">🏃</div><div class="word">Run away!</div></div><div class="tile"><div class="emoji ">⚠️</div><div class="word">Watch out!</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Hide, quick!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">There&#x27;s a <span class="blank">_____</span>!</div><div class="chips"><span class="chip">🐺&nbsp;wolf</span><span class="chip">🐻&nbsp;bear</span><span class="chip"><img src="img/deer.webp" alt="" class="pic chip-pic">&nbsp;deer</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>When the Deer comes, warn your friend: “Watch out! Run away!”</p>
+      </div>
+    </section>
+    <section class="card" id="l7" style="--c1:#78716c;--c2:#57534e">
+      <div class="head">
+        <span class="badge">Lesson 7</span>
+        <span class="bigemoji">🏠</span>
+        <h2>Build a Base</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🏠</div><div class="word">Let&#x27;s build a base</div></div><div class="tile"><div class="emoji ">🧱</div><div class="word">Build a wall here</div></div><div class="tile"><div class="emoji ">🚪</div><div class="word">We need a door</div></div><div class="tile"><div class="emoji ">🔨</div><div class="word">I&#x27;m building</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Help me build it!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">Let&#x27;s build a <span class="blank">_____</span></div><div class="chips"><span class="chip">🧱&nbsp;wall</span><span class="chip">🚪&nbsp;door</span><span class="chip">🛖&nbsp;shelter</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Build a base together. Say “Let's build a wall here!”</p>
+      </div>
+    </section>
+    <section class="card" id="l8" style="--c1:#ca8a04;--c2:#a16207">
+      <div class="head">
+        <span class="badge">Lesson 8</span>
+        <span class="bigemoji">📦</span>
+        <h2>Chests &amp; Loot</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">📦</div><div class="word">Open the chest</div></div><div class="tile"><div class="emoji ">💰</div><div class="word">I found loot</div></div><div class="tile"><div class="emoji ">🔦</div><div class="word">I found a torch</div></div><div class="tile"><div class="emoji ">🎒</div><div class="word">I got a bag</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">What&#x27;s inside?</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">I found a / an <span class="blank">_____</span></div><div class="chips"><span class="chip">🔦&nbsp;torch</span><span class="chip">🎒&nbsp;bag</span><span class="chip">🪓&nbsp;axe</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Open a chest. Say “I found a torch!” and name what's inside.</p>
+      </div>
+    </section>
+    <section class="card" id="l9" style="--c1:#0d9488;--c2:#0f766e">
+      <div class="head">
+        <span class="badge">Lesson 9</span>
+        <span class="bigemoji">🤝</span>
+        <h2>Teamwork</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🆘</div><div class="word">Can you help me?</div></div><div class="tile"><div class="emoji ">🤝</div><div class="word">Let&#x27;s work together</div></div><div class="tile"><div class="emoji ">❓</div><div class="word">Where are you?</div></div><div class="tile"><div class="emoji ">🙋</div><div class="word">I&#x27;m over here!</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">Stay close to me!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">Where&#x27;s the <span class="blank">_____</span>?</div><div class="chips"><span class="chip">📦&nbsp;chest</span><span class="chip">🔥&nbsp;fire</span><span class="chip">🏠&nbsp;base</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Work as a team. Ask “Where are you?” and answer “I'm over here!”</p>
+      </div>
+    </section>
+    <section class="card" id="l10" style="--c1:#7c3aed;--c2:#6d28d9">
+      <div class="head">
+        <span class="badge">Lesson 10</span>
+        <span class="bigemoji">🏆</span>
+        <h2>Fight &amp; Win!</h2>
+        <span class="sayit">🔊 Say each phrase out loud</span>
+      </div>
+      <div class="tiles"><div class="tile"><div class="emoji ">🗡️</div><div class="word">I&#x27;ve got a sword</div></div><div class="tile"><div class="emoji ">🔱</div><div class="word">Take the spear</div></div><div class="tile"><div class="emoji ">⚔️</div><div class="word">Attack now!</div></div><div class="tile"><div class="emoji ">🏆</div><div class="word">We survived!</div></div><div class="tile"><div class="emoji ">🗣️</div><div class="word">We did it!</div></div></div>
+      <div class="ex"><span class="exttl">✏️ Your turn! Say it:</span><div class="frame">I&#x27;ve got a <span class="blank">_____</span></div><div class="chips"><span class="chip">🗡️&nbsp;sword</span><span class="chip">🔱&nbsp;spear</span><span class="chip">🔦&nbsp;torch</span></div></div>
+      <div class="play">
+        <span class="playttl">🎮 Play &amp; use it!</span>
+        <p>Survive the night together! Cheer “We did it!”, then use ALL your phrases from every lesson. 🌟</p>
+      </div>
+    </section></div>
+  
+</body></html>
