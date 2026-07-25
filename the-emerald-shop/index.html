@@ -97,6 +97,11 @@
     font-size:clamp(38px,7.5vw,62px);color:#1c8b3b;line-height:1}
   .bigprice .em{width:.9em;height:.9em}
   .word{font-size:clamp(17px,2.5vw,25px);color:#a86b2f;font-weight:700;text-transform:capitalize;margin-top:-2px}
+  .word.reveal{cursor:pointer;color:#b98a3a;border:2px dashed #d9b877;border-radius:11px;padding:3px 14px;
+    display:inline-block;font-size:clamp(14px,1.9vw,19px);text-transform:none;margin-top:4px}
+  .word.reveal:hover{background:#fff4dc}
+  .word.reveal.shown{color:#a86b2f;border-color:transparent;background:none;cursor:default;
+    text-transform:capitalize;font-size:clamp(17px,2.5vw,25px);padding:0}
   .acts{display:flex;gap:11px;justify-content:center;margin-top:14px}
   .btn{border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:15px;padding:11px 20px;
     font-size:clamp(16px,2.1vw,21px);color:#fff;transition:transform .06s;display:flex;align-items:center;gap:6px}
@@ -181,6 +186,7 @@ const WORDS=['zero','one','two','three','four','five','six','seven','eight','nin
  'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
 const numWord=n=> n<=20 ? WORDS[n] : String(n);
 const NO_ART=new Set(['shoes','trousers','milk','water']);
+const PLURAL=new Set(['shoes','trousers']);
 const AN=new Set(['apple']);
 const art=n=> NO_ART.has(n)?'' : (AN.has(n)?'an ':'a ');
 
@@ -258,7 +264,7 @@ function openBuy(name){
     <div class="frame">I want ${art(name)}<b>${name}</b>.</div>
     <div class="howmuch">HOW MUCH?</div>
     <div class="bigprice">${emIconHTML}${p}</div>
-    <div class="word">${numWord(p)}</div>
+    <div class="word reveal" id="revealWord">say it, then tap 👂</div>
     <div class="nomoney">${can?(onList?'On your list! ⭐':''):'Not enough! 💚'}</div>
     <div class="acts">
       <button class="btn buy" ${can?'':'disabled'} id="doBuy">Buy ${emIconHTML}${p}</button>
@@ -266,6 +272,8 @@ function openBuy(name){
     </div>`;
   document.getElementById('doCancel').onclick=closeVeil;
   if(can) document.getElementById('doBuy').onclick=()=>doBuy(name);
+  const rw=document.getElementById('revealWord');
+  rw.onclick=()=>{ rw.textContent=numWord(p); rw.classList.add('shown'); };
   showVeil();
 }
 function doBuy(name){
@@ -285,7 +293,7 @@ function openBag(name){
   const b=document.getElementById('bubble');
   b.innerHTML=`
     <img src="${ITEMS[name].uri}">
-    <div class="frame">This is my <b>${name}</b>!</div>
+    <div class="frame">${PLURAL.has(name)?'These are':'This is'} my <b>${name}</b>!</div>
     <div class="word" style="color:#8a5c28;text-transform:none">Sell it back?</div>
     <div class="bigprice" style="color:#e6912a;font-size:clamp(30px,6vw,48px)">+${emIconHTML}${p}</div>
     <div class="nomoney"></div>
