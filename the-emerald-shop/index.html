@@ -190,22 +190,32 @@ const AN=new Set(['apple']);
 const art=n=> NO_ART.has(n)?'' : (AN.has(n)?'an ':'a ');
 
 const START=20;
-let emeralds=START, bag={}, list=[];
+let emeralds=START, bag={}, list=[], lastLen=0;
 const emIconHTML='<svg class="em" viewBox="0 0 100 100"><use href="#emerald"/></svg>';
 function say(){}  // sound removed (silent game)
 
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
 // ---------- shopping list ----------
-function newList(){
+function pickList(L){
   const all=Object.keys(PRICE);
-  for(let t=0;t<500;t++){
-    const pick=shuffle(all).slice(0,3);
-    const tot=pick.reduce((s,n)=>s+PRICE[n],0);
-    const teen=pick.some(n=>PRICE[n]>=11&&PRICE[n]<=15);
-    if(tot<=START && teen){ list=pick.map(n=>({name:n,done:false})); return; }
+  const teens=all.filter(n=>PRICE[n]>=11&&PRICE[n]<=15);
+  for(let t=0;t<400;t++){
+    const teen=teens[Math.floor(Math.random()*teens.length)];
+    const rest=shuffle(all.filter(n=>n!==teen)).slice(0,L-1);
+    const pick=[teen,...rest];
+    if(pick.reduce((s,n)=>s+PRICE[n],0)<=START) return shuffle(pick);
   }
-  list=[{name:'teddy',done:false},{name:'apple',done:false},{name:'water',done:false}];
+  return null;
+}
+function newList(){
+  // vary list length 2-4 each round, avoid repeating the previous length
+  let lens=shuffle([2,3,4].filter(l=>l!==lastLen));
+  for(const L of [...lens,3,2]){
+    const pick=pickList(L);
+    if(pick){ lastLen=pick.length; list=pick.map(n=>({name:n,done:false})); return; }
+  }
+  lastLen=3; list=[{name:'teddy',done:false},{name:'apple',done:false},{name:'water',done:false}];
 }
 function listTotal(){ return list.reduce((s,i)=>s+PRICE[i.name],0); }
 function wantedSet(){ return new Set(list.filter(i=>!i.done).map(i=>i.name)); }
