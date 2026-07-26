@@ -199,6 +199,7 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 // ---------- shopping list ----------
 function pickList(L){
   const all=Object.keys(PRICE);
+  if(L===1) return [all[Math.floor(Math.random()*all.length)]];  // single item: any (all cost <=20)
   const teens=all.filter(n=>PRICE[n]>=11&&PRICE[n]<=15);
   for(let t=0;t<400;t++){
     const teen=teens[Math.floor(Math.random()*teens.length)];
@@ -209,9 +210,9 @@ function pickList(L){
   return null;
 }
 function newList(){
-  // vary list length 2-4 each round, avoid repeating the previous length
-  let lens=shuffle([2,3,4].filter(l=>l!==lastLen));
-  for(const L of [...lens,3,2]){
+  // vary list length 1-4 each round, avoid repeating the previous length
+  let lens=shuffle([1,2,3,4].filter(l=>l!==lastLen));
+  for(const L of [...lens,3,2,1]){
     const pick=pickList(L);
     if(pick){ lastLen=pick.length; list=pick.map(n=>({name:n,done:false})); return; }
   }
