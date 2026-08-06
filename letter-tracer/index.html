@@ -74,9 +74,40 @@
   .clear { background: #ef5350; }
   .done { background: #43a047; }
   .hint { font-size: 14px; color: #888; margin-top: 8px; text-align: center; }
+
+  /* ---- settings: choose which letters & words are in play (Dasha's control) ---- */
+  .gear { position: fixed; top: 12px; right: 14px; background: #5e35b1; font-size: 22px; padding: 10px 14px; z-index: 5; }
+  .menu {
+    position: fixed; inset: 0; background: rgba(40,30,70,0.55);
+    display: none; align-items: center; justify-content: center; z-index: 20; padding: 16px;
+  }
+  .menu.show { display: flex; }
+  .menu-card {
+    background: #fff; border-radius: 22px; padding: 20px 22px;
+    max-width: 700px; width: 100%; max-height: 92vh; overflow: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .menu-title { font-size: 24px; font-weight: 700; color: #5e35b1; text-align: center; margin-bottom: 4px; }
+  .menu-sub { font-size: 14px; color: #888; text-align: center; margin-bottom: 14px; }
+  .menu-sec { margin-bottom: 14px; }
+  .menu-head {
+    font-size: 18px; font-weight: 700; color: #00838F;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+  }
+  .menu-head span { display: flex; gap: 6px; }
+  .bulk { font-size: 14px; padding: 5px 11px; background: #ede9fe; color: #5e35b1; box-shadow: none; border-radius: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: inherit; font-size: 20px; font-weight: 700; min-width: 44px; padding: 8px 12px;
+    border-radius: 12px; background: #eee; color: #bbb; box-shadow: none; border: 2px solid #ddd;
+  }
+  .chip.on { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+  .menu-close { display: block; margin: 8px auto 0; background: #43a047; font-size: 20px; padding: 12px 30px; }
 </style>
 </head>
 <body>
+
+<button class="gear" id="gear" title="Choose letters &amp; words">⚙️</button>
 
 <header>
   <div class="title">✏️ Letter Tracer 🦕</div>
@@ -106,9 +137,31 @@
 </div>
 <div class="hint">Stay in the white lane between the lines — the grey areas are out of bounds (too tall / too low). Small letters sit between the dashed and pink lines; tall letters reach the blue line; g p q y hang down to the dotted line. Switch to Write to do it solo.</div>
 
+<!-- settings overlay: pick which letters & words are in the rotation -->
+<div class="menu" id="menu">
+  <div class="menu-card">
+    <div class="menu-title">Choose letters &amp; words</div>
+    <div class="menu-sub">Tap to turn on / off. Only the purple ones show up when tracing.</div>
+    <div class="menu-sec">
+      <div class="menu-head"><span>abc small letters</span><span><button class="bulk" data-grp="lower" data-want="1">All</button><button class="bulk" data-grp="lower" data-want="0">None</button></span></div>
+      <div class="chips" id="grpLower"></div>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-head"><span>ABC BIG letters</span><span><button class="bulk" data-grp="upper" data-want="1">All</button><button class="bulk" data-grp="upper" data-want="0">None</button></span></div>
+      <div class="chips" id="grpUpper"></div>
+    </div>
+    <div class="menu-sec">
+      <div class="menu-head"><span>📖 Words</span><span><button class="bulk" data-grp="words" data-want="1">All</button><button class="bulk" data-grp="words" data-want="0">None</button></span></div>
+      <div class="chips" id="grpWords"></div>
+    </div>
+    <button class="menu-close" id="menuDone">Done ✓</button>
+  </div>
+</div>
+
 <script>
 // ---- Letters + stroke cues (starter set: Tobi's phonics letters; expand from the formation file) ----
 const LETTERS = [
+  // lowercase a-z (cues follow the print formation families: round-first c a d e g o q s; line-down b h i j k l m n p r t u; slants v w x y z)
   { ch: 'a', cue: 'Round, then a line down' },
   { ch: 'b', cue: 'Tall line down, then round on the right' },
   { ch: 'c', cue: 'Curl round, like a smile' },
@@ -124,13 +177,44 @@ const LETTERS = [
   { ch: 'm', cue: 'Line down, jump, jump' },
   { ch: 'n', cue: 'Line down, jump' },
   { ch: 'o', cue: 'Round and round' },
+  { ch: 'p', cue: 'Line down low, then round on the right' },
+  { ch: 'q', cue: 'Round first, like c, then down and a flick' },
+  { ch: 'r', cue: 'Line down, up, and curve over' },
+  { ch: 's', cue: 'Curve round like a snake' },
   { ch: 't', cue: 'Line down, then a cross' },
+  { ch: 'u', cue: 'Down, curve round, up, then down' },
+  { ch: 'v', cue: 'Slant down, slant up' },
+  { ch: 'w', cue: 'Down, up, down, up' },
+  { ch: 'x', cue: 'Slant down, then cross it' },
+  { ch: 'y', cue: 'Short slant down, long slant below the line' },
+  { ch: 'z', cue: 'Across, slant down, across' },
+  // capitals A-Z (all start at the TOP)
+  { ch: 'A', cue: 'Slant down, slant down, then a line across' },
+  { ch: 'B', cue: 'Big line down, then two bumps on the right' },
+  { ch: 'C', cue: 'Big curl round, like a smile' },
+  { ch: 'D', cue: 'Big line down, then one big curve out' },
+  { ch: 'E', cue: 'Big line down, then three lines across' },
+  { ch: 'F', cue: 'Big line down, then a line across the top and middle' },
+  { ch: 'G', cue: 'Round like a C, then a little line in' },
+  { ch: 'H', cue: 'Two big lines down, then a line across the middle' },
+  { ch: 'I', cue: 'Tall line down. No dot!' },
+  { ch: 'J', cue: 'Big line down, hook. No dot!' },
+  { ch: 'K', cue: 'Big line down, then a kick' },
+  { ch: 'L', cue: 'Big line down, then a line across the bottom' },
   { ch: 'M', cue: 'Down. Back to top. Down, up, down' },
   { ch: 'N', cue: 'Down. Back to top. Slant down, up' },
-  { ch: 'G', cue: 'Round like a C, then a line in' },
-  { ch: 'I', cue: 'Tall line down. No dot!' },
-  { ch: 'K', cue: 'Big line down, then a kick' },
-  { ch: 'J', cue: 'Big line down, hook. No dot!' },
+  { ch: 'O', cue: 'Big round, all the way round' },
+  { ch: 'P', cue: 'Big line down, then a bump at the top' },
+  { ch: 'Q', cue: 'Big round, then a little tail' },
+  { ch: 'R', cue: 'Big line down, a bump, then a kick' },
+  { ch: 'S', cue: 'Big curve, like a snake' },
+  { ch: 'T', cue: 'Big line down, then across the top' },
+  { ch: 'U', cue: 'Big line down, curve, and up' },
+  { ch: 'V', cue: 'Slant down, slant up' },
+  { ch: 'W', cue: 'Down, up, down, up' },
+  { ch: 'X', cue: 'Slant down, then cross it' },
+  { ch: 'Y', cue: 'Two slants meet, then a line down' },
+  { ch: 'Z', cue: 'Across, slant down, across' },
 ];
 
 // ---- Words Tobi has learned (sight words), coloured by his palette. play + little are recent. ----
@@ -141,7 +225,7 @@ const WORDS = [
   { ch: 'big', c: '#C62828' }, { ch: 'go', c: '#2E7D32' },   { ch: 'can', c: '#C2185B' },  { ch: 'look', c: '#1565C0' },
   { ch: 'here', c: '#6D4C41' },{ ch: 'it', c: '#F4511E' },   { ch: 'is', c: '#5E35B1' },   { ch: 'jump', c: '#7c3aed' },
   { ch: 'up', c: '#2E7D32' },  { ch: 'down', c: '#C62828' }, { ch: 'in', c: '#00897B' },   { ch: 'little', c: '#1565C0' },
-  { ch: 'play', c: '#E8820C' },
+  { ch: 'play', c: '#E8820C' }, { ch: 'me', c: '#C2185B' }, { ch: 'we', c: '#2E75B6' },
 ];
 
 const W = 760, H = 560;
@@ -157,7 +241,21 @@ let idx = 0, mode = 'trace', section = 'letters';
 const BOX = { x: 22, y: 22, w: W - 44, h: H - 44 };  // horizontal bounds + card extent
 let LINES = null;   // current item's line geometry + allowed vertical band (set by computeLines)
 const TOL = 16;     // px of forgiveness so a stroke may just touch the boundary lines
-function items() { return section === 'letters' ? LETTERS : WORDS; }
+// ---- which letters/words are switched on (Dasha's menu; remembered per device) ----
+const LS = { letters: 'tracer_on_letters', words: 'tracer_on_words' };
+function allCh(sec) { return (sec === 'letters' ? LETTERS : WORDS).map(x => x.ch); }
+function loadEnabled(sec) {
+  try { const v = JSON.parse(localStorage.getItem(LS[sec])); if (Array.isArray(v)) return new Set(v); } catch (e) {}
+  return new Set(allCh(sec));                       // default: everything on
+}
+const enabled = { letters: loadEnabled('letters'), words: loadEnabled('words') };
+function saveEnabled(sec) { try { localStorage.setItem(LS[sec], JSON.stringify([...enabled[sec]])); } catch (e) {} }
+
+function items() {
+  const base = section === 'letters' ? LETTERS : WORDS;
+  const on = base.filter(it => enabled[section].has(it.ch));
+  return on.length ? on : base;                     // never leave the game empty
+}
 function cur() { return items()[idx]; }
 function fontSizeFor(text) {
   if (section === 'letters') return 360;
@@ -311,6 +409,50 @@ modeBtn.onclick = () => {
   modeBtn.textContent = (mode === 'trace') ? '✏️ Trace' : '✍️ Write';
   modeBtn.classList.toggle('write', mode === 'write');
   clearDraw(); drawBackground();
+};
+
+// ---- settings menu ----
+const menuEl = document.getElementById('menu');
+function grpFilter(grp) {
+  if (grp === 'lower') return it => it.ch.length === 1 && it.ch.toLowerCase() === it.ch;
+  if (grp === 'upper') return it => it.ch.length === 1 && it.ch.toUpperCase() === it.ch;
+  return () => true;                                // words
+}
+function grpSec(grp) { return grp === 'words' ? 'words' : 'letters'; }
+function chipHTML(sec, filterFn) {
+  return (sec === 'letters' ? LETTERS : WORDS).filter(filterFn).map(it => {
+    const on = enabled[sec].has(it.ch);
+    return '<button class="chip' + (on ? ' on' : '') + '" data-sec="' + sec +
+           '" data-ch="' + it.ch.replace(/"/g, '&quot;') + '">' + it.ch + '</button>';
+  }).join('');
+}
+function buildMenu() {
+  document.getElementById('grpLower').innerHTML = chipHTML('letters', grpFilter('lower'));
+  document.getElementById('grpUpper').innerHTML = chipHTML('letters', grpFilter('upper'));
+  document.getElementById('grpWords').innerHTML = chipHTML('words', grpFilter('words'));
+}
+menuEl.addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (chip) {
+    const sec = chip.dataset.sec, ch = chip.dataset.ch;
+    if (enabled[sec].has(ch)) enabled[sec].delete(ch); else enabled[sec].add(ch);
+    saveEnabled(sec); chip.classList.toggle('on');
+    return;
+  }
+  const bulk = e.target.closest('.bulk');
+  if (bulk) {
+    const grp = bulk.dataset.grp, want = bulk.dataset.want === '1', sec = grpSec(grp);
+    (sec === 'letters' ? LETTERS : WORDS).filter(grpFilter(grp)).forEach(it => {
+      if (want) enabled[sec].add(it.ch); else enabled[sec].delete(it.ch);
+    });
+    saveEnabled(sec); buildMenu();
+  }
+});
+document.getElementById('gear').onclick = () => { buildMenu(); menuEl.classList.add('show'); };
+document.getElementById('menuDone').onclick = () => {
+  menuEl.classList.remove('show');
+  if (idx >= items().length) idx = 0;               // current item may have been switched off
+  refresh();
 };
 
 // init (wait for the font so the grey letter shapes are right)
