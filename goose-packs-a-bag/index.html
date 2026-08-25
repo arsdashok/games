@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Goose Packs a Bag</title>
+<style>
+:root{
+  --ink:#25233a; --violet:#6c63ff; --violet-d:#4c3fbf; --soft:#ede9fe;
+  --mint:#10b981; --rose:#f43f5e; --amber:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI',Arial,sans-serif; color:var(--ink);
+  background:linear-gradient(135deg,#f9f8ff,#eeeaff); min-height:100vh;
+  display:flex; align-items:center; justify-content:center; padding:14px;
+}
+.app{width:100%;max-width:980px}
+
+header{
+  background:linear-gradient(135deg,var(--violet),#a78bfa); color:#fff;
+  border-radius:16px; padding:12px 20px; margin-bottom:12px;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+header h1{font-size:23px;line-height:1.15}
+header .ru{font-size:13px;opacity:.9}
+.eggs{margin-left:auto;font-size:24px;letter-spacing:2px;min-height:30px}
+
+.stage{background:#fff;border-radius:16px;padding:18px 20px 20px;box-shadow:0 6px 0 #d9d3ff}
+.scene{display:grid;grid-template-columns:1fr 1.15fr;gap:20px;align-items:center}
+@media (max-width:760px){ .scene{grid-template-columns:1fr} }
+
+.bagwrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.bagwrap .who{font-size:19px;font-weight:800;color:var(--violet-d)}
+
+.bubblewrap{display:flex;align-items:flex-start;gap:12px}
+.bubble{position:relative;background:var(--soft);border:2.5px solid #c4b5fd;border-radius:16px;padding:14px 16px;flex:1}
+.bubble:before{content:"";position:absolute;left:-13px;top:26px;border:11px solid transparent;border-right-color:#c4b5fd}
+.bubble:after{content:"";position:absolute;left:-9px;top:26px;border:11px solid transparent;border-right-color:var(--soft)}
+.bubble p{font-size:25px;font-weight:700;line-height:1.35}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+@media (max-width:760px){ .choices{grid-template-columns:1fr} }
+.choice{
+  background:#fff;border:3px solid #d9d3ff;border-radius:14px;padding:14px 16px;
+  cursor:pointer;text-align:left;font:inherit;transition:transform .08s,border-color .12s,background .12s;
+}
+.choice:hover{border-color:var(--violet);background:#faf8ff}
+.choice:active{transform:translateY(2px)}
+.choice b{display:block;font-size:19.5px;color:var(--violet-d);margin-bottom:3px}
+.choice span{font-size:14px;color:#5f5b73}
+.choice.dim{opacity:.35;pointer-events:none}
+.choice.bad{border-color:var(--rose);background:#fff1f3}
+.choice.good{border-color:var(--mint);background:#ecfdf5}
+.choices.hidden{display:none}
+
+/* ---------- say it: a FRAME with pictures, never the finished sentence ---------- */
+.answer{margin-top:16px;display:none}
+.answer.on{display:block}
+.saybox{background:#ecfdf5;border:3px solid var(--mint);border-radius:14px;padding:16px 18px;text-align:center}
+.saybox .lead{font-size:13px;font-weight:800;color:#047857;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.frame{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:29px;font-weight:800}
+.slot{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:78px;height:66px;border-bottom:4px solid var(--mint);position:relative;
+}
+.slot svg{max-width:100%;max-height:100%}
+.slot.no:after{
+  content:"";position:absolute;left:2px;right:2px;top:48%;height:4px;
+  background:var(--rose);border-radius:2px;transform:rotate(-16deg);
+}
+.saybox .row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:999px;padding:10px 22px;font:inherit;font-size:17px;font-weight:800;cursor:pointer}
+.btn.go{background:var(--violet);color:#fff}
+.btn.go:hover{background:var(--violet-d)}
+.peek{background:none;border:0;font:inherit;font-size:13px;color:#5f5b73;text-decoration:underline;cursor:pointer;padding:6px}
+
+.frame.hide{display:none}
+.peeked{margin-top:10px;font-size:22px;font-weight:800;color:#047857;display:none}
+.peeked.on{display:block}
+
+.nudge{margin-top:14px;background:#fff7ed;border:2.5px solid var(--amber);border-radius:14px;padding:12px 16px;font-size:19px;display:none}
+.nudge.on{display:block}
+
+.solo{
+  margin-top:18px;background:#faf8ff;border:3px dashed #c4b5fd;border-radius:14px;
+  padding:14px 16px;text-align:center;font-size:20px;font-weight:700;color:var(--violet-d);display:none
+}
+.solo.on{display:block}
+
+.teach{background:#fff;border-radius:16px;padding:22px 24px;box-shadow:0 6px 0 #d9d3ff}
+.teach h2{font-size:25px;color:var(--violet-d);margin-bottom:4px}
+.teach .ru{font-size:14px;color:#5f5b73;margin-bottom:16px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){ .rules{grid-template-columns:1fr} }
+.rule{border:3px solid #d9d3ff;border-radius:14px;padding:14px 16px}
+.rule .cap{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--violet);margin-bottom:8px}
+.rule .demo{margin-bottom:10px}
+.rule .goosesays{font-size:18px;font-weight:700;color:#5f5b73;margin-bottom:8px}
+.rule .say{font-size:22px;font-weight:800;color:var(--violet-d)}
+.rule .why{font-size:14.5px;color:#5f5b73;margin-top:5px}
+.startrow{margin-top:20px;text-align:center}
+
+.done{text-align:center}
+.done h2{font-size:30px;color:var(--violet-d);margin-bottom:8px}
+.done .eggline{font-size:38px;letter-spacing:4px;margin:14px 0}
+.progress{font-size:13px;color:#5f5b73;margin-top:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div>
+      <h1>🪿 The Goose Packs a Bag</h1>
+      <div class="ru">Гусь собирает сумку и всё время ошибается. Исправь его.</div>
+    </div>
+    <div class="eggs" id="eggs"></div>
+  </header>
+
+  <!-- ================= TEACH ================= -->
+  <section class="teach" id="teach">
+    <h2>Two ways to fix the goose</h2>
+    <div class="ru">Два разных исправления. Сначала посмотри в сумку.</div>
+
+    <div class="rules">
+      <div class="rule">
+        <div class="cap">The bag is empty · в сумке ничего нет</div>
+        <div class="goosesays">🪿 &laquo;She's got a ball.&raquo;</div>
+        <div class="demo" id="demoA"></div>
+        <div class="say">She hasn't got a ball.</div>
+        <div class="why">Мячика вообще нет. Ничего не лежит.</div>
+      </div>
+      <div class="rule">
+        <div class="cap">Something else is there · лежит другое</div>
+        <div class="goosesays">🪿 &laquo;She's got a ball.&raquo;</div>
+        <div class="demo" id="demoB"></div>
+        <div class="say">It's not a ball, it's a fish.</div>
+        <div class="why">Что-то лежит, но это не мячик.</div>
+      </div>
+    </div>
+
+    <div class="startrow">
+      <button class="btn go" id="startBtn">Start · поехали</button>
+    </div>
+  </section>
+
+  <!-- ================= PLAY ================= -->
+  <section class="stage" id="stage" style="display:none">
+    <div class="scene">
+      <div class="bagwrap">
+        <div class="who" id="who"></div>
+        <div id="bag"></div>
+      </div>
+
+      <div>
+        <div class="bubblewrap">
+          <div id="gooseArt"></div>
+          <div class="bubble"><p id="claim"></p></div>
+        </div>
+
+        <div class="choices" id="choices">
+          <button class="choice" id="cA"><b>… hasn't got a …</b><span>ничего нет</span></button>
+          <button class="choice" id="cB"><b>It's not a …, it's a …</b><span>лежит другое</span></button>
+        </div>
+
+        <div class="solo" id="solo">No buttons this time. Say the whole thing.<div style="font-size:14px;font-weight:600;color:#5f5b73;margin-top:5px">Кнопок нет. Скажи всю фразу сама.</div></div>
+      </div>
+    </div>
+
+    <div class="nudge" id="nudge"></div>
+
+    <div class="answer" id="answer">
+      <div class="saybox">
+        <div class="lead" id="lead">Say the whole thing</div>
+        <div class="frame" id="frame"></div>
+        <div class="peeked" id="peeked"></div>
+        <div class="row">
+          <button class="btn go" id="nextBtn">I said it 🥚</button>
+          <button class="peek" id="peekBtn">показать</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress" id="prog"></div>
+  </section>
+
+  <!-- ================= DONE ================= -->
+  <section class="teach done" id="done" style="display:none">
+    <h2>The bag is packed 🎒</h2>
+    <div class="eggline" id="doneEggs"></div>
+    <div class="startrow">
+      <button class="btn go" id="againBtn">Play again</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   Art. Everything is drawn here, so the picture always matches the
+   sentence. Nothing is generated and nothing is fetched.
+------------------------------------------------------------------- */
+const ART = {
+  cap: (c) => `<svg viewBox="0 0 100 70" width="86" height="60">
+      <path d="M14 44 Q14 12 50 12 Q86 12 86 44 Z" fill="${c}" stroke="#25233a" stroke-width="3"/>
+      <path d="M14 44 h78 q8 0 8 7 h-86 Z" fill="${c}" stroke="#25233a" stroke-width="3"/>
+      <circle cx="50" cy="14" r="5" fill="#25233a"/></svg>`,
+  tshirt: (c) => `<svg viewBox="0 0 100 90" width="80" height="72">
+      <path d="M30 10 L18 20 L8 34 L22 44 L26 36 L26 82 L74 82 L74 36 L78 44 L92 34 L82 20 L70 10
+               Q50 24 30 10 Z" fill="${c}" stroke="#25233a" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  jacket: (c) => `<svg viewBox="0 0 100 90" width="80" height="72">
+      <path d="M30 10 L18 20 L8 34 L22 44 L26 36 L26 82 L74 82 L74 36 L78 44 L92 34 L82 20 L70 10
+               Q50 24 30 10 Z" fill="${c}" stroke="#25233a" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M50 30 L50 82" stroke="#25233a" stroke-width="3.4"/>
+      <path d="M31 11 L50 32 L40 41 L28 22 Z" fill="#fff" stroke="#25233a" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M69 11 L50 32 L60 41 L72 22 Z" fill="#fff" stroke="#25233a" stroke-width="2.6" stroke-linejoin="round"/>
+      <circle cx="42" cy="49" r="4" fill="#25233a"/><circle cx="42" cy="62" r="4" fill="#25233a"/>
+      <circle cx="42" cy="75" r="4" fill="#25233a"/></svg>`,
+  skirt: (c) => `<svg viewBox="0 0 100 80" width="80" height="64">
+      <rect x="30" y="10" width="40" height="10" rx="3" fill="#25233a"/>
+      <path d="M30 20 L70 20 L88 70 L12 70 Z" fill="${c}" stroke="#25233a" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M38 22 L30 68 M50 22 L50 68 M62 22 L70 68" stroke="#25233a" stroke-width="1.6" opacity=".45"/></svg>`,
+  ball: (c) => `<svg viewBox="0 0 100 100" width="72" height="72">
+      <circle cx="50" cy="50" r="38" fill="${c}" stroke="#25233a" stroke-width="3"/>
+      <path d="M18 38 Q50 52 82 38 M18 62 Q50 48 82 62" fill="none" stroke="#25233a" stroke-width="3"/></svg>`,
+  fish: (c) => `<svg viewBox="0 0 120 80" width="88" height="60">
+      <path d="M78 40 Q60 12 34 40 Q60 68 78 40 Z" fill="${c}" stroke="#25233a" stroke-width="3"/>
+      <path d="M78 40 L104 22 L104 58 Z" fill="${c}" stroke="#25233a" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="44" cy="35" r="3.6" fill="#25233a"/></svg>`
+};
+/* one fixed colour per object, so the colour never becomes a second
+   thing to work out */
+const COLOUR = { cap:'#38bdf8', tshirt:'#34d399', jacket:'#fb7185', skirt:'#c084fc', ball:'#fbbf24', fish:'#f97316' };
+const NAME   = { cap:'cap', tshirt:'t-shirt', jacket:'jacket', skirt:'skirt', ball:'ball', fish:'fish' };
+const drawItem = k => ART[k](COLOUR[k]);
+
+function drawBag(contentKey){
+  const inside = contentKey
+    ? `<g transform="translate(100,124)">${drawItem(contentKey).replace('<svg','<svg x="-60" y="-46"')}</g>`
+    : `<rect x="52" y="78" width="96" height="70" rx="8" fill="none" stroke="#c4b5fd" stroke-width="3" stroke-dasharray="8 7"/>`;
+  return `<svg viewBox="0 0 200 190" width="230" height="218" aria-hidden="true">
+      <rect x="26" y="56" width="148" height="112" rx="14" fill="#fff" stroke="#25233a" stroke-width="4"/>
+      <path d="M74 56 v-14 a26 26 0 0 1 52 0 v14" fill="none" stroke="#25233a" stroke-width="5"/>
+      <rect x="26" y="56" width="148" height="16" rx="8" fill="#ede9fe" stroke="#25233a" stroke-width="4"/>
+      ${inside}
+    </svg>`;
+}
+const GOOSE = `<div style="font-size:74px;line-height:1">🪿</div>`;
+
+/* ------------------------------------------------------------------
+   Items.
+   'M' = the bag is EMPTY         -> "... hasn't got a ..."
+   'N' = something ELSE is there  -> "It's not a ..., it's a ..."
+   Type sequence is pre-jumbled: M N N M M N | M N
+   (four of each, no alternation, no run of three).
+   Every noun is claimed in BOTH types across the set, so no noun maps
+   to one answer. 'ball' is claimed in no item, which is why the teach
+   card can use it without printing an answer to anything.
+   Items 9 and 10 run with the buttons HIDDEN: she says the whole
+   repair cold, with nothing to pick. That is the hinge.
+------------------------------------------------------------------- */
+const ITEMS = [
+  { who:'Simon', he:'He', type:'M', claim:'cap',    inside:null     },
+  { who:'Stella',he:'She',type:'N', claim:'jacket', inside:'tshirt' },
+  { who:'Suzy',  he:'She',type:'N', claim:'fish',   inside:'cap'    },
+  { who:'Stella',he:'She',type:'M', claim:'skirt',  inside:null     },
+  { who:'Simon', he:'He', type:'M', claim:'fish',   inside:null     },
+  { who:'Stella',he:'She',type:'N', claim:'skirt',  inside:'fish'   },
+  /* --- the two below run cold: no buttons, no frame. This is the hinge,
+         and it is meant to sit AFTER the mid-lesson game break. --- */
+  { who:'Suzy',  he:'She',type:'M', claim:'jacket', inside:null, solo:true },
+  { who:'Simon', he:'He', type:'N', claim:'tshirt', inside:'cap',  solo:true }
+];
+
+const claimText = it => `${it.he}'s got a ${NAME[it.claim]}.`;
+const fixText   = it => it.type === 'M'
+  ? `${it.he} hasn't got a ${NAME[it.claim]}.`
+  : `It's not a ${NAME[it.claim]}, it's a ${NAME[it.inside]}.`;
+
+/* The frame she speaks from: WORDS carry the grammar, PICTURES carry the
+   nouns. So the sentence is assembled, not read off the screen. */
+function frameHTML(it){
+  const slot = (k, crossed) => `<span class="slot${crossed ? ' no' : ''}">${drawItem(k)}</span>`;
+  return it.type === 'M'
+    ? `<span>${it.he} hasn't got a</span>${slot(it.claim, true)}`
+    : `<span>It's not a</span>${slot(it.claim, true)}<span>, it's a</span>${slot(it.inside, false)}`;
+}
+
+/* ------------------------------------------------------------------ */
+const $ = id => document.getElementById(id);
+let i = 0, eggs = 0, locked = false;
+
+const renderEggs = () => { $('eggs').textContent = '🥚'.repeat(eggs); };
+
+function openSay(it){
+  locked = true;
+  $('frame').innerHTML    = frameHTML(it);
+  $('peeked').textContent = fixText(it);
+  /* on a hinge item nothing is shown until she has spoken: the frame is
+     the FIRST level of help, the full sentence only the second */
+  $('frame').classList.toggle('hide', !!it.solo);
+  $('answer').classList.add('on');
+}
+
+function show(it){
+  locked = false;
+  $('who').textContent    = it.who + "'s bag";
+  $('bag').innerHTML      = drawBag(it.inside);
+  $('claim').textContent  = claimText(it);
+  $('gooseArt').innerHTML = GOOSE;
+  $('cA').className = 'choice'; $('cB').className = 'choice';
+  $('choices').classList.toggle('hidden', !!it.solo);
+  $('solo').classList.toggle('on', !!it.solo);
+  $('lead').textContent = it.solo ? 'Say it on your own' : 'Say the whole thing';
+  $('answer').classList.remove('on');
+  $('nudge').classList.remove('on');
+  $('peeked').classList.remove('on');
+  $('frame').classList.remove('hide');
+  $('prog').textContent = i < 6 ? '' : 'on your own';
+  if(it.solo) openSay(it);           /* no choice to make: straight to saying it */
+}
+
+function choose(pick){
+  if(locked) return;
+  const it = ITEMS[i];
+  const right = it.type === 'M' ? 'A' : 'B';
+  if(pick === right){
+    $(pick === 'A' ? 'cA' : 'cB').classList.add('good');
+    $(pick === 'A' ? 'cB' : 'cA').classList.add('dim');
+    openSay(it);
+  } else {
+    $(pick === 'A' ? 'cA' : 'cB').classList.add('bad');
+    $('nudge').textContent = it.type === 'M'
+      ? 'Look in the bag again. What can you see in it?'
+      : 'Look in the bag again. Something is in it. What is it?';
+    $('nudge').classList.add('on');
+  }
+}
+
+$('cA').onclick = () => choose('A');
+$('cB').onclick = () => choose('B');
+$('peekBtn').onclick = () => {
+  const f = $('frame');
+  if(f.classList.contains('hide')) f.classList.remove('hide');   /* help 1: the frame */
+  else $('peeked').classList.add('on');                          /* help 2: the sentence */
+};
+
+/* the egg is for SAYING it, not for clicking a button */
+$('nextBtn').onclick = () => {
+  eggs++; renderEggs();
+  i++;
+  if(i < ITEMS.length){ show(ITEMS[i]); }
+  else {
+    $('stage').style.display = 'none';
+    $('done').style.display  = 'block';
+    $('doneEggs').textContent = '🥚'.repeat(eggs);
+  }
+};
+
+function begin(){
+  $('teach').style.display = 'none';
+  $('done').style.display  = 'none';
+  $('stage').style.display = 'block';
+  i = 0; eggs = 0; renderEggs(); show(ITEMS[0]);
+}
+$('startBtn').onclick = begin;
+$('againBtn').onclick = begin;
+
+/* teach-card demos: an empty bag, and a bag with a fish in it */
+$('demoA').innerHTML = drawBag(null).replace('width="230" height="218"','width="126" height="120"');
+$('demoB').innerHTML = drawBag('fish').replace('width="230" height="218"','width="126" height="120"');
+renderEggs();
+</script>
+</body>
+</html>
