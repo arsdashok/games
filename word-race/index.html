@@ -49,6 +49,14 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
 .confetti{position:fixed;font-size:30px;pointer-events:none;animation:fall 1.4s linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
 .endstats{text-align:center;font-size:22px;font-weight:900;margin:18px 0}
+.picimg{height:64px;width:auto;vertical-align:middle}
+.plate{display:inline-block;background:#2b3a67;padding:7px 7px 3px;border-radius:20px}
+.kbd{display:none;flex-direction:column;gap:5px;align-items:center;margin-top:8px}
+.kbd.show{display:flex}
+.krow{display:flex;gap:5px}
+.key{width:34px;height:38px;border:2px solid #8a93bf;border-radius:8px;background:#fff;
+ font-weight:900;font-size:18px;color:#5f6b8f;display:flex;align-items:center;justify-content:center}
+.key.hot{background:#fde68a;border-color:#f59e0b;color:#b45309;transform:scale(1.18);animation:bob .7s infinite alternate}
 </style></head><body>
 <div class="stage">
 
@@ -73,6 +81,7 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
       <div class="flag">🚩</div>
     </div>
     <div class="msg" id="msg"></div>
+    <div class="kbd" id="kbd"></div>
   </div>
 
   <div id="scrEnd" class="hidden">
@@ -87,12 +96,12 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
 /* Word sets = exactly what Dima's lessons taught (sight words, short-a CVC, colours 21 Aug, his words). */
 const SETS = {
   "⭐ small words": ["I","a","the","is","and","my","can","you","go","we"],
-  "🐱 cat · hat · jam": ["cat","hat","bag","map","van","jam"],
+  "🐱 cat · hat · jam": ["cat","hat","bag","map","van","jam","fan"],
   "🎨 colours": ["red","blue","green","yellow","pink","black","white","brown","grey","orange","purple"],
   "🤖 my words": ["big","small","new","run","dog","box","robot"],
 };
-const PICS = {cat:"🐱",hat:"👒",bag:"🎒",map:"🗺️",van:"🚐",jam:"🍯",dog:"🐶",box:"📦",robot:"🤖",
-  run:"🏃",big:"🐘",small:"🐜",new:"✨",I:"⭐",a:"⭐",the:"⭐",is:"⭐",and:"⭐",my:"⭐",can:"⭐",
+const PICS = {cat:"img/cat.png",hat:"img/hat.png",bag:"img/bag.png",map:"img/map.png",
+  van:"img/van.png",jam:"img/jam.png",dog:"🐶",box:"📦",robot:"🤖",run:"🏃",new:"✨",
   you:"👉",go:"🏁",we:"👫"};
 const COLORS = {red:"#e11d48",blue:"#2563eb",green:"#16a34a",yellow:"#facc15",pink:"#f472b6",
   black:"#1f2937",white:"#f8fafc",brown:"#92400e",grey:"#9ca3af",orange:"#f97316",purple:"#8b5cf6"};
@@ -102,14 +111,15 @@ const COLORS = {red:"#e11d48",blue:"#2563eb",green:"#16a34a",yellow:"#facc15",pi
    the zombie wins, the same word repeats with the zombie 40% slower (invisible rubber band). */
 const ROUNDS = [
   {name:"Round 1 · Practice 😴", perLetter:0,   grace:0},
-  {name:"Round 2 · Slow zombie 🚶", perLetter:5,  grace:3},
-  {name:"Round 3 · Zombie runs! 🏃",     perLetter:3.5,grace:1.5},
+  {name:"Round 2 · Slow zombie 🚶", perLetter:7,  grace:3},
+  {name:"Round 3 · Zombie runs! 🏃",     perLetter:5,  grace:3},
 ];
 const WORDS_PER_ROUND = 6;
 
 let picked = new Set(["⭐ small words","🐱 cat · hat · jam"]);
 let queue=[], round=0, wi=0, word="", pos=0, stars=0, wins=0, raced=0;
 let dinoT=null, dinoStart=0, dinoDur=0, slowFactor=1, roundOver=false;
+let wrongN=0, letterAt=0, frozen=false, lastT=0;
 
 const $=id=>document.getElementById(id);
 const setrow=$("setrow");
@@ -133,6 +143,19 @@ let AC=null;
 function blip(f,d=0.07,type="square",g=0.04){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
   const o=AC.createOscillator(),v=AC.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;
   o.connect(v);v.connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+
+/* rescue hint: he often cannot FIND the key (11 Aug: letter hunts of tens of seconds).
+   After 3 wrong keys or 6 s stuck, show a mini keyboard with the needed key lit and
+   FREEZE the zombie until he presses the right letter. No shame, no clock. */
+(function buildKbd(){const rows=["qwertyuiop","asdfghjkl","zxcvbnm"];const k=document.getElementById("kbd");
+  rows.forEach(r=>{const d=document.createElement("div");d.className="krow";
+    [...r].forEach(ch=>{const s=document.createElement("div");s.className="key";s.dataset.k=ch;s.textContent=ch;d.appendChild(s);});
+    k.appendChild(d);});})();
+function showHint(){const k=$("kbd");k.classList.add("show");frozen=true;
+  [...k.querySelectorAll(".key")].forEach(x=>x.classList.toggle("hot",x.dataset.k===word[pos].toLowerCase()));}
+function hideHint(){$("kbd").classList.remove("show");frozen=false;}
+setInterval(()=>{ if(!roundOver&&letterAt&&!$("scrGame").classList.contains("hidden")
+  &&performance.now()-letterAt>6000&&!$("kbd").classList.contains("show")) showHint(); },500);
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
@@ -158,23 +181,32 @@ function nextWord(){
   if(wi>=queue.length){endRound();return;}
   word=queue[wi];pos=0;roundOver=false;
   $("msg").textContent="";$("msg").className="msg";
-  const pic=PICS[word]||"";
-  $("pic").innerHTML=COLORS[word]?'<span class="swatch" style="background:'+COLORS[word]+'"></span>':(pic||"⭐");
+  const pic=PICS[word]||"⭐";
+  if(COLORS[word]){
+    const sw='<span class="swatch" style="background:'+COLORS[word]+'"></span>';
+    $("pic").innerHTML=word==="white"?'<span class="plate">'+sw+'</span>':sw;
+  }else{
+    $("pic").innerHTML=pic.endsWith(".png")?'<img class="picimg" src="'+pic+'" alt="">':pic;
+  }
   const w=$("word");w.innerHTML="";
   [...word].forEach((ch,i)=>{const t=document.createElement("div");t.className="lt"+(i===0?" next":"");
     t.textContent=ch;w.appendChild(t);});
   moveRunner("runMe",0);moveRunner("runDino",0);
+  wrongN=0;letterAt=performance.now();hideHint();
   clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
   if(ROUNDS[round].perLetter>0){
     dinoDur=ROUNDS[round].perLetter*word.length*1000*slowFactor;
-    dinoT=setTimeout(()=>{dinoStart=performance.now();dinoTick();},ROUNDS[round].grace*1000);
+    dinoT=setTimeout(()=>{dinoStart=performance.now();lastT=dinoStart;dinoTick();},ROUNDS[round].grace*1000);
   }
   $("trap").focus();
 }
 let dinoRAF=0;
 function dinoTick(){
   if(roundOver)return;
-  const p=Math.min(1,(performance.now()-dinoStart)/dinoDur);
+  const t=performance.now();
+  if(frozen){dinoStart+=t-lastT;}
+  lastT=t;
+  const p=Math.min(1,(t-dinoStart)/dinoDur);
   moveRunner("runDino",p);
   if(p>=1){dinoWins();return;}
   dinoRAF=requestAnimationFrame(dinoTick);
@@ -189,16 +221,18 @@ function keyIn(ch){
   const tiles=$("word").children;
   if(ch.toLowerCase()===word[pos].toLowerCase()){
     tiles[pos].className="lt done";pos++;blip(500+pos*80);
+    wrongN=0;letterAt=performance.now();hideHint();
     moveRunner("runMe",pos/word.length);
     if(pos<word.length){tiles[pos].classList.add("next");}
     else{wordDone();}
   }else{
     tiles[pos].classList.add("bad");blip(140,0.12,"sawtooth");
+    wrongN++;if(wrongN>=3)showHint();
     setTimeout(()=>tiles[pos].classList.remove("bad"),260);
   }
 }
 function wordDone(){
-  roundOver=true;clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
+  roundOver=true;letterAt=0;hideHint();clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
   stars++;slowFactor=1;
   if(ROUNDS[round].perLetter>0){wins++;raced++;}
   $("stars").textContent="⭐".repeat(Math.min(stars,12));
@@ -208,7 +242,7 @@ function wordDone(){
   wi++;setTimeout(nextWord,1300);
 }
 function dinoWins(){
-  roundOver=true;raced++;
+  roundOver=true;letterAt=0;hideHint();raced++;
   moveRunner("runDino",1);
   $("msg").textContent="So close! Again! 💪";
   $("msg").className="msg lose";blip(220,0.2,"triangle");
@@ -224,7 +258,7 @@ function endRound(){
     setTimeout(startRound,1500);
   }else{
     $("scrGame").classList.add("hidden");$("scrEnd").classList.remove("hidden");
-    $("endstats").innerHTML="⭐ Words typed: "+stars+"<br>🏁 Races won: "+wins+" / "+raced;
+    $("endstats").innerHTML="⭐ Words typed: "+stars;
   }
 }
 function confetti(){
