@@ -107,13 +107,13 @@ const PICS = {cat:"img/cat.png",hat:"img/hat.png",bag:"img/bag.png",map:"img/map
 const COLORS = {red:"#e11d48",blue:"#2563eb",green:"#16a34a",yellow:"#facc15",pink:"#f472b6",
   black:"#1f2937",white:"#f8fafc",brown:"#92400e",grey:"#9ca3af",orange:"#f97316",purple:"#8b5cf6"};
 
-/* Rounds: 1 = practice (dino asleep, no clock). Then races: seconds PER LETTER the zombie
-   needs, plus a head start for Dima before the dino wakes. Generous on purpose, and if
-   the zombie wins, the same word repeats with the zombie 40% slower (invisible rubber band). */
+/* Rounds: 1 = practice (zombie asleep, no clock). Then races: the zombie starts almost
+   at once (0.5s) and needs N seconds PER LETTER — 7 in round 2, 5 in round 3, so he IS
+   faster each round. If he wins, the same word repeats with him 40% slower. */
 const ROUNDS = [
   {name:"Round 1 · Practice 😴", perLetter:0,   grace:0},
-  {name:"Round 2 · Slow zombie 🚶", perLetter:7,  grace:3},
-  {name:"Round 3 · Zombie runs! 🏃",     perLetter:5,  grace:3},
+  {name:"Round 2 · Slow zombie 🚶", perLetter:7,  grace:0.5},
+  {name:"Round 3 · Zombie runs! 🏃",     perLetter:5,  grace:0.5},
 ];
 const WORDS_PER_ROUND = 6;
 
