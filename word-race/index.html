@@ -33,7 +33,8 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
 .lt.bad{animation:wig 0.25s;border-color:#dc2626;color:#dc2626}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 @keyframes wig{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.speak{display:block;margin:2px auto 0;font:inherit;font-weight:900;font-size:15px;border:3px solid #2b3a67;
+.btnrow{display:flex;gap:10px;justify-content:center;margin-top:2px}
+.speak{display:block;font:inherit;font-weight:900;font-size:15px;border:3px solid #2b3a67;
  border-radius:30px;background:#fff;padding:6px 16px;cursor:pointer}
 .track{position:relative;height:118px;margin:16px 6px 4px}
 .lane{position:absolute;left:0;right:70px;height:52px}
@@ -74,8 +75,8 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
     </div>
     <div class="picbox" id="pic"></div>
     <div class="word" id="word"></div>
+    <div class="btnrow"><button class="speak" id="btnSpeak">🔊 hear it</button><button class="speak" id="btnKbd">⌨️ show letters</button></div>
     <div class="kbd" id="kbd"></div>
-    <button class="speak" id="btnSpeak">🔊 hear it</button>
     <div class="track">
       <div class="lane me"><div class="rail"></div><div class="runner" id="runMe">🤖</div></div>
       <div class="lane dino"><div class="rail"></div><div class="runner dino-sleep" id="runDino">🧟</div></div>
@@ -119,7 +120,6 @@ const WORDS_PER_ROUND = 6;
 let picked = new Set(["⭐ small words","🐱 cat · hat · jam"]);
 let queue=[], round=0, wi=0, word="", pos=0, stars=0, wins=0, raced=0;
 let dinoT=null, dinoStart=0, dinoDur=0, slowFactor=1, roundOver=false;
-let wrongN=0, letterAt=0, frozen=false, lastT=0;
 
 const $=id=>document.getElementById(id);
 const setrow=$("setrow");
@@ -144,20 +144,16 @@ function blip(f,d=0.07,type="square",g=0.04){try{AC=AC||new (window.AudioContext
   const o=AC.createOscillator(),v=AC.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;
   o.connect(v);v.connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}}
 
-/* rescue hint: he often cannot FIND the key (11 Aug: letter hunts of tens of seconds).
-   After 3 wrong keys or 6 s stuck, show a mini keyboard with the needed key lit and
-   FREEZE the zombie until he presses the right letter. No shame, no clock. */
+/* letter-finder keyboard: OPT-IN via the button only, never automatic, and the race
+   never pauses for it (Dasha 2026-08-26: the zombie overtaking IS the game; the soft
+   40%-slower replay is the safety net). */
 (function buildKbd(){const rows=["qwertyuiop","asdfghjkl","zxcvbnm"];const k=document.getElementById("kbd");
   rows.forEach(r=>{const d=document.createElement("div");d.className="krow";
     [...r].forEach(ch=>{const s=document.createElement("div");s.className="key";s.dataset.k=ch;s.textContent=ch;d.appendChild(s);});
     k.appendChild(d);});})();
-function showHint(){const k=$("kbd");k.classList.add("show");frozen=true;
-  $("runDino").classList.add("dino-sleep");
+function lightKey(){const k=$("kbd");if(!k.classList.contains("show")||pos>=word.length)return;
   [...k.querySelectorAll(".key")].forEach(x=>x.classList.toggle("hot",x.dataset.k===word[pos].toLowerCase()));}
-function hideHint(){$("kbd").classList.remove("show");frozen=false;
-  $("runDino").classList.toggle("dino-sleep",ROUNDS[round].perLetter===0);}
-setInterval(()=>{ if(!roundOver&&letterAt&&!$("scrGame").classList.contains("hidden")
-  &&performance.now()-letterAt>4000&&!$("kbd").classList.contains("show")) showHint(); },500);
+function hideHint(){$("kbd").classList.remove("show");}
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
@@ -194,21 +190,18 @@ function nextWord(){
   [...word].forEach((ch,i)=>{const t=document.createElement("div");t.className="lt"+(i===0?" next":"");
     t.textContent=ch;w.appendChild(t);});
   moveRunner("runMe",0);moveRunner("runDino",0);
-  wrongN=0;letterAt=performance.now();hideHint();
+  hideHint();
   clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
   if(ROUNDS[round].perLetter>0){
     dinoDur=ROUNDS[round].perLetter*word.length*1000*slowFactor;
-    dinoT=setTimeout(()=>{dinoStart=performance.now();lastT=dinoStart;dinoTick();},ROUNDS[round].grace*1000);
+    dinoT=setTimeout(()=>{dinoStart=performance.now();dinoTick();},ROUNDS[round].grace*1000);
   }
   $("trap").focus();
 }
 let dinoRAF=0;
 function dinoTick(){
   if(roundOver)return;
-  const t=performance.now();
-  if(frozen){dinoStart+=t-lastT;}
-  lastT=t;
-  const p=Math.min(1,(t-dinoStart)/dinoDur);
+  const p=Math.min(1,(performance.now()-dinoStart)/dinoDur);
   moveRunner("runDino",p);
   if(p>=1){dinoWins();return;}
   dinoRAF=requestAnimationFrame(dinoTick);
@@ -223,18 +216,17 @@ function keyIn(ch){
   const tiles=$("word").children;
   if(ch.toLowerCase()===word[pos].toLowerCase()){
     tiles[pos].className="lt done";pos++;blip(500+pos*80);
-    wrongN=0;letterAt=performance.now();hideHint();
+    lightKey();
     moveRunner("runMe",pos/word.length);
     if(pos<word.length){tiles[pos].classList.add("next");}
     else{wordDone();}
   }else{
     tiles[pos].classList.add("bad");blip(140,0.12,"sawtooth");
-    wrongN++;if(wrongN>=3)showHint();
     setTimeout(()=>tiles[pos].classList.remove("bad"),260);
   }
 }
 function wordDone(){
-  roundOver=true;letterAt=0;hideHint();clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
+  roundOver=true;hideHint();clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
   stars++;slowFactor=1;
   if(ROUNDS[round].perLetter>0){wins++;raced++;}
   $("stars").textContent="⭐".repeat(Math.min(stars,12));
@@ -244,7 +236,7 @@ function wordDone(){
   wi++;setTimeout(nextWord,1300);
 }
 function dinoWins(){
-  roundOver=true;letterAt=0;hideHint();raced++;
+  roundOver=true;hideHint();raced++;
   moveRunner("runDino",1);
   $("msg").textContent="So close! Again! 💪";
   $("msg").className="msg lose";blip(220,0.2,"triangle");
@@ -277,5 +269,8 @@ document.addEventListener("click",()=>{if(!$("scrGame").classList.contains("hidd
 $("btnStart").onclick=startGame;
 $("btnAgain").onclick=()=>{$("scrEnd").classList.add("hidden");$("scrStart").classList.remove("hidden");};
 $("btnSpeak").onclick=e=>{e.stopPropagation();speak(word);};
+$("btnKbd").onclick=e=>{e.stopPropagation();const k=$("kbd");
+  if(k.classList.contains("show")){hideHint();}else{k.classList.add("show");lightKey();}
+  $("trap").focus();};
 </script>
 </body></html>
