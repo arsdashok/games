@@ -1,0 +1,245 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Word Race! Robot vs Zombie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Nunito','Segoe UI',sans-serif;color:#2b3a67;background:linear-gradient(160deg,#bae6fd 0%,#d4fc79 100%);
+ display:flex;align-items:center;justify-content:center;padding:16px;user-select:none}
+.stage{width:min(880px,100%);background:#ffffffee;border-radius:26px;padding:26px 30px;border:4px solid #2b3a67}
+h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
+.sub{text-align:center;font-size:17px;color:#5f6b8f;margin-top:4px}
+.setrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:22px 0 8px}
+.setchip{font:inherit;font-weight:900;font-size:18px;border:3px solid #2b3a67;border-radius:16px;
+ background:#fff;padding:10px 16px;cursor:pointer;opacity:.45}
+.setchip.on{opacity:1;background:#fde68a}
+.bigbtn{display:block;margin:18px auto 0;font:inherit;font-weight:900;font-size:26px;color:#fff;
+ background:#16a34a;border:4px solid #2b3a67;border-radius:20px;padding:14px 42px;cursor:pointer}
+.bigbtn:active{transform:scale(.96)}
+.roundtag{display:inline-block;background:#2b3a67;color:#fff;font-weight:900;font-size:16px;
+ border-radius:30px;padding:6px 18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.stars{font-size:22px;letter-spacing:2px;min-height:28px}
+.picbox{text-align:center;font-size:54px;line-height:1;min-height:60px;margin:6px 0 2px}
+.swatch{display:inline-block;width:54px;height:54px;border-radius:16px;border:3px solid #2b3a67;vertical-align:middle}
+.word{display:flex;justify-content:center;gap:9px;margin:12px 0 4px;flex-wrap:wrap}
+.lt{width:58px;height:66px;border:3px solid #2b3a67;border-radius:14px;background:#fff;
+ display:flex;align-items:center;justify-content:center;font-weight:900;font-size:40px;color:#8a93bf}
+.lt.done{background:#bbf7d0;color:#15803d;border-color:#15803d}
+.lt.next{border-color:#f59e0b;animation:bob 0.7s infinite alternate}
+.lt.bad{animation:wig 0.25s;border-color:#dc2626;color:#dc2626}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+@keyframes wig{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.speak{display:block;margin:2px auto 0;font:inherit;font-weight:900;font-size:15px;border:3px solid #2b3a67;
+ border-radius:30px;background:#fff;padding:6px 16px;cursor:pointer}
+.track{position:relative;height:118px;margin:16px 6px 4px}
+.lane{position:absolute;left:0;right:70px;height:52px}
+.lane .runner{position:absolute;left:0;font-size:44px;line-height:1;transition:left .18s linear;transform:scaleX(-1)}
+.lane.me{top:0}.lane.dino{top:56px}
+.lane .rail{position:absolute;left:24px;right:0;top:50%;border-top:3px dashed #8a93bf}
+.flag{position:absolute;right:6px;top:26px;font-size:52px}
+.dino-sleep{filter:grayscale(.6);opacity:.55}
+.msg{text-align:center;font-weight:900;font-size:26px;min-height:34px;margin-top:8px}
+.msg.win{color:#16a34a}.msg.lose{color:#b45309}
+.hidden{display:none}
+#trap{position:absolute;opacity:0;pointer-events:none;left:-999px}
+.confetti{position:fixed;font-size:30px;pointer-events:none;animation:fall 1.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
+.endstats{text-align:center;font-size:22px;font-weight:900;margin:18px 0}
+</style></head><body>
+<div class="stage">
+
+  <div id="scrStart">
+    <h1>Word Race! 🤖🧟</h1>
+    <p class="sub">Type the word. Beat the zombie!</p>
+    <div class="setrow" id="setrow"></div>
+    <button class="bigbtn" id="btnStart">START</button>
+  </div>
+
+  <div id="scrGame" class="hidden">
+    <div class="topbar">
+      <span class="roundtag" id="roundTag">Round 1 · Practice</span>
+      <span class="stars" id="stars"></span>
+    </div>
+    <div class="picbox" id="pic"></div>
+    <div class="word" id="word"></div>
+    <button class="speak" id="btnSpeak">🔊 hear it</button>
+    <div class="track">
+      <div class="lane me"><div class="rail"></div><div class="runner" id="runMe">🤖</div></div>
+      <div class="lane dino"><div class="rail"></div><div class="runner dino-sleep" id="runDino">🧟</div></div>
+      <div class="flag">🚩</div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div id="scrEnd" class="hidden">
+    <h1>Great job! ⭐</h1>
+    <div class="endstats" id="endstats"></div>
+    <button class="bigbtn" id="btnAgain">PLAY AGAIN</button>
+  </div>
+
+  <input id="trap" autocomplete="off" autocapitalize="none">
+</div>
+<script>
+/* Word sets = exactly what Dima's lessons taught (sight words, short-a CVC, colours 21 Aug, his words). */
+const SETS = {
+  "⭐ small words": ["I","a","the","is","and","my","can","you","go","we"],
+  "🐱 cat · hat · jam": ["cat","hat","bag","map","van","jam"],
+  "🎨 colours": ["red","blue","green","yellow","pink","black","white","brown","grey","orange","purple"],
+  "🤖 my words": ["big","small","new","run","dog","box","robot"],
+};
+const PICS = {cat:"🐱",hat:"👒",bag:"🎒",map:"🗺️",van:"🚐",jam:"🍯",dog:"🐶",box:"📦",robot:"🤖",
+  run:"🏃",big:"🐘",small:"🐜",new:"✨",I:"⭐",a:"⭐",the:"⭐",is:"⭐",and:"⭐",my:"⭐",can:"⭐",
+  you:"👉",go:"🏁",we:"👫"};
+const COLORS = {red:"#e11d48",blue:"#2563eb",green:"#16a34a",yellow:"#facc15",pink:"#f472b6",
+  black:"#1f2937",white:"#f8fafc",brown:"#92400e",grey:"#9ca3af",orange:"#f97316",purple:"#8b5cf6"};
+
+/* Rounds: 1 = practice (dino asleep, no clock). Then races: seconds PER LETTER the zombie
+   needs, plus a head start for Dima before the dino wakes. Generous on purpose, and if
+   the zombie wins, the same word repeats with the zombie 40% slower (invisible rubber band). */
+const ROUNDS = [
+  {name:"Round 1 · Practice 😴", perLetter:0,   grace:0},
+  {name:"Round 2 · Slow zombie 🚶", perLetter:5,  grace:3},
+  {name:"Round 3 · Zombie runs! 🏃",     perLetter:3.5,grace:1.5},
+];
+const WORDS_PER_ROUND = 6;
+
+let picked = new Set(["⭐ small words","🐱 cat · hat · jam"]);
+let queue=[], round=0, wi=0, word="", pos=0, stars=0, wins=0, raced=0;
+let dinoT=null, dinoStart=0, dinoDur=0, slowFactor=1, roundOver=false;
+
+const $=id=>document.getElementById(id);
+const setrow=$("setrow");
+Object.keys(SETS).forEach(k=>{
+  const b=document.createElement("button"); b.className="setchip"+(picked.has(k)?" on":""); b.textContent=k;
+  b.onclick=()=>{ if(picked.has(k)&&picked.size>1){picked.delete(k);b.classList.remove("on");}
+                  else{picked.add(k);b.classList.add("on");} };
+  setrow.appendChild(b);
+});
+
+/* voice: Google UK English Female (house standard). Speaks ONLY on tap, never automatically. */
+let vc=null;
+function vcLoad(){const v=speechSynthesis.getVoices();
+  vc=v.find(x=>x.name==="Google UK English Female")||v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null;}
+if("speechSynthesis"in window){vcLoad();speechSynthesis.onvoiceschanged=vcLoad;}
+function speak(t){if(!("speechSynthesis"in window))return;const u=new SpeechSynthesisUtterance(t);
+  u.lang=vc?vc.lang:"en-GB";u.rate=.85;if(vc)u.voice=vc;speechSynthesis.cancel();speechSynthesis.speak(u);}
+
+/* tiny sounds via WebAudio, no assets */
+let AC=null;
+function blip(f,d=0.07,type="square",g=0.04){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  const o=AC.createOscillator(),v=AC.createGain();o.type=type;o.frequency.value=f;v.gain.value=g;
+  o.connect(v);v.connect(AC.destination);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildQueue(){
+  const pool=shuffle([...new Set([...picked].flatMap(k=>SETS[k]))]);
+  queue=pool.slice(0,WORDS_PER_ROUND);
+  if(queue.length<WORDS_PER_ROUND){queue=pool;}
+}
+
+function startGame(){
+  round=0;stars=0;wins=0;raced=0;
+  $("scrStart").classList.add("hidden");$("scrEnd").classList.add("hidden");
+  $("scrGame").classList.remove("hidden");
+  startRound();
+}
+function startRound(){
+  buildQueue();wi=0;slowFactor=1;
+  $("roundTag").textContent=ROUNDS[round].name;
+  $("runDino").classList.toggle("dino-sleep",ROUNDS[round].perLetter===0);
+  nextWord();
+}
+function nextWord(){
+  if(wi>=queue.length){endRound();return;}
+  word=queue[wi];pos=0;roundOver=false;
+  $("msg").textContent="";$("msg").className="msg";
+  const pic=PICS[word]||"";
+  $("pic").innerHTML=COLORS[word]?'<span class="swatch" style="background:'+COLORS[word]+'"></span>':(pic||"⭐");
+  const w=$("word");w.innerHTML="";
+  [...word].forEach((ch,i)=>{const t=document.createElement("div");t.className="lt"+(i===0?" next":"");
+    t.textContent=ch;w.appendChild(t);});
+  moveRunner("runMe",0);moveRunner("runDino",0);
+  clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
+  if(ROUNDS[round].perLetter>0){
+    dinoDur=ROUNDS[round].perLetter*word.length*1000*slowFactor;
+    dinoT=setTimeout(()=>{dinoStart=performance.now();dinoTick();},ROUNDS[round].grace*1000);
+  }
+  $("trap").focus();
+}
+let dinoRAF=0;
+function dinoTick(){
+  if(roundOver)return;
+  const p=Math.min(1,(performance.now()-dinoStart)/dinoDur);
+  moveRunner("runDino",p);
+  if(p>=1){dinoWins();return;}
+  dinoRAF=requestAnimationFrame(dinoTick);
+}
+function moveRunner(id,frac){
+  const lane=$(id).parentElement;
+  const max=lane.clientWidth-54;
+  $(id).style.left=(max*frac)+"px";
+}
+function keyIn(ch){
+  if(roundOver||$("scrGame").classList.contains("hidden"))return;
+  const tiles=$("word").children;
+  if(ch.toLowerCase()===word[pos].toLowerCase()){
+    tiles[pos].className="lt done";pos++;blip(500+pos*80);
+    moveRunner("runMe",pos/word.length);
+    if(pos<word.length){tiles[pos].classList.add("next");}
+    else{wordDone();}
+  }else{
+    tiles[pos].classList.add("bad");blip(140,0.12,"sawtooth");
+    setTimeout(()=>tiles[pos].classList.remove("bad"),260);
+  }
+}
+function wordDone(){
+  roundOver=true;clearTimeout(dinoT);cancelAnimationFrame(dinoRAF);
+  stars++;slowFactor=1;
+  if(ROUNDS[round].perLetter>0){wins++;raced++;}
+  $("stars").textContent="⭐".repeat(Math.min(stars,12));
+  $("msg").textContent=ROUNDS[round].perLetter>0?"You beat the zombie! 🎉":"Super! ⭐";
+  $("msg").className="msg win";blip(660,0.1);blip(880,0.14);
+  confetti();
+  wi++;setTimeout(nextWord,1300);
+}
+function dinoWins(){
+  roundOver=true;raced++;
+  moveRunner("runDino",1);
+  $("msg").textContent="So close! Again! 💪";
+  $("msg").className="msg lose";blip(220,0.2,"triangle");
+  slowFactor*=1.4;                      /* same word again, slower dino */
+  setTimeout(nextWord,1400);
+}
+function endRound(){
+  round++;
+  if(round<ROUNDS.length){
+    $("msg").textContent="";
+    $("roundTag").textContent=ROUNDS[round].name;
+    const m=$("msg");m.textContent=round===1?"The zombie woke up! 🧟":"The zombie speeds up! 🏃";m.className="msg";
+    setTimeout(startRound,1500);
+  }else{
+    $("scrGame").classList.add("hidden");$("scrEnd").classList.remove("hidden");
+    $("endstats").innerHTML="⭐ Words typed: "+stars+"<br>🏁 Races won: "+wins+" / "+raced;
+  }
+}
+function confetti(){
+  for(let i=0;i<8;i++){const s=document.createElement("div");s.className="confetti";
+    s.textContent=["⭐","🎉","💚","🤖"][i%4];
+    s.style.left=(10+Math.random()*80)+"vw";s.style.top="-40px";
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1500);}
+}
+document.addEventListener("keydown",e=>{
+  if(e.key.length===1&&/[a-zA-Z]/.test(e.key)){keyIn(e.key);e.preventDefault();}
+});
+$("trap").addEventListener("input",e=>{const v=e.target.value;if(v){keyIn(v[v.length-1]);e.target.value="";}});
+document.addEventListener("click",()=>{if(!$("scrGame").classList.contains("hidden"))$("trap").focus();});
+$("btnStart").onclick=startGame;
+$("btnAgain").onclick=()=>{$("scrEnd").classList.add("hidden");$("scrStart").classList.remove("hidden");};
+$("btnSpeak").onclick=e=>{e.stopPropagation();speak(word);};
+</script>
+</body></html>
