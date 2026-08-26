@@ -208,7 +208,7 @@ function dinoTick(){
 }
 function moveRunner(id,frac){
   const lane=$(id).parentElement;
-  const max=lane.clientWidth-54;
+  const max=Math.max(0,lane.clientWidth-54);
   $(id).style.left=(max*frac)+"px";
 }
 function keyIn(ch){
