@@ -74,6 +74,7 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
     </div>
     <div class="picbox" id="pic"></div>
     <div class="word" id="word"></div>
+    <div class="kbd" id="kbd"></div>
     <button class="speak" id="btnSpeak">🔊 hear it</button>
     <div class="track">
       <div class="lane me"><div class="rail"></div><div class="runner" id="runMe">🤖</div></div>
@@ -81,7 +82,6 @@ h1{font-weight:900;font-size:clamp(26px,5vw,40px);text-align:center}
       <div class="flag">🚩</div>
     </div>
     <div class="msg" id="msg"></div>
-    <div class="kbd" id="kbd"></div>
   </div>
 
   <div id="scrEnd" class="hidden">
@@ -100,7 +100,7 @@ const SETS = {
   "🎨 colours": ["red","blue","green","yellow","pink","black","white","brown","grey","orange","purple"],
   "🤖 my words": ["big","small","new","run","dog","box","robot"],
 };
-const PICS = {cat:"img/cat.png",hat:"img/hat.png",bag:"img/bag.png",map:"img/map.png",
+const PICS = {cat:"img/cat.png",hat:"img/hat.png",bag:"img/bag.png",map:"img/map.png",fan:"img/fan.png",
   van:"img/van.png",jam:"img/jam.png",dog:"🐶",box:"📦",robot:"🤖",run:"🏃",new:"✨",
   you:"👉",go:"🏁",we:"👫"};
 const COLORS = {red:"#e11d48",blue:"#2563eb",green:"#16a34a",yellow:"#facc15",pink:"#f472b6",
@@ -152,10 +152,12 @@ function blip(f,d=0.07,type="square",g=0.04){try{AC=AC||new (window.AudioContext
     [...r].forEach(ch=>{const s=document.createElement("div");s.className="key";s.dataset.k=ch;s.textContent=ch;d.appendChild(s);});
     k.appendChild(d);});})();
 function showHint(){const k=$("kbd");k.classList.add("show");frozen=true;
+  $("runDino").classList.add("dino-sleep");
   [...k.querySelectorAll(".key")].forEach(x=>x.classList.toggle("hot",x.dataset.k===word[pos].toLowerCase()));}
-function hideHint(){$("kbd").classList.remove("show");frozen=false;}
+function hideHint(){$("kbd").classList.remove("show");frozen=false;
+  $("runDino").classList.toggle("dino-sleep",ROUNDS[round].perLetter===0);}
 setInterval(()=>{ if(!roundOver&&letterAt&&!$("scrGame").classList.contains("hidden")
-  &&performance.now()-letterAt>6000&&!$("kbd").classList.contains("show")) showHint(); },500);
+  &&performance.now()-letterAt>4000&&!$("kbd").classList.contains("show")) showHint(); },500);
 
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
