@@ -217,16 +217,20 @@ const LETTERS = [
   { ch: 'Z', cue: 'Across, slant down, across' },
 ];
 
-// ---- Words Tobi has learned (sight words), coloured by his palette. play + little are recent. ----
-// Tobi's known sight words only (so the "read it, then write it" step never lands on an unknown word)
+// ---- Words Tobi has learned, coloured by his reading palette, in the order he met them. ----
+// Reading sight words through L23 (all 31 of the L24 big review), then the two position words he
+// wrote in maths L27 (16 Sep). Only words he has actually been taught, so the "read it, then write it"
+// step never lands on an unknown word.
 const WORDS = [
   { ch: 'I', c: '#CC3333' },   { ch: 'a', c: '#E91E63' },    { ch: 'see', c: '#2E75B6' },  { ch: 'the', c: '#548235' },
   { ch: 'my', c: '#D4AC0D' },  { ch: 'like', c: '#00897B' }, { ch: 'have', c: '#7D3C98' }, { ch: 'want', c: '#E8820C' },
   { ch: 'big', c: '#C62828' }, { ch: 'go', c: '#2E7D32' },   { ch: 'can', c: '#C2185B' },  { ch: 'look', c: '#1565C0' },
-  { ch: 'here', c: '#6D4C41' },{ ch: 'it', c: '#F4511E' },   { ch: 'is', c: '#5E35B1' },   { ch: 'jump', c: '#7c3aed' },
-  { ch: 'up', c: '#2E7D32' },  { ch: 'down', c: '#C62828' }, { ch: 'in', c: '#00897B' },   { ch: 'little', c: '#1565C0' },
-  { ch: 'play', c: '#E8820C' }, { ch: 'me', c: '#C2185B' }, { ch: 'we', c: '#2E75B6' },
-  { ch: 'come', c: '#E64A19' }, { ch: 'funny', c: '#FBC02D' }, { ch: 'make', c: '#5D4037' }, { ch: 'find', c: '#303F9F' },
+  { ch: 'here', c: '#6D4C41' },{ ch: 'and', c: '#00838F' },  { ch: 'it', c: '#F4511E' },   { ch: 'is', c: '#5E35B1' },
+  { ch: 'run', c: '#FF6F00' }, { ch: 'jump', c: '#7c3aed' }, { ch: 'up', c: '#2E7D32' },   { ch: 'down', c: '#C62828' },
+  { ch: 'in', c: '#00897B' },  { ch: 'little', c: '#1565C0' },{ ch: 'play', c: '#E8820C' }, { ch: 'me', c: '#C2185B' },
+  { ch: 'we', c: '#2E75B6' },  { ch: 'come', c: '#E64A19' }, { ch: 'funny', c: '#FBC02D' }, { ch: 'make', c: '#5D4037' },
+  { ch: 'find', c: '#303F9F' },{ ch: 'help', c: '#C2185B' }, { ch: 'one', c: '#00838F' },
+  { ch: 'on', c: '#0277BD' },  { ch: 'under', c: '#6A1B9A' },
 ];
 
 const W = 760, H = 560;
@@ -245,12 +249,32 @@ const TOL = 16;     // px of forgiveness so a stroke may just touch the boundary
 // ---- which letters/words are switched on (Dasha's menu; remembered per device) ----
 const LS = { letters: 'tracer_on_letters', words: 'tracer_on_words' };
 function allCh(sec) { return (sec === 'letters' ? LETTERS : WORDS).map(x => x.ch); }
+// Words that existed before the 19 Sep update. A selection saved on a device before then only
+// lists these, so anything outside it is NEW and must start switched ON, not silently off.
+const LEGACY_KNOWN = { words: ['I', 'a', 'see', 'the', 'my', 'like', 'have', 'want', 'big', 'go', 'can', 'look', 'here', 'it', 'is', 'jump', 'up', 'down', 'in', 'little', 'play', 'me', 'we', 'come', 'funny', 'make', 'find'] };
+const KNOWN_KEY = { letters: 'tracer_known_letters', words: 'tracer_known_words' };
 function loadEnabled(sec) {
-  try { const v = JSON.parse(localStorage.getItem(LS[sec])); if (Array.isArray(v)) return new Set(v); } catch (e) {}
-  return new Set(allCh(sec));                       // default: everything on
+  const all = allCh(sec);
+  try {
+    const v = JSON.parse(localStorage.getItem(LS[sec]));
+    if (Array.isArray(v)) {
+      let known = null;
+      try { known = JSON.parse(localStorage.getItem(KNOWN_KEY[sec])); } catch (e) {}
+      if (!Array.isArray(known)) known = LEGACY_KNOWN[sec] || all;
+      const on = new Set(v);
+      all.forEach(ch => { if (!known.includes(ch)) on.add(ch); });   // new since the last save: ON
+      return on;
+    }
+  } catch (e) {}
+  return new Set(all);                              // default: everything on
 }
 const enabled = { letters: loadEnabled('letters'), words: loadEnabled('words') };
-function saveEnabled(sec) { try { localStorage.setItem(LS[sec], JSON.stringify([...enabled[sec]])); } catch (e) {} }
+function saveEnabled(sec) {
+  try {
+    localStorage.setItem(LS[sec], JSON.stringify([...enabled[sec]]));
+    localStorage.setItem(KNOWN_KEY[sec], JSON.stringify(allCh(sec)));
+  } catch (e) {}
+}
 
 function items() {
   const base = section === 'letters' ? LETTERS : WORDS;
