@@ -276,6 +276,16 @@ function saveEnabled(sec) {
   } catch (e) {}
 }
 
+// Add r to previously saved practice sets once. Later teacher choices still win.
+const R_UPDATE_KEY = 'tracer_added_r_2026_09_25';
+try {
+  if (localStorage.getItem(R_UPDATE_KEY) !== '1') {
+    enabled.letters.add('r');
+    saveEnabled('letters');
+    localStorage.setItem(R_UPDATE_KEY, '1');
+  }
+} catch (e) { enabled.letters.add('r'); }
+
 function items() {
   const base = section === 'letters' ? LETTERS : WORDS;
   const on = base.filter(it => enabled[section].has(it.ch));
