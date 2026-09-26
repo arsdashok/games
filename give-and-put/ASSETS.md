@@ -1,0 +1,8 @@
+# Generated object atlas
+
+Saved file: `assets/objects.png`. Mode: built-in image generation, not CLI.
+Original characters are reused unchanged from Town Trips.
+
+## Final prompt
+
+Create ONE game sprite atlas image: a precise 4 by 4 grid of 16 equally sized SQUARE cells, no grid lines. White background. Each cell has one isolated cute clean colourful illustrated object centered within the central 75% of its cell, generous empty margins, no objects crossing cells. Consistent friendly slightly dimensional children's educational sticker art, crisp silhouette, not pixel art. NO letters, words, labels or numbers anywhere (ruler may have unnumbered tick marks). Exact cell contents reading left to right: ROW 1: wooden ruler; closed purple school backpack with handle; blue ballpoint PEN with cap (clearly not a pencil); yellow wooden PENCIL with pink eraser. ROW 2: closed red book; small whole birthday cake; one yellow banana; clear glass of blue drinking water. ROW 3: one pair of blue trousers; one pair of brown boots/shoes side by side; brown cuddly teddy bear; Minecraft-inspired turquoise diamond pickaxe with brown handle. ROW 4: single bed in side/three-quarter view with yellow blanket; simple wooden table with a CLEAR wide empty tabletop; one wooden chair with a clearly visible empty seat; OPEN purple school backpack with a large visible dark opening at the TOP (to place objects inside). Every object completely visible. No extra objects, scenery, shadows extending beyond own cell, people, text, interface elements or borders. The image is a square spritesheet for an interactive give-and-put game, not a mockup.
