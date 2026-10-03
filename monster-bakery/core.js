@@ -9,5 +9,6 @@ function answer(order,input){if(order.stage!=='spell'||order.answers.length>=ord
 function next(order){if(order.stage!=='feedback')return;order.stage=order.answers.length===order.words.length?'ready':'spell'}
 function score(order){return order.answers.filter(a=>a.correct).length}
 function award(order,progress){if(order.awarded)return {earned:0,unlocked:[]};if(order.answers.length!==order.words.length)throw Error('Finish the order first.');const earned=score(order),before=level(progress.stars);progress.stars+=earned;progress.orders+=1;order.awarded=true;order.stage='result';return{earned,unlocked:upgrades.slice(before+1,level(progress.stars)+1)}}
-const api={normalize,upgrades,level,shuffle,makeOrder,answer,next,score,award};root.KitchenCore=api;if(typeof module!=='undefined')module.exports=api;
+function recipe(ingredients=[]){const surprises=ingredients.filter(x=>!x.correct).map(x=>x.art);const bad=surprises.length,total=ingredients.length;return {bad,total,surprises,ratio:total?bad/total:0,icing:bad?'#9daa69':'#e6a9b6',name:bad?(bad===1?'A cake with a surprise':'A wonderfully wonky cake'):'A delicious cake'};}
+const api={recipe,normalize,upgrades,level,shuffle,makeOrder,answer,next,score,award};root.KitchenCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
