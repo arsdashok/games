@@ -10,5 +10,9 @@ function next(order){if(order.stage!=='feedback')return;order.stage=order.answer
 function score(order){return order.answers.filter(a=>a.correct).length}
 function award(order,progress){if(order.awarded)return {earned:0,unlocked:[]};if(order.answers.length!==order.words.length)throw Error('Finish the order first.');const earned=score(order),before=level(progress.stars);progress.stars+=earned;progress.orders+=1;order.awarded=true;order.stage='result';return{earned,unlocked:upgrades.slice(before+1,level(progress.stars)+1)}}
 function recipe(ingredients=[]){const surprises=ingredients.filter(x=>!x.correct).map(x=>x.art);const bad=surprises.length,total=ingredients.length;return {bad,total,surprises,ratio:total?bad/total:0,icing:bad?'#9daa69':'#e6a9b6',name:bad?(bad===1?'A cake with a surprise':'A wonderfully wonky cake'):'A delicious cake'};}
-const api={recipe,normalize,upgrades,level,shuffle,makeOrder,answer,next,score,award};root.KitchenCore=api;if(typeof module!=='undefined')module.exports=api;
+const cakes=[{name:'Strawberry cloud',icing:'#efa9bd',sponge:'#d8ab72',topping:'#be586e'},{name:'Chocolate comet',icing:'#694337',sponge:'#875039',topping:'#f3d097'},{name:'Lemon sunshine',icing:'#f7d969',sponge:'#e5be76',topping:'#eaae37'},{name:'Blueberry dream',icing:'#b8a0de',sponge:'#d5af83',topping:'#65558d'}];
+function cakeStyle(order){return cakes[((Number(order.variant)||0)+(order.bonusStage?1:0))%cakes.length];}
+function finishPractice(order,words){const missed=order.words.filter((w,i)=>!order.answers[i]?.correct);if(order.stage!=='result'||order.practiceComplete||!missed.length||missed.some(w=>!words.some(t=>normalize(t)===normalize(w.text))))return false;order.practiceComplete=true;order.bonusStage='baking';return true;}
+function serveBonus(order,progress){if(order.bonusStage!=='serve')return false;order.bonusStage='result';progress.orders++;return true;}
+const api={cakes,cakeStyle,finishPractice,serveBonus,recipe,normalize,upgrades,level,shuffle,makeOrder,answer,next,score,award};root.KitchenCore=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

@@ -25,5 +25,13 @@ car:wrap(`<path d="M25 82h21l19-39h54l20 39h18v41H25z" fill="#92BFCF"/><path d="
 boot:wrap(`<path d="M45 23h68v74l33 9q24 12 13 34H37V94z" fill="#84BCA8"/><path d="M36 132h126v15H36z" fill="#50635D"/><path d="M46 47h65" fill="none"/>`),
 button:wrap(`<circle cx="90" cy="80" r="55" fill="#AEA1D7"/><circle cx="90" cy="80" r="40" fill="none" stroke="#8976B5"/><circle cx="77" cy="67" r="7" fill="#FFF4E2"/><circle cx="103" cy="67" r="7" fill="#FFF4E2"/><circle cx="77" cy="94" r="7" fill="#FFF4E2"/><circle cx="103" cy="94" r="7" fill="#FFF4E2"/>`)
 };
+Object.assign(art,{
+lemon:wrap('<ellipse cx="90" cy="85" rx="54" ry="34" fill="#f6d75e"/><path d="M35 85l-14-6 14-7m108 13 13 4-13 9M105 50q13-31 36-19-9 25-36 19" fill="#96b576"/>'),
+cherry:wrap('<path d="M65 90q-4-46 41-68-3 40 16 66" fill="none" stroke="#6c926c"/><circle cx="59" cy="108" r="29" fill="#d46882"/><circle cx="121" cy="105" r="28" fill="#b95875"/>'),
+blueberry:wrap('<g fill="#8581b5"><circle cx="61" cy="99" r="29"/><circle cx="111" cy="104" r="30"/><circle cx="88" cy="56" r="30"/></g><path d="m78 50 10 7 10-7m3 48 9 7 10-7m-70-6 10 7 9-7" fill="none"/>'),
+banana:wrap('<path d="M35 36q-3 75 100 52l15-21q-5 88-85 65-52-21-40-87Z" fill="#f4d779"/><path d="M39 55q5 73 91 43" fill="none"/>'),
+leaf:wrap('<path d="M30 135Q15 46 149 21q21 119-119 114Z" fill="#94b980"/><path d="m28 140 91-87m-53 47 0-37m16 18 34 0" fill="none"/>'),
+stone:wrap('<path d="m30 111 14-50 50-23 50 32 9 51-68 20Z" fill="#a2b0b4"/><path d="m44 61 44 39 56-30m-56 30-3 41" fill="none"/>'),
+pencil:wrap('<path d="m45 130 53-99 28 16-53 99-34 8Z" fill="#f4ca62"/><path d="m98 31 9-14q8-7 17 0l15 9q7 7 2 15l-15 6" fill="#e9a1aa"/><path d="m45 130 28 16-34 8Z" fill="#e5cfa8"/>')});
 window.BakeryArt=art;
 })();
