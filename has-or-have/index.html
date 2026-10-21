@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>has or have?</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f5f3ff; color:#2b2b3a;
+       min-height:100vh; display:flex; flex-direction:column; }
+header { background:linear-gradient(135deg,#6c63ff,#a78bfa); color:#fff; padding:10px 18px;
+         display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:12px; }
+header h1 { margin:0; font-size:19px; }
+header .meta { font-size:13px; opacity:.92; }
+#count { font-size:17px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+main { flex:1; display:flex; padding:clamp(8px,1.8vh,16px); }
+.screen { display:none; flex-direction:column; align-items:center; gap:clamp(8px,1.6vh,14px);
+          width:100%; max-width:820px; margin:auto; }
+.screen.on { display:flex; }
+
+/* the card: who + what, with a tick or a cross */
+.card { display:flex; align-items:stretch; justify-content:center; gap:clamp(10px,3vw,26px); width:100%; flex-wrap:wrap; }
+.who, .what { background:#fff; border:3px solid #ddd6fe; border-radius:20px; padding:10px 14px;
+              display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+              min-width:clamp(150px,30vw,250px); }
+.emo { font-size:clamp(54px,12vh,92px); line-height:1.05; letter-spacing:4px; white-space:nowrap; }
+.emo .x2 { display:inline-block; filter:hue-rotate(150deg) saturate(1.4); }
+.name { font-size:clamp(20px,3.6vh,28px); font-weight:700; text-align:center; }
+.thing { font-size:clamp(18px,3vh,24px); font-weight:600; text-align:center; }
+.mark { font-size:clamp(30px,6vh,44px); font-weight:800; line-height:1; }
+.mark.yes { color:#15803d; } .mark.no { color:#b91c1c; }
+
+.step { font-size:clamp(18px,3vh,23px); font-weight:700; text-align:center; }
+.sentence { font-size:clamp(22px,4.2vh,32px); font-weight:700; text-align:center; min-height:1.3em; }
+.sentence .gap { display:inline-block; min-width:3.2em; border-bottom:3px dashed #a78bfa; color:#6c63ff; }
+.chain { font-size:clamp(17px,2.8vh,22px); font-weight:700; color:#6c63ff; text-align:center; min-height:1.3em; }
+
+.btns { display:flex; gap:clamp(8px,2vw,18px); flex-wrap:wrap; justify-content:center; }
+.btn { font-family:inherit; font-size:clamp(22px,4.6vh,34px); font-weight:700; padding:clamp(6px,1.4vh,12px) clamp(20px,4vw,40px);
+       border-radius:18px; border:4px solid #6c63ff; background:#fff; color:#6c63ff; cursor:pointer;
+       transition:transform .06s; touch-action:manipulation; }
+.btn:active { transform:scale(.96); }
+.btn.right { background:#15803d; border-color:#15803d; color:#fff; }
+.btn.wrong { background:#fee2e2; border-color:#b91c1c; color:#b91c1c; }
+.btn:disabled { cursor:default; }
+.btn.go { background:#6c63ff; color:#fff; font-size:clamp(19px,3vh,26px); padding:clamp(9px,1.8vh,14px) clamp(26px,5vw,42px); }
+.btn.ghost { background:#fff; color:#6c63ff; }
+.answers { display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.6vh,14px); width:100%; max-width:640px; }
+.answers .btn { font-size:clamp(19px,3.6vh,27px); padding:clamp(8px,1.6vh,12px) 10px; }
+
+.say { background:#fff; border:3px solid #a78bfa; border-radius:18px; padding:12px 18px; text-align:center; width:100%; max-width:640px; }
+.say .q { font-size:clamp(21px,3.8vh,30px); font-weight:700; }
+.say .a { font-size:clamp(21px,3.8vh,30px); font-weight:700; color:#15803d; margin-top:4px; }
+.say .hint { font-size:14px; color:#6b6b80; margin-top:6px; }
+
+.hidden { display:none !important; }
+#startScreen p, #endScreen p { margin:4px 0; font-size:17px; text-align:center; max-width:580px; }
+.big { font-size:clamp(26px,6vh,40px); font-weight:700; color:#6c63ff; }
+.model { background:#fff; border:2px dashed #a78bfa; border-radius:14px; padding:10px 16px; text-align:center; font-size:18px; max-width:560px; }
+.model .tag { font-size:12px; font-weight:700; letter-spacing:1px; color:#6c63ff; text-transform:uppercase; }
+.missed { background:#fff; border:2px solid #ddd6fe; border-radius:14px; padding:12px 16px;
+          max-width:640px; width:100%; max-height:40vh; overflow-y:auto; }
+.missed h3 { margin:0 0 8px; font-size:15px; color:#6c63ff; }
+.missed div { font-size:17px; padding:4px 0; }
+.missed small { color:#b91c1c; font-weight:700; }
+.teachbox { max-width:580px; width:100%; }
+.teachbox summary { font-size:12px; color:#9aa0ae; cursor:pointer; list-style:none; text-align:center; }
+.teachbox summary::-webkit-details-marker { display:none; }
+.teacher { background:#fff7ed; border-left:3px solid #f59e0b; border-radius:6px; padding:8px 12px;
+           font-size:12px; color:#7c4a03; text-align:left; }
+@media (max-width:700px) {
+  header .meta { display:none; }
+  .card { flex-wrap:nowrap; gap:10px; }
+  .who, .what { min-width:0; flex:1 1 0; padding:8px; }
+  .emo { font-size:clamp(36px,9vw,60px); letter-spacing:0; }
+  .name { font-size:18px; } .thing { font-size:16px; }
+  .btn { font-size:22px; padding:6px 16px; }
+  .answers .btn { font-size:17px; }
+}
+</style></head><body>
+
+<header>
+  <div><h1>has or have?</h1><div class="meta">Who? Then has or have. Then answer.</div></div>
+  <div id="count"></div>
+</header>
+
+<main>
+  <div class="screen on" id="startScreen">
+    <div class="big">has or have?</div>
+    <p>Say it first. Then tap.</p>
+    <div class="model">
+      <div class="tag">Like this</div>
+      👦 Superdog and 🤖 X1 &rarr; <b>they</b> &rarr; <b>Have</b> Superdog and X1 got a cake? 🎂<br>
+      ✔ &rarr; <b>Yes, they have.</b>
+    </div>
+    <button class="btn go" id="goBtn">Start</button>
+    <details class="teachbox"><summary>for the teacher</summary><div class="teacher">
+      On every card she SAYS each step before the tap (you can tap for her while sharing the screen): who (he / she / it / they), then the question with Has or Have, then the short answer. Listen for they + have / haven't: a spoken «she have» is a miss even if the tap is right.<br>
+      On a wrong tap the page shows the chain (X1 and X2 &rarr; they &rarr; have): say the whole question and answer once and move on, do not re-explain.<br>
+      Cards 13-16 have no buttons: she says the whole chain, the question and the answer, you press Check and mark it by ear.<br>
+      Pronouns are the comic's, as used on 20 Oct: Wonder Cat she, Superdog he (Doug in his suit), Wonder Wheels he, X1 / X2 it (a robot, your rule), any two together they. A he / it slip on a single robot is not the plural error; the miss list shows what she chose.<br>
+      The end screen gives cards right first time; «Play the missed ones» replays only those.
+    </div></details>
+  </div>
+
+  <div class="screen" id="playScreen">
+    <div class="card">
+      <div class="who"><div class="emo" id="whoEmo"></div><div class="name" id="whoName"></div></div>
+      <div class="what"><div class="emo" id="whatEmo"></div><div class="thing" id="whatName"></div><div class="mark" id="whatMark"></div></div>
+    </div>
+
+    <div class="step" id="stepLabel"></div>
+    <div class="chain" id="chain"></div>
+    <div class="sentence" id="sentence"></div>
+
+    <div class="btns" id="pronBtns">
+      <button class="btn" data-p="he">he</button>
+      <button class="btn" data-p="she">she</button>
+      <button class="btn" data-p="it">it</button>
+      <button class="btn" data-p="they">they</button>
+    </div>
+    <div class="btns hidden" id="auxBtns">
+      <button class="btn" data-x="Has">Has</button>
+      <button class="btn" data-x="Have">Have</button>
+    </div>
+    <div class="answers hidden" id="ansBtns"></div>
+
+    <div class="say hidden" id="sayBox">
+      <div class="q" id="sayQ"></div>
+      <div class="a" id="sayA"></div>
+    </div>
+    <button class="btn go hidden" id="checkBtn">Check</button>
+    <div class="btns hidden" id="markBtns">
+      <button class="btn" id="markYes">✔ Right</button>
+      <button class="btn" id="markNo">Not yet</button>
+    </div>
+    <button class="btn go hidden" id="nextBtn">Next</button>
+  </div>
+
+  <div class="screen" id="endScreen">
+    <div class="big" id="score"></div>
+    <p id="scoreNote"></p>
+    <div class="missed hidden" id="missed"><h3>Say these again</h3><div id="missedList"></div></div>
+    <div class="btns">
+      <button class="btn go" id="missedBtn">Play the missed ones</button>
+      <button class="btn go ghost" id="againBtn">Play all again</button>
+    </div>
+  </div>
+</main>
+
+<script>
+// who, what, tick, pronoun, contrast pronoun for the answer, which answer column holds the right pronoun.
+// Cards 13-16 (free:true) have no buttons: she says the chain, the question and the answer; Dasha marks by ear.
+var CARDS = [
+  { who:"👧", name:"Wonder Cat", q:"Wonder Cat", what:"👂", thing:"super ears", yes:true,  p:"she",  alt:"they", col:0 },
+  { who:"🤖<span class='x2'>🤖</span>", name:"X1 and X2", q:"X1 and X2", what:"🔋", thing:"a battery", yes:false, p:"they", alt:"it", col:1 },
+  { who:"🦸‍♀️🦸‍♀️", name:"Iron Girls", q:"Iron Girls", what:"💪", thing:"super arms", yes:true, p:"they", alt:"she", col:1 },
+  { who:"👦", name:"Superdog", q:"Superdog", what:"⚽", thing:"a ball", yes:true, p:"he", alt:"they", col:0 },
+  { who:"🤖", name:"X1", q:"X1", what:"🎩", thing:"a hat", yes:false, p:"it", alt:"they", col:1 },
+  { who:"👦👧", name:"Superdog and Wonder Cat", q:"Superdog and Wonder Cat", what:"🗺️", thing:"a map", yes:false, p:"they", alt:"she", col:0 },
+  { who:"🦸‍♀️", name:"an Iron Girl", q:"an Iron Girl", what:"🕶️", thing:"sunglasses", yes:true, p:"she", alt:"they", col:0 },
+  { who:"🦸‍♂️", name:"Wonder Wheels", q:"Wonder Wheels", what:"🚲", thing:"a bike", yes:true, p:"he", alt:"they", col:1 },
+  { who:"🦸‍♂️👦", name:"Wonder Wheels and Superdog", q:"Wonder Wheels and Superdog", what:"🚤", thing:"a boat", yes:false, p:"they", alt:"he", col:0 },
+  { who:"<span class='x2'>🤖</span>", name:"X2", q:"X2", what:"🎒", thing:"a backpack", yes:true, p:"it", alt:"they", col:1 },
+  { who:"<span class='x2'>🤖</span>👧", name:"X2 and Wonder Cat", q:"X2 and Wonder Cat", what:"📷", thing:"a camera", yes:false, p:"they", alt:"she", col:1 },
+  { who:"👧", name:"Wonder Cat", q:"Wonder Cat", what:"🛹", thing:"a skateboard", yes:true, p:"she", alt:"they", col:0 },
+  { who:"🤖<span class='x2'>🤖</span>", name:"X1 and X2", q:"X1 and X2", what:"💻", thing:"a laptop", yes:false, p:"they", free:true },
+  { who:"👦", name:"Superdog", q:"Superdog", what:"☂️", thing:"an umbrella", yes:false, p:"he", free:true },
+  { who:"👧🦸‍♀️", name:"Wonder Cat and an Iron Girl", q:"Wonder Cat and an Iron Girl", what:"🍕", thing:"a pizza", yes:true, p:"they", free:true },
+  { who:"🦸‍♀️🦸‍♀️", name:"Iron Girls", q:"Iron Girls", what:"🎸", thing:"a guitar", yes:false, p:"they", free:true }
+];
+
+function aux(p){ return p === "they" ? "Have" : "Has"; }
+function shortAns(p, yes){
+  var a = (p === "they") ? (yes ? "have" : "haven't") : (yes ? "has" : "hasn't");
+  return (yes ? "Yes, " : "No, ") + p + " " + a + ".";
+}
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+function $(id){ return document.getElementById(id); }
+function show(id, on){ $(id).classList.toggle("hidden", !on); }
+function mark(c){ return c.yes ? "✔" : "✘"; }
+
+var deck = [], i = 0, firstTry = true, wrongStep = "", results = [];
+
+function screen(id){
+  ["startScreen","playScreen","endScreen"].forEach(function(s){ $(s).classList.toggle("on", s === id); });
+}
+function miss(text){ if (firstTry) { firstTry = false; wrongStep = text; } }
+
+function render(){
+  var c = deck[i];
+  firstTry = true; wrongStep = "";
+  $("count").textContent = (i + 1) + " / " + deck.length;
+  $("whoEmo").innerHTML = c.who;
+  $("whoName").textContent = cap(c.name);
+  $("whatEmo").textContent = c.what;
+  $("whatName").textContent = c.thing;
+  $("whatMark").textContent = mark(c);
+  $("whatMark").className = "mark " + (c.yes ? "yes" : "no");
+  $("chain").textContent = "";
+  $("sentence").innerHTML = "";
+  $("sayQ").textContent = ""; $("sayA").textContent = "";
+  document.querySelectorAll("#pronBtns .btn, #auxBtns .btn").forEach(function(b){ b.className = "btn"; b.disabled = false; });
+  ["pronBtns","auxBtns","ansBtns","sayBox","checkBtn","markBtns","nextBtn"].forEach(function(id){ show(id, false); });
+  if (c.free) {
+    $("stepLabel").textContent = "No help now. Say who, the question and the answer.";
+    show("checkBtn", true);
+  } else {
+    $("stepLabel").textContent = "1. Who? Say it, then tap.";
+    show("pronBtns", true);
+  }
+}
+
+function pickPron(btn){
+  var c = deck[i], p = btn.getAttribute("data-p");
+  if (p !== c.p) { miss("who: " + p + ", not " + c.p); btn.className = "btn wrong"; }
+  document.querySelectorAll("#pronBtns .btn").forEach(function(b){
+    b.disabled = true;
+    if (b.getAttribute("data-p") === c.p) b.className = "btn right";
+  });
+  $("chain").textContent = cap(c.name) + " → " + c.p;
+  setTimeout(stepAux, p === c.p ? 500 : 1300);
+}
+
+function stepAux(){
+  var c = deck[i];
+  show("pronBtns", false);
+  $("stepLabel").textContent = "2. Say the question. Has or have?";
+  $("sentence").innerHTML = "<span class='gap'>___</span> " + c.q + " got " + c.thing + "?";
+  show("auxBtns", true);
+}
+
+function pickAux(btn){
+  var c = deck[i], x = btn.getAttribute("data-x"), right = aux(c.p);
+  if (x !== right) { miss("has / have: " + x + ", not " + right); btn.className = "btn wrong"; }
+  document.querySelectorAll("#auxBtns .btn").forEach(function(b){
+    b.disabled = true;
+    if (b.getAttribute("data-x") === right) b.className = "btn right";
+  });
+  $("chain").textContent = cap(c.name) + " → " + c.p + " → " + right.toLowerCase();
+  $("sentence").innerHTML = "<span class='gap'>" + right + "</span> " + c.q + " got " + c.thing + "?";
+  setTimeout(stepAns, x === right ? 600 : 1500);
+}
+
+function stepAns(){
+  var c = deck[i];
+  show("auxBtns", false);
+  $("chain").textContent = "";            // the pronoun is not printed while she answers
+  $("stepLabel").textContent = "3. Look at " + mark(c) + ". Say the answer, then tap it.";
+  var cols = c.col === 0 ? [c.p, c.alt] : [c.alt, c.p];
+  var opts = [ shortAns(cols[0], true), shortAns(cols[1], true), shortAns(cols[0], false), shortAns(cols[1], false) ];
+  var box = $("ansBtns"); box.innerHTML = "";
+  opts.forEach(function(t){
+    var b = document.createElement("button");
+    b.className = "btn"; b.textContent = t;
+    b.addEventListener("click", function(){ pickAns(b, t); });
+    box.appendChild(b);
+  });
+  show("ansBtns", true);
+}
+
+function pickAns(btn, t){
+  var c = deck[i], right = shortAns(c.p, c.yes);
+  if (t !== right) { miss("answer: " + t.replace(/\.$/, "")); btn.className = "btn wrong"; }
+  document.querySelectorAll("#ansBtns .btn").forEach(function(b){
+    b.disabled = true;
+    if (b.textContent === right) b.className = "btn right";
+  });
+  setTimeout(function(){
+    show("ansBtns", false);
+    $("sentence").innerHTML = "";
+    $("stepLabel").textContent = "Now say the question and the answer together.";
+    show("checkBtn", true);
+  }, t === right ? 500 : 1400);
+}
+
+function check(){
+  var c = deck[i];
+  show("checkBtn", false);
+  $("chain").textContent = cap(c.name) + " → " + c.p + " → " + aux(c.p).toLowerCase();
+  $("sayQ").textContent = aux(c.p) + " " + c.q + " got " + c.thing + "?";
+  $("sayA").textContent = shortAns(c.p, c.yes);
+  show("sayBox", true);
+  if (c.free) { $("stepLabel").textContent = "Was it right?"; show("markBtns", true); }
+  else { $("stepLabel").textContent = ""; record(); show("nextBtn", true); }
+}
+
+function record(){
+  results.push({ idx: deck[i].idx, ok:firstTry, step:wrongStep, q:$("sayQ").textContent, a:$("sayA").textContent });
+}
+function markFree(ok){
+  if (!ok) miss("said it");
+  record(); show("markBtns", false); show("nextBtn", true); $("stepLabel").textContent = "";
+}
+
+function next(){
+  i++;
+  if (i < deck.length) { render(); return; }
+  var good = results.filter(function(r){ return r.ok; }).length;
+  $("count").textContent = "";
+  $("score").textContent = good + " / " + deck.length + " right first time";
+  $("scoreNote").textContent = good === deck.length ? "Every card right the first time." : "Say the ones below again, question and answer.";
+  var list = $("missedList"); list.innerHTML = "";
+  results.filter(function(r){ return !r.ok; }).forEach(function(r){
+    var d = document.createElement("div");
+    d.innerHTML = r.q + " " + r.a + " <small>(" + r.step + ")</small>";
+    list.appendChild(d);
+  });
+  show("missed", good < deck.length);
+  show("missedBtn", good < deck.length);
+  screen("endScreen");
+}
+
+function start(cards){
+  deck = cards; i = 0; results = [];
+  screen("playScreen"); render();
+}
+CARDS.forEach(function(c, k){ c.idx = k; });
+
+document.querySelectorAll("#pronBtns .btn").forEach(function(b){ b.addEventListener("click", function(){ pickPron(b); }); });
+document.querySelectorAll("#auxBtns .btn").forEach(function(b){ b.addEventListener("click", function(){ pickAux(b); }); });
+$("checkBtn").addEventListener("click", check);
+$("markYes").addEventListener("click", function(){ markFree(true); });
+$("markNo").addEventListener("click", function(){ markFree(false); });
+$("nextBtn").addEventListener("click", next);
+$("goBtn").addEventListener("click", function(){ start(CARDS.slice()); });
+$("againBtn").addEventListener("click", function(){ start(CARDS.slice()); });
+$("missedBtn").addEventListener("click", function(){
+  var missed = results.filter(function(r){ return !r.ok; }).map(function(r){ return CARDS[r.idx]; });
+  start(missed);
+});
+</script>
+</body></html>
