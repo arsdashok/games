@@ -95,6 +95,34 @@ main { flex:1; display:flex; padding:clamp(8px,1.8vh,16px); }
   .name { font-size:18px; } .thing { font-size:15px; }
   .btn { font-size:21px; padding:7px 16px; }
   .answers .btn { font-size:16px; }
+  #pronBtns, #auxBtns, #markBtns { display:grid; grid-template-columns:1fr 1fr; width:100%; }
+  #pronBtns .btn, #auxBtns .btn { font-size:24px; padding:10px; }
+}
+
+/* Use the width (Dasha, 21 Oct 2026): on a laptop the picture sits left and the task right; capped at 1200px. */
+.col { display:flex; flex-direction:column; align-items:center; gap:clamp(10px,1.8vh,16px); width:100%; min-width:0; }
+header { max-width:calc(1200px + 2 * clamp(16px,3vw,40px)); padding:14px clamp(16px,3vw,40px); }
+main { padding:clamp(10px,2vh,24px) clamp(16px,3vw,40px); }
+.screen { max-width:1200px; }
+@media (min-width:861px) {
+  #startScreen.on, #playScreen.on, #endScreen.on { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+                                                   gap:clamp(32px,4.5vw,72px); align-items:center; }
+  #endScreen.on.solo { grid-template-columns:1fr; }
+  #playScreen .card { flex-wrap:nowrap; }
+  #playScreen .who, #playScreen .what { flex:1 1 0; min-width:0; min-height:clamp(260px,46vh,360px); }
+  #playScreen .emo { font-size:clamp(64px,14vh,118px); }
+  #playScreen .name { font-size:clamp(24px,4vh,32px); }
+  #playScreen .thing { font-size:clamp(20px,3.2vh,26px); }
+  #playScreen .mark { font-size:clamp(40px,7vh,56px); }
+  .panel .step { font-size:clamp(22px,3.6vh,30px); }
+  .panel .sentence { font-size:clamp(24px,4.4vh,34px); }
+  #pronBtns, #auxBtns, #markBtns { display:grid; grid-template-columns:1fr 1fr; width:100%; max-width:540px; }
+  #pronBtns .btn, #auxBtns .btn { font-size:clamp(26px,5vh,38px); padding:clamp(10px,1.8vh,16px) 10px; }
+  .answers, .say { max-width:560px; }
+  #startScreen .big { font-size:clamp(44px,8.5vh,68px); }
+  #startScreen .model { font-size:clamp(20px,3.4vh,26px); line-height:1.5; max-width:none; width:100%; padding:clamp(18px,3vh,30px); }
+  #endScreen .big { font-size:clamp(38px,7vh,56px); }
+  .missed { max-width:none; max-height:62vh; }
 }
 </style></head><body>
 
@@ -106,63 +134,75 @@ main { flex:1; display:flex; padding:clamp(8px,1.8vh,16px); }
 
 <main>
   <div class="screen on" id="startScreen">
-    <div class="big">Say it, then tap!</div>
-    <div class="model">
-      <div class="tag">Like this</div>
-      👦 Superdog and 🤖 X1 &rarr; <b>they</b> &rarr; <b>Have</b> Superdog and X1 got a cake? 🎂<br>
-      ✔ &rarr; <b>Yes, they have.</b>
+    <div class="col">
+      <div class="big">Say it, then tap!</div>
+      <button class="btn go" id="goBtn">Start</button>
+      <details class="teachbox"><summary>for the teacher</summary><div class="teacher">
+        On every card she SAYS each step before the tap (you can tap for her while sharing the screen): who (he / she / it / they), then the question with Has or Have, then the short answer. Listen for they + have / haven't: a spoken «she have» is a miss even if the tap is right.<br>
+        On a wrong tap the page shows the chain (X1 and X2 &rarr; they &rarr; have): say the whole question and answer once and move on, do not re-explain.<br>
+        Cards 13-16 have no buttons: she says the whole chain, the question and the answer, you press Check and mark it by ear.<br>
+        Pronouns are the comic's, as used on 20 Oct: Wonder Cat she, Superdog he (Doug in his suit), Wonder Wheels he, X1 / X2 it (a robot, your rule), any two together they. A he / it slip on a single robot is not the plural error; the miss list shows what she chose.<br>
+        The end screen gives cards right first time; «Play the missed ones» replays only those.
+      </div></details>
     </div>
-    <button class="btn go" id="goBtn">Start</button>
-    <details class="teachbox"><summary>for the teacher</summary><div class="teacher">
-      On every card she SAYS each step before the tap (you can tap for her while sharing the screen): who (he / she / it / they), then the question with Has or Have, then the short answer. Listen for they + have / haven't: a spoken «she have» is a miss even if the tap is right.<br>
-      On a wrong tap the page shows the chain (X1 and X2 &rarr; they &rarr; have): say the whole question and answer once and move on, do not re-explain.<br>
-      Cards 13-16 have no buttons: she says the whole chain, the question and the answer, you press Check and mark it by ear.<br>
-      Pronouns are the comic's, as used on 20 Oct: Wonder Cat she, Superdog he (Doug in his suit), Wonder Wheels he, X1 / X2 it (a robot, your rule), any two together they. A he / it slip on a single robot is not the plural error; the miss list shows what she chose.<br>
-      The end screen gives cards right first time; «Play the missed ones» replays only those.
-    </div></details>
+    <div class="col">
+      <div class="model">
+        <div class="tag">Like this</div>
+        👦 Superdog and 🤖 X1 &rarr; <b>they</b> &rarr;<br><b>Have</b> Superdog and X1 got a cake? 🎂<br>
+        ✔ &rarr; <b>Yes, they have.</b>
+      </div>
+    </div>
   </div>
 
   <div class="screen" id="playScreen">
-    <div class="card">
-      <div class="who"><div class="emo" id="whoEmo"></div><div class="name" id="whoName"></div></div>
-      <div class="what"><div class="emo" id="whatEmo"></div><div class="thing" id="whatName"></div><div class="mark" id="whatMark"></div></div>
+    <div class="col">
+      <div class="card">
+        <div class="who"><div class="emo" id="whoEmo"></div><div class="name" id="whoName"></div></div>
+        <div class="what"><div class="emo" id="whatEmo"></div><div class="thing" id="whatName"></div><div class="mark" id="whatMark"></div></div>
+      </div>
     </div>
 
-    <div class="step" id="stepLabel"></div>
-    <div class="chain" id="chain"></div>
-    <div class="sentence" id="sentence"></div>
+    <div class="col panel">
+      <div class="step" id="stepLabel"></div>
+      <div class="chain" id="chain"></div>
+      <div class="sentence" id="sentence"></div>
 
-    <div class="btns" id="pronBtns">
-      <button class="btn" data-p="he">he</button>
-      <button class="btn" data-p="she">she</button>
-      <button class="btn" data-p="it">it</button>
-      <button class="btn" data-p="they">they</button>
-    </div>
-    <div class="btns hidden" id="auxBtns">
-      <button class="btn" data-x="Has">Has</button>
-      <button class="btn" data-x="Have">Have</button>
-    </div>
-    <div class="answers hidden" id="ansBtns"></div>
+      <div class="btns" id="pronBtns">
+        <button class="btn" data-p="he">he</button>
+        <button class="btn" data-p="she">she</button>
+        <button class="btn" data-p="it">it</button>
+        <button class="btn" data-p="they">they</button>
+      </div>
+      <div class="btns hidden" id="auxBtns">
+        <button class="btn" data-x="Has">Has</button>
+        <button class="btn" data-x="Have">Have</button>
+      </div>
+      <div class="answers hidden" id="ansBtns"></div>
 
-    <div class="say hidden" id="sayBox">
-      <div class="q" id="sayQ"></div>
-      <div class="a" id="sayA"></div>
+      <div class="say hidden" id="sayBox">
+        <div class="q" id="sayQ"></div>
+        <div class="a" id="sayA"></div>
+      </div>
+      <button class="btn go hidden" id="checkBtn">Check</button>
+      <div class="btns hidden" id="markBtns">
+        <button class="btn" id="markYes">✔ Right</button>
+        <button class="btn" id="markNo">Not yet</button>
+      </div>
+      <button class="btn go hidden" id="nextBtn">Next</button>
     </div>
-    <button class="btn go hidden" id="checkBtn">Check</button>
-    <div class="btns hidden" id="markBtns">
-      <button class="btn" id="markYes">✔ Right</button>
-      <button class="btn" id="markNo">Not yet</button>
-    </div>
-    <button class="btn go hidden" id="nextBtn">Next</button>
   </div>
 
   <div class="screen" id="endScreen">
-    <div class="big" id="score"></div>
-    <p id="scoreNote"></p>
-    <div class="missed hidden" id="missed"><h3>Say these again</h3><div id="missedList"></div></div>
-    <div class="btns">
-      <button class="btn go" id="missedBtn">Play the missed ones</button>
-      <button class="btn go ghost" id="againBtn">Play all again</button>
+    <div class="col">
+      <div class="big" id="score"></div>
+      <p id="scoreNote"></p>
+      <div class="btns">
+        <button class="btn go" id="missedBtn">Play the missed ones</button>
+        <button class="btn go ghost" id="againBtn">Play all again</button>
+      </div>
+    </div>
+    <div class="col">
+      <div class="missed hidden" id="missed"><h3>Say these again</h3><div id="missedList"></div></div>
     </div>
   </div>
 </main>
@@ -328,6 +368,7 @@ function next(){
     list.appendChild(d);
   });
   show("missed", good < deck.length);
+  $("endScreen").classList.toggle("solo", good === deck.length);
   show("missedBtn", good < deck.length);
   screen("endScreen");
 }
