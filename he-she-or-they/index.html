@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>He, she or they?</title>
+<!-- Built 2026-10-23 for the 30 Oct Halloween lesson. Dasha, 23 Oct: smaller steps for the present simple.
+     Step 1 ONLY: he / she / they from a picture, the pronoun alone, no verb, many reps. (Step 2, he plays /
+     they play with two verbs, comes only once this holds.) Pictures are Halloween costumes: one man or boy ->
+     he, one woman or girl -> she, two or more (including mixed pairs) -> they. No single animals or things
+     (that would be «it», not taught in this step). Each round = 12 pictures, 4 he / 4 she / 4 they, order
+     shuffled with no run of 3 and no strict alternation; a new shuffle every round. The noun appears only
+     AFTER the answer. Silent page: no audio anywhere. No pupil name on the page (screen-shared). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Duolingo style (Admin/Design Styles/DESIGN duolingo.md): white page, Duo Green actions with a solid bottom
+   edge, flat cards with a Cloud Gray border, Fredoka headlines, Nunito UI with wide tracking. Same system as
+   Erin's has / have game. Halloween lives in the pictures, not in the chrome. */
+:root {
+  --green:#58cc02; --green-edge:#58a700; --green-light:#d7ffb8; --green-text:#58a700;
+  --sky:#1cb0f6; --sky-light:#ddf4ff;
+  --red:#ff4b4b; --red-light:#ffdfe0; --red-text:#ea2b2b;
+  --orange:#ff9600; --orange-light:#fff1dc;
+  --gray:#e5e5e5; --silver:#afafaf; --graphite:#777777; --charcoal:#4b4b4b; --ink:#3c3c3c;
+  --feather:'Fredoka','Baloo 2','Segoe UI',sans-serif;
+  --din:'Nunito','Varela Round','Segoe UI',sans-serif;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:var(--din); letter-spacing:.053em; background:#fff; color:var(--ink);
+       min-height:100vh; display:flex; flex-direction:column; }
+header { display:flex; align-items:center; gap:18px; width:100%; margin:0 auto; flex-shrink:0;
+         max-width:calc(1200px + 2 * clamp(16px,3vw,40px)); padding:14px clamp(16px,3vw,40px); }
+header h1 { margin:0; font-family:var(--feather); font-weight:700; font-size:26px; letter-spacing:-.02em; color:var(--green); white-space:nowrap; }
+.bar { flex:1; height:16px; background:var(--gray); border-radius:999px; overflow:hidden; }
+#barFill { height:100%; width:0; background:var(--green); border-radius:999px; transition:width .35s; box-shadow:inset 0 -4px 0 rgba(0,0,0,.08); }
+.bag { display:flex; align-items:center; gap:6px; font-size:18px; font-weight:800; color:var(--orange); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.bag .pump { font-size:26px; }
+#clock { font-size:15px; font-weight:800; color:var(--graphite); font-variant-numeric:tabular-nums; min-width:3.6em; text-align:right; }
+main { flex:1; display:flex; padding:clamp(10px,2vh,24px) clamp(16px,3vw,40px); }
+.screen { display:none; flex-direction:column; align-items:center; gap:clamp(12px,2vh,18px); width:100%; max-width:1200px; margin:auto; }
+.screen.on { display:flex; }
+.col { display:flex; flex-direction:column; align-items:center; gap:clamp(12px,2vh,18px); width:100%; min-width:0; }
+
+.big { font-family:var(--feather); font-weight:700; font-size:clamp(36px,7vh,56px); letter-spacing:-.02em; color:var(--green); text-align:center; line-height:1.1; }
+.lead { font-size:18px; font-weight:700; color:var(--graphite); text-align:center; margin:0; max-width:560px; }
+.rule { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; max-width:620px; }
+.rule > div { background:#fff; border:2px solid var(--gray); border-bottom-width:4px; border-radius:16px; padding:12px 8px; text-align:center; }
+.rule .e { font-size:clamp(40px,7vh,58px); line-height:1.1; white-space:nowrap; }
+.rule .w { font-size:15px; font-weight:700; color:var(--graphite); margin-top:4px; }
+.rule .p { font-family:var(--feather); font-weight:700; font-size:clamp(24px,4vh,30px); letter-spacing:0; color:var(--sky); }
+.tag { font-size:13px; font-weight:800; letter-spacing:.1em; color:var(--sky); text-transform:uppercase; text-align:center; }
+
+.pic { background:#fff; border:2px solid var(--gray); border-bottom-width:4px; border-radius:20px; width:100%;
+       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+       padding:16px; min-height:clamp(240px,44vh,400px); }
+.pic .e { font-size:clamp(84px,19vh,160px); line-height:1.05; white-space:nowrap; letter-spacing:6px; }
+.pic .e.many { font-size:clamp(70px,15vh,130px); }
+.pic .label { font-family:var(--feather); font-weight:600; font-size:clamp(22px,3.8vh,30px); letter-spacing:0; color:var(--charcoal);
+              min-height:1.3em; text-align:center; visibility:hidden; }
+.pic .label.show { visibility:visible; }
+.pic .label b { color:var(--green-text); }
+.pic.shake { animation:shake .35s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+.ask { font-family:var(--feather); font-weight:700; font-size:clamp(28px,5vh,40px); letter-spacing:-.01em; color:var(--ink); text-align:center; margin:0; }
+.hint { font-size:clamp(17px,2.8vh,21px); font-weight:800; color:var(--orange); text-align:center; min-height:1.4em; text-wrap:balance; }
+.pron { display:grid; grid-template-columns:1fr; gap:clamp(10px,1.8vh,16px); width:100%; max-width:440px; }
+.btn { font-family:var(--din); letter-spacing:.053em; font-size:clamp(28px,5.4vh,42px); font-weight:800;
+       padding:clamp(10px,1.8vh,16px) 16px; border-radius:16px;
+       border:2px solid var(--gray); background:#fff; color:var(--charcoal); cursor:pointer;
+       box-shadow:0 4px 0 var(--gray); transition:transform .06s, box-shadow .06s; touch-action:manipulation; }
+.btn:hover:not(:disabled) { background:#f7f7f7; }
+.btn:active:not(:disabled) { transform:translateY(4px); box-shadow:0 0 0 var(--gray); }
+.btn.right { background:var(--green-light); border-color:var(--green); color:var(--green-text); box-shadow:0 4px 0 var(--green); }
+.btn.wrong { background:var(--red-light); border-color:var(--red); color:var(--red-text); box-shadow:0 4px 0 var(--red); }
+.btn:disabled { cursor:default; }
+.btn.go { background:var(--green); border-color:var(--green); color:#fff; text-transform:uppercase; font-size:clamp(17px,2.6vh,20px);
+          padding:clamp(11px,1.8vh,14px) clamp(26px,5vw,46px); box-shadow:0 4px 0 var(--green-edge); }
+.btn.go:hover { background:#61d800; }
+.btn.go:active { box-shadow:0 0 0 var(--green-edge); }
+.btn.ghost { color:var(--sky); font-size:clamp(16px,2.4vh,19px); padding:10px 20px; }
+.row { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+.help { font-size:16px; font-weight:700; color:var(--charcoal); background:var(--sky-light); border-radius:12px; padding:8px 14px; text-align:center; }
+.help span { white-space:nowrap; }
+.hidden { display:none !important; }
+
+.result { font-family:var(--feather); font-weight:700; font-size:clamp(30px,6vh,46px); color:var(--orange); text-align:center; }
+.missed { background:#fff; border:2px solid var(--gray); border-radius:16px; padding:12px 16px; width:100%; max-width:560px; }
+.missed h3 { margin:0 0 6px; font-family:var(--feather); font-weight:600; font-size:19px; letter-spacing:0; color:var(--red-text); }
+.missed div { font-size:18px; font-weight:700; padding:3px 0; color:var(--charcoal); }
+
+.check3 { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(12px,2vw,24px); width:100%; }
+.check3 .pic { min-height:clamp(200px,34vh,320px); }
+.check3 .num { font-size:15px; font-weight:800; color:var(--silver); }
+
+.teachbox { width:100%; max-width:620px; }
+.teachbox summary { font-size:12px; color:var(--silver); cursor:pointer; list-style:none; text-align:center; }
+.teachbox summary::-webkit-details-marker { display:none; }
+.teacher { background:#f7f7f7; border-left:3px solid var(--sky); border-radius:8px; padding:8px 12px;
+           font-size:12.5px; letter-spacing:.02em; color:var(--charcoal); text-align:left; line-height:1.45; }
+.teacher p { margin:4px 0; }
+
+@media (min-width:861px) {
+  #startScreen.on, #playScreen.on, #endScreen.on { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+                                                   gap:clamp(32px,4.5vw,72px); align-items:center; }
+}
+@media (max-width:480px) { header h1 { display:none; } .bar { min-width:60px; } }
+@media (max-width:700px) {
+  header { gap:10px; padding:10px 12px; }
+  header h1 { font-size:19px; }
+  .bag { font-size:16px; } .bag .pump { font-size:22px; }
+  .pic { min-height:200px; }
+  .pic .e { font-size:clamp(64px,22vw,110px); letter-spacing:2px; }
+  .pic .e.many { font-size:clamp(46px,15vw,84px); letter-spacing:0; }
+  .pron { grid-template-columns:repeat(3,1fr); max-width:none; }
+  .btn { font-size:24px; padding:12px 6px; }
+  .check3 .pic .e, .check3 .pic .e.many { font-size:clamp(34px,11vw,60px); }
+}
+</style></head><body>
+
+<header>
+  <h1>He, she or they? 🎃</h1>
+  <div class="bar"><div id="barFill"></div></div>
+  <div class="bag" title="Sweets in the bag"><span class="pump">🎃</span><span id="bagCount">0</span>🍬</div>
+  <div id="clock"></div>
+</header>
+
+<main>
+  <!-- START -->
+  <section class="screen on" id="startScreen">
+    <div class="col">
+      <div class="big">Trick or treat!</div>
+      <p class="lead">Look at the picture. Say <b>he</b>, <b>she</b> or <b>they</b>. Right first time = a sweet in your bag.</p>
+      <div class="tag">Like this</div>
+      <div class="rule">
+        <div><div class="e">👴</div><div class="w">one man</div><div class="p">he</div></div>
+        <div><div class="e">👵</div><div class="w">one woman</div><div class="p">she</div></div>
+        <div><div class="e">👴👵</div><div class="w">two or more</div><div class="p">they</div></div>
+      </div>
+    </div>
+    <div class="col">
+      <button class="btn go" id="startBtn" type="button">Start</button>
+      <div class="row">
+        <button class="btn ghost" id="fastBtn" type="button">⏱ Fast round</button>
+        <button class="btn ghost" id="swapBtn" type="button">🔄 My turn to answer</button>
+        <button class="btn ghost" id="checkBtnStart" type="button">✔ Check</button>
+      </div>
+      <details class="teachbox">
+        <summary>Teacher notes</summary>
+        <div class="teacher">
+          <p><b>Step 1 only</b> (Dasha, 23 Oct): the pronoun from the picture, no verb. 12 pictures a round: 4 he, 4 she, 4 they, new order every time. The noun (a witch, two ghosts) appears after the answer, as a bonus word.</p>
+          <p><b>Start</b>: she says the pronoun aloud, then you or she clicks it. A wrong first try gives a hint and no sweet; she tries again.</p>
+          <p><b>Fast round</b>: the same, timed; the best time is kept on this computer and counts only with 10 or more sweets. Run it after one normal round.</p>
+          <p><b>My turn to answer</b>: roles swapped. You say a pronoun (sometimes wrong on purpose), she says «right» or «wrong»; if it is wrong, she says the right one. Then click «Show».</p>
+          <p><b>Check</b> (the hinge): three pictures, no buttons, no help: one boy, a boy and a girl, one woman. She names all three; then «Show».</p>
+          <p>Mixed pairs (a witch and a vampire) are deliberately included: two people = they, not «she and he».</p>
+          <p>Move to step 2 (he plays / they play, two verbs) only when a round goes through with almost no hints.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="playScreen">
+    <div class="col">
+      <div class="pic" id="pic"><div class="e" id="picE"></div><div class="label" id="picLabel"></div></div>
+    </div>
+    <div class="col">
+      <p class="ask" id="ask">He, she or they?</p>
+      <div class="pron" id="pron">
+        <button class="btn" type="button" data-p="he">he</button>
+        <button class="btn" type="button" data-p="she">she</button>
+        <button class="btn" type="button" data-p="they">they</button>
+      </div>
+      <div class="row hidden" id="swapRow">
+        <button class="btn go" id="showBtn" type="button">Show</button>
+        <button class="btn go hidden" id="nextBtn" type="button">Next</button>
+      </div>
+      <div class="hint" id="hint"></div>
+      <button class="btn ghost" id="helpBtn" type="button">Help</button>
+      <div class="help hidden" id="helpBox"><span>he = הוא</span> · <span>she = היא</span> · <span>they = הם / הן</span></div>
+    </div>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="endScreen">
+    <div class="col">
+      <div class="big" id="endTitle">Well done!</div>
+      <div class="result" id="endResult"></div>
+      <p class="lead" id="endTime"></p>
+      <div class="missed hidden" id="missed"><h3>Try these again</h3><div id="missedList"></div></div>
+    </div>
+    <div class="col">
+      <button class="btn go" id="againBtn" type="button">Play again</button>
+      <div class="row">
+        <button class="btn ghost" id="fastBtn2" type="button">⏱ Fast round</button>
+        <button class="btn ghost" id="swapBtn2" type="button">🔄 My turn to answer</button>
+        <button class="btn ghost" id="checkBtnEnd" type="button">✔ Check</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECK (hinge) -->
+  <section class="screen" id="checkScreen">
+    <p class="ask">He, she or they? Say all three.</p>
+    <div class="check3">
+      <div class="pic"><div class="num">1</div><div class="e">👦</div><div class="label" data-a="he"></div></div>
+      <div class="pic"><div class="num">2</div><div class="e many">👦👧</div><div class="label" data-a="they"></div></div>
+      <div class="pic"><div class="num">3</div><div class="e">👩</div><div class="label" data-a="she"></div></div>
+    </div>
+    <div class="row">
+      <button class="btn go" id="checkShow" type="button">Show</button>
+      <button class="btn ghost" id="checkBack" type="button">Back</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  // Halloween costumes. he = one man / boy, she = one woman / girl, they = two or more (mixed pairs included).
+  var POOL = {
+    // Only figures whose man / woman reads at screen-share size (checked 23 Oct: wizard, genie and single zombies dropped).
+    he:   [["🧛‍♂️","a vampire"],["🤴","a prince"],["🦸‍♂️","a superhero"],["🤵‍♂️","a man in a suit"],
+           ["🧔‍♂️","a man with a beard"],["🕺","a dancer"]],
+    she:  [["🧙‍♀️","a witch"],["🧛‍♀️","a vampire"],["👸","a princess"],["🧚‍♀️","a fairy"],
+           ["🦸‍♀️","a superhero"],["🧜‍♀️","a mermaid"],["👰‍♀️","a bride"],["💃","a dancer"]],
+    they: [["👻👻","two ghosts"],["🦇🦇🦇","three bats"],["🎃🎃","two pumpkins"],["🕷️🕷️","two spiders"],
+           ["🧙‍♀️🧛‍♂️","a witch and a vampire"],["🧟‍♂️🧟‍♀️","two zombies"],["👸🤴","a princess and a prince"],
+           ["🧚‍♀️🧚‍♀️🧚‍♀️","three fairies"],["👻🦇","a ghost and a bat"]]
+  };
+  var PER = 4, KINDS = ["he","she","they"];
+  // The hint answers the mistake she actually made.
+  function hintFor(right, picked) {
+    if (right === "they") return "Count them! Two or more = they";
+    if (picked === "they") return "Just one. He or she?";
+    return right === "he" ? "He = a man or a boy" : "She = a woman or a girl";
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var screens = ["startScreen","playScreen","endScreen","checkScreen"];
+  function show(id) { screens.forEach(function (s) { $(s).classList.toggle("on", s === id); }); }
+
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function okOrder(seq) {
+    for (var i = 2; i < seq.length; i++) if (seq[i] === seq[i-1] && seq[i] === seq[i-2]) return false;   // no run of 3
+    // no visible cycle anywhere: ABAB (2-cycle over 4) or ABCABC (3-cycle over 6)
+    for (var s = 0; s + 4 <= seq.length; s++)
+      if (seq[s] === seq[s+2] && seq[s+1] === seq[s+3] && seq[s] !== seq[s+1]) return false;
+    for (var t = 0; t + 6 <= seq.length; t++) {
+      if (seq[t] === seq[t+3] && seq[t+1] === seq[t+4] && seq[t+2] === seq[t+5]) return false;
+      if (seq[t] === seq[t+1] && seq[t+2] === seq[t+3] && seq[t+4] === seq[t+5]) return false;            // no AABBCC pairs rhythm
+    }
+    return true;
+  }
+  function makeRound() {
+    var picks = {};
+    KINDS.forEach(function (k) { picks[k] = shuffle(POOL[k].slice()).slice(0, PER); });
+    var order;
+    for (var tries = 0; tries < 500; tries++) {
+      order = shuffle(KINDS.reduce(function (a, k) { for (var i = 0; i < PER; i++) a.push(k); return a; }, []));
+      if (okOrder(order)) break;
+    }
+    var idx = { he: 0, she: 0, they: 0 };
+    return order.map(function (k) { var it = picks[k][idx[k]++]; return { p: k, e: it[0], n: it[1] }; });
+  }
+
+  var round = [], i = 0, bag = 0, firstTry = true, missed = [], mode = "play", t0 = 0, timer = null, locked = false;
+
+  function setBar() { $("barFill").style.width = (round.length ? (i / round.length) * 100 : 0) + "%"; }
+  function setBag() { $("bagCount").textContent = bag; }
+  function fmt(ms) { var s = ms / 1000; return s.toFixed(1) + " s"; }
+  function tick() { $("clock").textContent = fmt(Date.now() - t0); }
+  function stopClock() { if (timer) { clearInterval(timer); timer = null; } }
+
+  function begin(m) {
+    mode = m; round = makeRound(); i = 0; bag = 0; missed = []; setBag(); setBar();
+    stopClock(); $("clock").textContent = "";
+    if (mode === "fast") { t0 = Date.now(); timer = setInterval(tick, 100); }
+    $("pron").classList.toggle("hidden", mode === "swap");
+    $("swapRow").classList.toggle("hidden", mode !== "swap");
+    $("ask").textContent = mode === "swap" ? "Is my answer right?" : "He, she or they?";
+    show("playScreen"); load();
+  }
+
+  function load() {
+    var it = round[i]; firstTry = true; locked = false;
+    $("picE").textContent = it.e;
+    $("picE").classList.toggle("many", it.p === "they");
+    var lab = $("picLabel"); lab.classList.remove("show"); lab.innerHTML = "";
+    $("hint").textContent = "";
+    Array.prototype.forEach.call($("pron").children, function (b) { b.className = "btn"; b.disabled = false; });
+    $("showBtn").classList.remove("hidden"); $("nextBtn").classList.add("hidden");
+  }
+
+  function reveal(it) {
+    var lab = $("picLabel");
+    lab.innerHTML = "<b>" + it.p + "</b> · " + it.n;
+    lab.classList.add("show");
+  }
+
+  function answer(btn) {
+    if (locked) return;
+    var it = round[i], p = btn.getAttribute("data-p");
+    if (p === it.p) {
+      locked = true; btn.className = "btn right";
+      Array.prototype.forEach.call($("pron").children, function (b) { b.disabled = true; });
+      if (firstTry) { bag++; setBag(); } else { missed.push(it); }
+      reveal(it); $("hint").textContent = "";
+      setTimeout(next, mode === "fast" ? 550 : 1100);
+    } else {
+      firstTry = false; btn.className = "btn wrong"; btn.disabled = true;
+      $("hint").textContent = hintFor(it.p, p);
+      var pic = $("pic"); pic.classList.remove("shake"); void pic.offsetWidth; pic.classList.add("shake");
+    }
+  }
+
+  function next() {
+    i++; setBar();
+    if (i >= round.length) return finish();
+    load();
+  }
+
+  function finish() {
+    stopClock();
+    var took = mode === "fast" ? Date.now() - t0 : 0;
+    if (mode === "swap") {
+      $("endTitle").textContent = "Good checking!";
+      $("endResult").textContent = "12 pictures checked";
+      $("endTime").textContent = "";
+      $("missed").classList.add("hidden");
+    } else {
+      $("endTitle").textContent = bag >= 11 ? "Brilliant!" : (bag >= 8 ? "Well done!" : "Good try!");
+      $("endResult").textContent = "🎃 " + bag + " / " + round.length + " 🍬";
+      var tline = "";
+      if (mode === "fast") {
+        var best = null;
+        try { best = parseFloat(localStorage.getItem("hst_best")); } catch (e) {}
+        var counts = bag >= 10;   // no record for clicking through
+        var isBest = counts && (!best || took < best);
+        if (isBest) { try { localStorage.setItem("hst_best", String(took)); } catch (e) {} }
+        tline = "Time: " + fmt(took) + (isBest ? "  ·  new best!" : (!counts ? "  ·  a record needs 10 sweets" : "  ·  best: " + fmt(best)));
+      }
+      $("endTime").textContent = tline;
+      var ml = $("missedList"); ml.innerHTML = "";
+      missed.forEach(function (it) { var d = document.createElement("div"); d.textContent = it.e + "  " + it.p + " · " + it.n; ml.appendChild(d); });
+      $("missed").classList.toggle("hidden", missed.length === 0);
+    }
+    show("endScreen");
+  }
+
+  Array.prototype.forEach.call($("pron").children, function (b) { b.addEventListener("click", function () { answer(b); }); });
+  $("showBtn").addEventListener("click", function () { reveal(round[i]); $("showBtn").classList.add("hidden"); $("nextBtn").classList.remove("hidden"); });
+  $("nextBtn").addEventListener("click", next);
+  $("helpBtn").addEventListener("click", function () { $("helpBox").classList.toggle("hidden"); });
+  $("startBtn").addEventListener("click", function () { begin("play"); });
+  $("againBtn").addEventListener("click", function () { begin(mode === "swap" ? "play" : mode); });
+  ["fastBtn","fastBtn2"].forEach(function (id) { $(id).addEventListener("click", function () { begin("fast"); }); });
+  ["swapBtn","swapBtn2"].forEach(function (id) { $(id).addEventListener("click", function () { begin("swap"); }); });
+  function openCheck() {
+    stopClock(); $("clock").textContent = "";
+    Array.prototype.forEach.call(document.querySelectorAll("#checkScreen .label"), function (l) { l.classList.remove("show"); l.innerHTML = ""; });
+    show("checkScreen");
+  }
+  ["checkBtnStart","checkBtnEnd"].forEach(function (id) { $(id).addEventListener("click", openCheck); });
+  $("checkShow").addEventListener("click", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("#checkScreen .label"), function (l) { l.innerHTML = "<b>" + l.getAttribute("data-a") + "</b>"; l.classList.add("show"); });
+  });
+  $("checkBack").addEventListener("click", function () { show("startScreen"); });
+  document.addEventListener("keydown", function (e) {
+    if (!$("playScreen").classList.contains("on") || mode === "swap") return;
+    var map = { "1": "he", "2": "she", "3": "they", "h": "he", "s": "she", "t": "they" };
+    var p = map[e.key]; if (!p) return;
+    var b = $("pron").querySelector('[data-p="' + p + '"]'); if (b && !b.disabled) answer(b);
+  });
+})();
+</script>
+</body></html>
