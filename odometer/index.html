@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#58cc02; --green-dark:#46a302; --green-light:#d7ffb8;
+  --blue:#1cb0f6; --blue-dark:#1899d6;
+  --red:#ff4b4b; --red-dark:#ea2b2b;
+  --cloud:#e5e5e5; --silver:#afafaf; --graphite:#777; --ink:#3c3c3c;
+  --wheel-h:132px; --wheel-w:96px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;background:#fff;color:var(--ink);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;letter-spacing:.02em}
+.wrap{width:100%;max-width:1200px;padding:28px 24px 40px;display:flex;flex-direction:column;align-items:center;gap:26px}
+h1{font-family:'Fredoka',Arial,sans-serif;font-size:44px;font-weight:700;color:var(--green);letter-spacing:-.01em}
+.sub{font-size:18px;color:var(--graphite);font-weight:700;margin-top:-16px}
+.counter{display:flex;align-items:flex-end;gap:10px;padding:22px 26px 14px;border:3px solid var(--cloud);border-radius:22px;background:#fafafa}
+.col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wheel{width:var(--wheel-w);height:var(--wheel-h);border-radius:16px;overflow:hidden;position:relative;
+  background:linear-gradient(#1f2937,#374151 18%,#4b5563 50%,#374151 82%,#1f2937);
+  box-shadow:inset 0 6px 10px rgba(0,0,0,.45),inset 0 -6px 10px rgba(0,0,0,.45),0 4px 0 #111827;
+  transition:outline-color .2s}
+.wheel.moved{outline:5px solid var(--green);outline-offset:3px}
+.strip{position:absolute;left:0;top:0;width:100%}
+.strip span{display:flex;align-items:center;justify-content:center;height:var(--wheel-h);
+  font-family:'Fredoka',Arial,sans-serif;font-size:92px;font-weight:600;color:#fff}
+.wheel.lead .strip span{color:#6b7280}
+.place{font-size:15px;font-weight:800;color:var(--silver);text-transform:uppercase;letter-spacing:.06em}
+.comma{font-family:'Fredoka',Arial,sans-serif;font-size:80px;font-weight:700;color:var(--ink);align-self:center;margin:0 2px 34px}
+.controls{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:'Fredoka',Arial,sans-serif;font-size:44px;font-weight:700;color:#fff;border:0;border-radius:18px;
+  padding:14px 46px;cursor:pointer;min-width:190px;transition:transform .05s,box-shadow .05s}
+.btn:active{transform:translateY(5px)}
+.minus{background:var(--blue);box-shadow:0 6px 0 var(--blue-dark)} .minus:active{box-shadow:0 1px 0 var(--blue-dark)}
+.plus{background:var(--green);box-shadow:0 6px 0 var(--green-dark)} .plus:active{box-shadow:0 1px 0 var(--green-dark)}
+.btn:disabled{background:var(--cloud);box-shadow:0 6px 0 #cfcfcf;cursor:default}
+.setbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:19px;font-weight:700}
+.setbar input{font-family:'Nunito',Arial,sans-serif;font-size:24px;font-weight:800;width:200px;padding:10px 14px;
+  border:3px solid var(--cloud);border-radius:12px;color:var(--ink);text-align:center}
+.setbar input:focus{outline:none;border-color:var(--blue)}
+.small{font-family:'Nunito',Arial,sans-serif;font-size:18px;font-weight:800;border-radius:12px;padding:11px 20px;cursor:pointer;
+  background:#fff;color:var(--blue);border:3px solid var(--cloud);box-shadow:0 4px 0 var(--cloud)}
+.small:active{transform:translateY(3px);box-shadow:0 1px 0 var(--cloud)}
+.small.on{background:var(--green-light);color:var(--green-dark);border-color:var(--green)}
+.hint{font-size:16px;color:var(--silver);font-weight:700;text-align:center}
+@media (max-width:820px){
+  :root{--wheel-h:84px;--wheel-w:56px}
+  .strip span{font-size:58px}
+  .comma{font-size:52px;margin-bottom:28px}
+  .counter{gap:5px;padding:16px 12px 10px}
+  .place{font-size:11px}
+  h1{font-size:34px}
+  .btn{font-size:34px;min-width:140px;padding:12px 28px}
+}
+@media (max-width:430px){
+  :root{--wheel-h:60px;--wheel-w:38px}
+  .strip span{font-size:42px}
+  .comma{font-size:34px;margin:0 0 26px}
+  .counter{gap:3px;padding:12px 8px 8px}
+  .wrap{padding:20px 10px 32px}
+  .btn{min-width:120px}
+  .place{font-size:9px;letter-spacing:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The number counter</h1>
+  <p class="sub">Say the answer first. Then press the button.</p>
+
+  <div class="counter" id="counter" aria-live="polite"></div>
+
+  <div class="controls">
+    <button class="btn minus" id="minus" aria-label="Take away 1">&minus; 1</button>
+    <button class="btn plus" id="plus" aria-label="Add 1">+ 1</button>
+  </div>
+
+  <div class="setbar">
+    <label for="start">Start at</label>
+    <input id="start" inputmode="numeric" autocomplete="off" placeholder="69,500" aria-label="Start number">
+    <button class="small" id="set">Set</button>
+    <button class="small on" id="slow" aria-pressed="true">Slow wheels</button>
+  </div>
+  <p class="hint">Keyboard: &uarr; or + adds 1, &darr; or &minus; takes 1 away. Numbers from 0 to 999,999.</p>
+</div>
+
+<script>
+(function(){
+  var PLACES=["HTh","TTh","Th","H","T","O"];
+  var MAX=999999;
+  var value=69500;
+  var slow=true;
+  var busy=false;
+  var counter=document.getElementById("counter");
+  var wheels=[];
+
+  // build six wheels: each strip holds 0-9 plus a second 0 for the 9 -> 0 roll
+  PLACES.forEach(function(p,i){
+    if(i===3){var c=document.createElement("div");c.className="comma";c.textContent=",";counter.appendChild(c);}
+    var col=document.createElement("div");col.className="col";
+    var w=document.createElement("div");w.className="wheel";
+    var s=document.createElement("div");s.className="strip";
+    for(var d=0;d<=10;d++){var sp=document.createElement("span");sp.textContent=String(d%10);s.appendChild(sp);}
+    w.appendChild(s);col.appendChild(w);
+    var lab=document.createElement("div");lab.className="place";lab.textContent=p;col.appendChild(lab);
+    counter.appendChild(col);
+    wheels.push({wheel:w,strip:s,digit:0});
+  });
+
+  function h(){return wheels[0].wheel.clientHeight;}
+  function place(wh,idx,animate,ms){
+    wh.strip.style.transition=animate?("transform "+ms+"ms cubic-bezier(.3,.7,.3,1)"):"none";
+    wh.strip.style.transform="translateY("+(-idx*h())+"px)";
+  }
+  function digits(n){var s=String(n).padStart(6,"0");return s.split("").map(Number);}
+  function markLead(){
+    var ds=digits(value),lead=true;
+    wheels.forEach(function(wh,i){ if(ds[i]!==0||i===5) lead=false; wh.wheel.classList.toggle("lead",lead); });
+  }
+  function render(){
+    var ds=digits(value);
+    wheels.forEach(function(wh,i){wh.digit=ds[i];place(wh,ds[i],false,0);});
+    markLead();
+  }
+
+  function step(delta){
+    if(busy) return;
+    var next=value+delta;
+    if(next<0||next>MAX) return;
+    var from=digits(value),to=digits(next);
+    value=next;
+    busy=true;
+    var ms=slow?520:220, gap=slow?380:90, order=0, last=0;
+    wheels.forEach(function(wh){wh.wheel.classList.remove("moved");});
+    // the ones wheel moves first, then each wheel to its left that changes, one after another
+    for(var i=5;i>=0;i--){
+      if(from[i]===to[i]) continue;
+      (function(wh,a,b,delay){
+        setTimeout(function(){
+          wh.wheel.classList.add("moved");
+          if(delta>0&&a===9&&b===0){ place(wh,10,true,ms); setTimeout(function(){place(wh,0,false,0);},ms+20); }
+          else if(delta<0&&a===0&&b===9){ place(wh,10,false,0); void wh.strip.offsetHeight; place(wh,9,true,ms); }
+          else place(wh,b,true,ms);
+          wh.digit=b;
+        },delay);
+      })(wheels[i],from[i],to[i],order*gap);
+      last=order*gap; order++;
+    }
+    setTimeout(function(){busy=false;markLead();},last+ms+40);
+  }
+
+  document.getElementById("plus").onclick=function(){step(1);};
+  document.getElementById("minus").onclick=function(){step(-1);};
+  document.getElementById("slow").onclick=function(){
+    slow=!slow; this.classList.toggle("on",slow); this.setAttribute("aria-pressed",String(slow));
+  };
+  function setFromInput(){
+    var raw=document.getElementById("start").value.replace(/[^0-9]/g,"");
+    if(raw==="") return;
+    var n=Math.min(MAX,parseInt(raw,10));
+    value=n; wheels.forEach(function(wh){wh.wheel.classList.remove("moved");}); render();
+  }
+  document.getElementById("set").onclick=setFromInput;
+  document.getElementById("start").addEventListener("keydown",function(e){ if(e.key==="Enter") setFromInput(); e.stopPropagation(); });
+  document.addEventListener("keydown",function(e){
+    if(e.key==="ArrowUp"||e.key==="+"||e.key==="="){e.preventDefault();step(1);}
+    if(e.key==="ArrowDown"||e.key==="-"||e.key==="_"){e.preventDefault();step(-1);}
+  });
+  window.addEventListener("resize",render);
+  try{ var q=new URLSearchParams(location.search).get("n"); if(q&&/^\d{1,6}$/.test(q)) value=parseInt(q,10); }catch(e){}
+  render();
+})();
+</script>
+</body>
+</html>
