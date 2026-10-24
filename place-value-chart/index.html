@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Place Value Chart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2f2a3b; --muted:#7a7488; --line:#e7e3ef; --panel:#faf8fd;
+  --main:#3d5afe; --main-dark:#2a3fc2; --main-pale:#e8ecff;
+  --warn:#e8590c; --warn-dark:#b9470a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;letter-spacing:.015em}
+.wrap{max-width:1240px;margin:0 auto;padding:18px 22px 30px;display:flex;flex-direction:column;gap:16px}
+
+/* expression */
+.expr-row{display:flex;gap:14px;align-items:stretch}
+.expr{flex:1;min-width:0;font-family:'Fredoka',Arial,sans-serif;font-size:54px;font-weight:600;color:var(--ink);
+  border:3px solid var(--line);border-radius:18px;padding:8px 22px;background:var(--panel);outline:none}
+.expr:focus{border-color:var(--main)}
+.expr::placeholder{color:#c4bfd0;font-size:34px;font-weight:600}
+.number{min-width:230px;border:3px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 16px;background:#fff}
+.number .lbl{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.number .val{font-family:'Fredoka',Arial,sans-serif;font-size:44px;font-weight:700;color:var(--main);line-height:1.1}
+.number.hidden .val{filter:blur(14px);user-select:none}
+
+/* toolbar */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.glabel{font-size:14px;font-weight:800;color:var(--muted)}
+.btn{font-family:'Nunito',Arial,sans-serif;font-weight:800;font-size:16px;border-radius:14px;padding:9px 16px;cursor:pointer;
+  background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line);transition:transform .05s,box-shadow .05s;user-select:none}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.on{background:var(--main-pale);border-color:var(--main);color:var(--main-dark);box-shadow:0 4px 0 var(--main)}
+.btn.primary{background:var(--main);border-color:var(--main);color:#fff;box-shadow:0 4px 0 var(--main-dark)}
+.btn.primary:active{box-shadow:0 1px 0 var(--main-dark)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn.sm{font-size:14px;padding:6px 11px;border-radius:11px}
+
+/* chart */
+.chart{display:flex;border:3px solid var(--line);border-radius:22px;overflow:hidden;min-height:430px;background:#fff}
+.col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;border-right:3px solid var(--line);position:relative}
+.col:last-child{border-right:0}
+.col.point{border-right:6px dotted var(--ink)}
+.head{padding:8px 6px;text-align:center;color:#fff;background:var(--c);min-height:76px;display:flex;flex-direction:column;justify-content:center}
+.head .nm{font-family:'Fredoka',Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.1}
+.head .pv{font-size:13px;font-weight:800;opacity:.9}
+.head .cnt{display:none;font-family:'Fredoka',Arial,sans-serif;font-size:30px;font-weight:700;margin-top:2px}
+.showcounts .head .cnt{display:block}
+.body{flex:1;display:grid;grid-template-rows:repeat(5,var(--s,50px));grid-auto-flow:column;grid-auto-columns:var(--s,50px);align-content:start;justify-content:center;gap:var(--g,6px);padding:12px 8px;background:var(--bg);min-height:0}
+.ctr{width:var(--s,50px);height:var(--s,50px);border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka',Arial,sans-serif;font-weight:700;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);cursor:pointer;flex:0 0 auto;
+  font-size:calc(var(--s,50px) * var(--fs,.42));transition:transform .12s}
+.ctr:hover{transform:scale(1.07)}
+.ctr.leaving{transform:scale(.2);opacity:0;transition:transform .35s,opacity .35s}
+.ctr.arriving{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+.foot{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 6px 10px;border-top:2px solid var(--line);background:#fff}
+.foot .btn{min-width:46px}
+.swaps{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:0 6px 10px;background:#fff;min-height:44px}
+.swap{font-size:13px;padding:6px 10px;border-radius:11px;background:#fff7ed;border:2px solid #fed7aa;color:var(--warn-dark);box-shadow:0 3px 0 #fed7aa}
+.swap.ready{background:var(--warn);border-color:var(--warn);color:#fff;box-shadow:0 3px 0 var(--warn-dark);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.fly{position:fixed;border-radius:50%;z-index:50;pointer-events:none;transition:left .55s cubic-bezier(.4,.1,.2,1),top .55s cubic-bezier(.4,.1,.2,1),transform .55s;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Fredoka',Arial,sans-serif;font-weight:700}
+.hint{font-size:14px;color:var(--muted);font-weight:700;text-align:center}
+.nohead .head .nm,.nohead .head .pv{visibility:hidden}
+
+@media (max-width:860px){
+  .expr{font-size:36px}
+  .number{min-width:150px}.number .val{font-size:32px}
+  .head .nm{font-size:15px}
+  .foot .btn{min-width:38px;padding:5px 8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="expr-row">
+    <input class="expr" id="expr" placeholder="Type the calculation here, e.g. 400 − 1" autocomplete="off" spellcheck="false" aria-label="The calculation we are working on">
+    <div class="number hidden" id="numberBox" aria-live="polite"><div class="lbl">Counters show</div><div class="val" id="numberVal">0</div></div>
+  </div>
+
+  <div class="bar">
+    <div class="group">
+      <span class="glabel">Biggest column</span>
+      <button class="btn sm" id="hiLess" aria-label="Fewer big columns">◀</button>
+      <button class="btn sm" id="hiMore" aria-label="More big columns">▶</button>
+      <span class="glabel" style="margin-left:10px">Smallest column</span>
+      <button class="btn sm" id="loLess" aria-label="Smallest column bigger">◀</button>
+      <button class="btn sm" id="loMore" aria-label="Smallest column smaller">▶</button>
+    </div>
+    <div class="group">
+      <button class="btn" id="showNum">Show the number</button>
+      <button class="btn" id="showCnt">Show counts</button>
+      <button class="btn" id="undo">↶ Undo</button>
+      <button class="btn" id="clear">Clear counters</button>
+    </div>
+  </div>
+
+  <div class="chart" id="chart"></div>
+  <p class="hint">+1, +10, −1 add or take away counters. Tap a counter to open it into 10 of the next column. «10 → 1» swaps ten counters for one in the next column up.</p>
+</div>
+
+<script>
+(function(){
+  var PLACES={
+    6:{nm:"Millions",pv:"1,000,000",lab:"1M",c:"#5b6478",bg:"#f4f5f8"},
+    5:{nm:"Hundred thousands",pv:"100,000",lab:"100k",c:"#d4558f",bg:"#fdf1f6"},
+    4:{nm:"Ten thousands",pv:"10,000",lab:"10k",c:"#8a5cd6",bg:"#f5f0fd"},
+    3:{nm:"Thousands",pv:"1,000",lab:"1,000",c:"#3f6fe0",bg:"#eef3fe"},
+    2:{nm:"Hundreds",pv:"100",lab:"100",c:"#14a090",bg:"#ebf8f6"},
+    1:{nm:"Tens",pv:"10",lab:"10",c:"#e8930c",bg:"#fef6e7"},
+    0:{nm:"Ones",pv:"1",lab:"1",c:"#ef5f4c",bg:"#fef0ee"},
+    "-1":{nm:"Tenths",pv:"0.1",lab:"0.1",c:"#8a9a1f",bg:"#f6f8e9"},
+    "-2":{nm:"Hundredths",pv:"0.01",lab:"0.01",c:"#7a6650",bg:"#f7f3ef"}
+  };
+  var MAXP=6, MINP=-2;
+  var hi=2, lo=0;
+  var counts={}; for(var p=MINP;p<=MAXP;p++) counts[p]=0;
+  var history=[];
+  var chart=document.getElementById("chart");
+  var busy=false;
+
+  function snap(){history.push(JSON.stringify({c:counts,hi:hi,lo:lo})); if(history.length>200) history.shift();}
+  function fmtNum(){
+    // exact value from counts, as a decimal string
+    var ints=0n, hund=0n;
+    for(var p=MINP;p<=MAXP;p++){ var n=BigInt(counts[p]); var scale=10n**BigInt(p+2); hund+=n*scale; }
+    var neg=hund<0n; if(neg) hund=-hund;
+    var whole=hund/100n, frac=hund%100n;
+    var s=whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    if(lo<0){ var f=frac.toString().padStart(2,"0"); if(lo===-1) f=f.slice(0,1); s+="."+f; }
+    return s;
+  }
+  function fsFor(lab){ return lab.length<=1?.46:lab.length<=2?.42:lab.length<=3?.36:lab.length<=4?.28:.24; }
+
+  function render(newIn){
+    chart.innerHTML="";
+    for(var p=hi;p>=lo;p--){
+      var P=PLACES[p];
+      var col=document.createElement("div"); col.className="col"+(p===0&&lo<0?" point":""); col.dataset.p=p;
+      col.style.setProperty("--c",P.c); col.style.setProperty("--bg",P.bg);
+      var head=document.createElement("div"); head.className="head";
+      head.innerHTML='<div class="nm">'+P.nm+'</div><div class="pv">'+P.pv+'</div><div class="cnt">'+counts[p]+'</div>';
+      col.appendChild(head);
+      var body=document.createElement("div"); body.className="body";
+            body.style.setProperty("--fs",fsFor(P.lab));
+      for(var i=0;i<counts[p];i++){
+        var c=document.createElement("div"); c.className="ctr"; c.textContent=P.lab; c.dataset.p=p;
+        c.title=p>lo?"Tap to open into 10 "+PLACES[p-1].nm.toLowerCase():"";
+        if(newIn&&newIn[p]&&i>=counts[p]-newIn[p]) c.classList.add("arriving");
+        (function(pp,el){ el.addEventListener("click",function(){ openOne(pp,el); }); })(p,c);
+        body.appendChild(c);
+      }
+      col.appendChild(body);
+      var swaps=document.createElement("div"); swaps.className="swaps";
+      if(p<hi){
+        var sw=document.createElement("button"); sw.className="btn swap"+(counts[p]>=10?" ready":""); sw.textContent="10 → 1 ⬅";
+        sw.title="Swap 10 "+P.nm.toLowerCase()+" for 1 "+PLACES[p+1].nm.toLowerCase(); sw.disabled=counts[p]<10;
+        (function(pp){ sw.onclick=function(){ packTen(pp); }; })(p);
+        swaps.appendChild(sw);
+      }
+      if(p>lo){
+        var op=document.createElement("button"); op.className="btn swap"+(counts[p]>0?" ready":""); op.textContent="➡ 1 → 10";
+        op.title="Open 1 "+P.nm.toLowerCase()+" into 10 "+PLACES[p-1].nm.toLowerCase(); op.disabled=counts[p]<1;
+        (function(pp){ op.onclick=function(){ var el=chart.querySelector('.col[data-p="'+pp+'"] .ctr:last-child'); openOne(pp,el); }; })(p);
+        swaps.appendChild(op);
+      }
+      col.appendChild(swaps);
+      var foot=document.createElement("div"); foot.className="foot";
+      [["+1",1],["+10",10],["−1",-1]].forEach(function(b){
+        var bt=document.createElement("button"); bt.className="btn sm"+(b[1]>0?" primary":""); bt.textContent=b[0];
+        bt.setAttribute("aria-label",(b[1]>0?"Add ":"Take away ")+Math.abs(b[1])+" "+P.nm.toLowerCase()+" counter"+(Math.abs(b[1])>1?"s":""));
+        if(b[1]<0) bt.disabled=counts[p]<1;
+        (function(pp,d){ bt.onclick=function(){ add(pp,d); }; })(p,b[1]);
+        foot.appendChild(bt);
+      });
+      col.appendChild(foot);
+      chart.appendChild(col);
+    }
+    // counters stand in columns of five (like a ten frame on its side); size them to fit the column
+    [].forEach.call(chart.querySelectorAll(".body"),function(b){
+      var n=b.children.length; if(!n) return;
+      var cols=Math.ceil(n/5), g=n>40?3:5;
+      var byW=(b.clientWidth-16-(cols-1)*g)/cols, byH=(b.clientHeight-24-4*g)/5;
+      var s=Math.max(14,Math.floor(Math.min(58,byW,byH)));
+      b.style.setProperty("--s",s+"px"); b.style.setProperty("--g",g+"px");
+    });
+    document.getElementById("numberVal").textContent=fmtNum();
+    document.getElementById("undo").disabled=history.length===0;
+    document.getElementById("hiLess").disabled=hi<=Math.max(lo,0);
+    document.getElementById("hiMore").disabled=hi>=MAXP;
+    document.getElementById("loLess").disabled=lo>=Math.min(hi,0);
+    document.getElementById("loMore").disabled=lo<=MINP;
+  }
+
+  function add(p,d){
+    if(busy) return;
+    if(d<0&&counts[p]<1) return;
+    snap(); counts[p]+=d; var n={}; if(d>0) n[p]=d; render(n);
+  }
+
+  function colBody(p){ return chart.querySelector('.col[data-p="'+p+'"] .body'); }
+  function flyClones(fromEls, toBody, p, onDone){
+    // small flying copies from the source counters to the target column
+    var tb=toBody.getBoundingClientRect(), P=PLACES[p];
+    fromEls.forEach(function(el,k){
+      var r=el.getBoundingClientRect(); var f=document.createElement("div"); f.className="fly";
+      f.style.width=r.width+"px"; f.style.height=r.height+"px"; f.style.left=r.left+"px"; f.style.top=r.top+"px";
+      f.style.background=getComputedStyle(el).backgroundColor; f.textContent=el.textContent; f.style.fontSize=getComputedStyle(el).fontSize;
+      document.body.appendChild(f);
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        f.style.left=(tb.left+tb.width/2-r.width/2+(k-4.5)*3)+"px"; f.style.top=(tb.top+20+(k%3)*4)+"px"; f.style.transform="scale(.6)";
+      });});
+      setTimeout(function(){ f.remove(); },650);
+    });
+    setTimeout(onDone,600);
+  }
+
+  function packTen(p){
+    if(busy||counts[p]<10||p>=hi) return;
+    busy=true; snap();
+    var els=[].slice.call(chart.querySelectorAll('.col[data-p="'+p+'"] .ctr')).slice(-10);
+    els.forEach(function(e){ e.style.visibility="hidden"; });
+    flyClones(els, colBody(p+1), p, function(){
+      counts[p]-=10; counts[p+1]+=1; var n={}; n[p+1]=1; busy=false; render(n);
+    });
+  }
+
+  function openOne(p,el){
+    if(busy||p<=lo||counts[p]<1||!el) return;
+    busy=true; snap();
+    el.classList.add("leaving");
+    var target=colBody(p-1);
+    // ten small copies burst from the opened counter into the next column
+    var r=el.getBoundingClientRect(), tb=target.getBoundingClientRect(), Q=PLACES[p-1];
+    for(var k=0;k<10;k++){
+      (function(k){
+        var f=document.createElement("div"); f.className="fly"; var s=Math.min(r.width,40);
+        f.style.width=s+"px"; f.style.height=s+"px"; f.style.left=(r.left+r.width/2-s/2)+"px"; f.style.top=(r.top+r.height/2-s/2)+"px";
+        f.style.background=Q.c; f.textContent=Q.lab; f.style.fontSize=(s*fsFor(Q.lab))+"px"; f.style.transform="scale(.3)";
+        document.body.appendChild(f);
+        requestAnimationFrame(function(){ requestAnimationFrame(function(){
+          f.style.left=(tb.left+18+(k%5)*(s+6))+"px"; f.style.top=(tb.top+14+Math.floor(k/5)*(s+6))+"px"; f.style.transform="scale(1)";
+        });});
+        setTimeout(function(){ f.remove(); },650);
+      })(k);
+    }
+    setTimeout(function(){ counts[p]-=1; counts[p-1]+=10; var n={}; n[p-1]=10; busy=false; render(n); },600);
+  }
+
+  document.getElementById("undo").onclick=function(){
+    if(busy||!history.length) return; var s=JSON.parse(history.pop()); counts=s.c; hi=s.hi; lo=s.lo; render();
+  };
+  document.getElementById("clear").onclick=function(){
+    if(busy) return; snap(); for(var p=MINP;p<=MAXP;p++) counts[p]=0; render();
+  };
+  document.getElementById("showNum").onclick=function(){
+    var box=document.getElementById("numberBox"); box.classList.toggle("hidden"); this.classList.toggle("on",!box.classList.contains("hidden"));
+  };
+  document.getElementById("showCnt").onclick=function(){
+    chart.classList.toggle("showcounts"); this.classList.toggle("on",chart.classList.contains("showcounts"));
+  };
+  function setRange(nh,nl){
+    if(nh<nl) return; if(nh>MAXP||nl<MINP) return; if(nh<0||nl>0) return;
+    snap();
+    // counters in columns that disappear are cleared, so the number on the chart stays honest
+    for(var p=MINP;p<=MAXP;p++){ if(p>nh||p<nl) counts[p]=0; }
+    hi=nh; lo=nl; render();
+  }
+  document.getElementById("hiMore").onclick=function(){ setRange(hi+1,lo); };
+  document.getElementById("hiLess").onclick=function(){ setRange(hi-1,lo); };
+  document.getElementById("loMore").onclick=function(){ setRange(hi,lo-1); };
+  document.getElementById("loLess").onclick=function(){ setRange(hi,lo+1); };
+
+  var expr=document.getElementById("expr");
+  expr.addEventListener("input",function(){
+    var v=expr.value, pos=expr.selectionStart;
+    var nv=v.replace(/-/g,"−").replace(/\*/g,"×").replace(/\//g,"÷");
+    if(nv!==v){ expr.value=nv; expr.setSelectionRange(pos,pos); }
+  });
+
+  // optional start from the link, e.g. ?hi=3&lo=0&e=400-1
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get("hi")!==null) hi=Math.max(0,Math.min(MAXP,parseInt(q.get("hi"),10)));
+    if(q.get("lo")!==null) lo=Math.max(MINP,Math.min(0,parseInt(q.get("lo"),10)));
+    if(q.get("e")) expr.value=q.get("e").replace(/-/g,"−");
+  }catch(e){}
+  window.addEventListener("resize",function(){ if(!busy) render(); });
+  render();
+})();
+</script>
+</body>
+</html>
