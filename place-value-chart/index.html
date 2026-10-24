@@ -65,7 +65,16 @@ body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;lett
 .swap.ready{background:var(--warn);border-color:var(--warn);color:#fff;box-shadow:0 3px 0 var(--warn-dark);animation:nudge 1.6s ease-in-out infinite}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 .fly{position:fixed;border-radius:50%;z-index:50;pointer-events:none;transition:left .55s cubic-bezier(.4,.1,.2,1),top .55s cubic-bezier(.4,.1,.2,1),transform .55s;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Fredoka',Arial,sans-serif;font-weight:700}
+#penNote{display:none}.board-pen #penNote{display:inline}
 .hint{font-size:14px;color:var(--muted);font-weight:700;text-align:center}
+/* pen */
+.board{position:relative}
+#ink{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:20}
+.board.pen #ink{pointer-events:auto;cursor:crosshair;touch-action:none}
+.swatch{width:34px;height:34px;border-radius:50%;border:3px solid #fff;background:var(--sw);cursor:pointer;box-shadow:0 0 0 2px var(--line);transition:transform .08s}
+.swatch:active{transform:scale(.92)}
+.swatch.on{box-shadow:0 0 0 3px var(--ink)}
+.penbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .nohead .head .nm,.nohead .head .pv{visibility:hidden}
 
 @media (max-width:860px){
@@ -100,7 +109,16 @@ body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;lett
     </div>
   </div>
 
-  <div class="chart" id="chart"></div>
+  <div class="penbar" aria-label="Pen">
+    <button class="btn" id="penBtn" aria-pressed="false">✏️ Pen</button>
+    <button class="swatch on" data-c="#2f2a3b" style="--sw:#2f2a3b" aria-label="Black pen"></button>
+    <button class="swatch" data-c="#e03131" style="--sw:#e03131" aria-label="Red pen"></button>
+    <button class="swatch" data-c="#1c7ed6" style="--sw:#1c7ed6" aria-label="Blue pen"></button>
+    <button class="btn" id="clearInk">Clear ink</button>
+    <span class="glabel" id="penNote">Pen on: write on the chart. Turn the pen off to move counters.</span>
+  </div>
+
+  <div class="board" id="board"><div class="chart" id="chart"></div><canvas id="ink" aria-label="Writing layer"></canvas></div>
   <p class="hint">+1, +10, −1 add or take away counters. Tap a counter to open it into 10 of the next column. «10 → 1» swaps ten counters for one in the next column up.</p>
 </div>
 
@@ -190,7 +208,7 @@ body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;lett
       b.style.setProperty("--s",s+"px"); b.style.setProperty("--g",g+"px");
     });
     document.getElementById("numberVal").textContent=fmtNum();
-    document.getElementById("undo").disabled=history.length===0;
+    updateUndo();
     document.getElementById("hiLess").disabled=hi<=Math.max(lo,0);
     document.getElementById("hiMore").disabled=hi>=MAXP;
     document.getElementById("loLess").disabled=lo>=Math.min(hi,0);
@@ -253,8 +271,56 @@ body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;lett
   }
 
   document.getElementById("undo").onclick=function(){
+    // with the pen on, Undo takes back the last line; otherwise the last counter move
+    if(penOn&&strokes.length){ strokes.pop(); redraw(); updateUndo(); return; }
     if(busy||!history.length) return; var s=JSON.parse(history.pop()); counts=s.c; hi=s.hi; lo=s.lo; render();
   };
+
+  // ---------- pen ----------
+  var board=document.getElementById("board"), ink=document.getElementById("ink"), ctx=ink.getContext("2d");
+  var penOn=false, penColour="#2f2a3b", strokes=[], cur=null;
+  function updateUndo(){ document.getElementById("undo").disabled=!(history.length||(penOn&&strokes.length)); }
+  function sizeInk(){
+    var dpr=window.devicePixelRatio||1, w=board.clientWidth, h=board.clientHeight;
+    if(ink.width!==Math.round(w*dpr)||ink.height!==Math.round(h*dpr)){ ink.width=Math.round(w*dpr); ink.height=Math.round(h*dpr); }
+    ctx.setTransform(dpr,0,0,dpr,0,0); redraw();
+  }
+  function drawStroke(s){
+    var w=board.clientWidth, h=board.clientHeight, pts=s.pts; if(!pts.length) return;
+    ctx.strokeStyle=s.c; ctx.fillStyle=s.c; ctx.lineWidth=s.w; ctx.lineCap="round"; ctx.lineJoin="round";
+    if(pts.length===1){ ctx.beginPath(); ctx.arc(pts[0][0]*w,pts[0][1]*h,s.w/2,0,Math.PI*2); ctx.fill(); return; }
+    ctx.beginPath(); ctx.moveTo(pts[0][0]*w,pts[0][1]*h);
+    for(var i=1;i<pts.length-1;i++){
+      var mx=(pts[i][0]+pts[i+1][0])/2*w, my=(pts[i][1]+pts[i+1][1])/2*h;
+      ctx.quadraticCurveTo(pts[i][0]*w,pts[i][1]*h,mx,my);
+    }
+    var L=pts[pts.length-1]; ctx.lineTo(L[0]*w,L[1]*h); ctx.stroke();
+  }
+  function redraw(){ ctx.clearRect(0,0,board.clientWidth,board.clientHeight); strokes.forEach(drawStroke); if(cur) drawStroke(cur); }
+  function pos(e){ var r=ink.getBoundingClientRect(); return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]; }
+  ink.addEventListener("pointerdown",function(e){
+    if(!penOn) return; e.preventDefault(); try{ ink.setPointerCapture(e.pointerId); }catch(err){}
+    cur={c:penColour,w:5,pts:[pos(e)]}; redraw();
+  });
+  ink.addEventListener("pointermove",function(e){
+    if(!cur) return; e.preventDefault(); cur.pts.push(pos(e)); redraw();
+  });
+  function endStroke(){ if(!cur) return; strokes.push(cur); cur=null; redraw(); updateUndo(); }
+  ink.addEventListener("pointerup",endStroke); ink.addEventListener("pointercancel",endStroke);
+  function setPen(on){
+    penOn=on; board.classList.toggle("pen",on); document.body.classList.toggle("board-pen",on);
+    var b=document.getElementById("penBtn"); b.classList.toggle("on",on); b.setAttribute("aria-pressed",String(on));
+    b.textContent=on?"✏️ Pen on":"✏️ Pen"; updateUndo();
+  }
+  document.getElementById("penBtn").onclick=function(){ setPen(!penOn); };
+  [].forEach.call(document.querySelectorAll(".swatch"),function(s){
+    s.onclick=function(){
+      penColour=s.dataset.c; [].forEach.call(document.querySelectorAll(".swatch"),function(o){o.classList.toggle("on",o===s);});
+      setPen(true);
+    };
+  });
+  document.getElementById("clearInk").onclick=function(){ strokes=[]; cur=null; redraw(); updateUndo(); };
+  if(window.ResizeObserver) new ResizeObserver(sizeInk).observe(board); else window.addEventListener("resize",sizeInk);
   document.getElementById("clear").onclick=function(){
     if(busy) return; snap(); for(var p=MINP;p<=MAXP;p++) counts[p]=0; render();
   };
@@ -292,6 +358,7 @@ body{font-family:'Nunito',Arial,sans-serif;color:var(--ink);background:#fff;lett
   }catch(e){}
   window.addEventListener("resize",function(){ if(!busy) render(); });
   render();
+  sizeInk();
 })();
 </script>
 </body>
