@@ -35,11 +35,12 @@ def render_console(categories,games):
         for j,l in enumerate(g['links']):
             label=l['label'];label='3D' if label=='3D adventure' else label
             links.append(f'<a class="play{" alternate" if j else " primary"}" href="{esc(l["href"],quote=True)}" target="_blank" rel="noopener" aria-label="{esc(g["title"]+": "+l["label"],quote=True)}" data-open="{g["id"]}">{esc(label)}{icon("arrow") if j==0 else ""}</a>')
+        cover_src = g['cover'] + ('?v=20261101-cobalt' if g['cover'].endswith('.svg') else '')
         badge=f'<span class="game-badge">{esc(g["badge"])}</span>' if g.get('badge') else ''
         haystack=' '.join([g['title'],g['description'],g.get('keywords',''),cat_title])
         cards.append(f'''<article class="game-card {g['category']}" id="{g['id']}" data-game="{g['id']}" data-category="{g['category']}" data-order="{i}" data-title="{esc(g['title'],quote=True)}" data-search="{esc(haystack,quote=True)}">
  <div class="cover">
-  <a class="cover-link" href="{esc(first['href'],quote=True)}" target="_blank" rel="noopener" aria-label="Open {title}" data-open="{g['id']}"><img src="{g['cover']}" width="600" height="360" alt="" loading="{'eager' if i<3 else 'lazy'}" decoding="async"><span class="cover-play">{icon('arrow')}</span></a>
+  <a class="cover-link" href="{esc(first['href'],quote=True)}" target="_blank" rel="noopener" aria-label="Open {title}" data-open="{g['id']}"><img src="{cover_src}" width="600" height="360" alt="" loading="{'eager' if i<3 else 'lazy'}" decoding="async"><span class="cover-play">{icon('arrow')}</span></a>
   <button class="favourite" type="button" data-favourite="{g['id']}" aria-label="Add {title} to favourites" aria-pressed="false" hidden>{icon('heart')}</button>
  </div>
  <div class="card-body"><div class="card-meta"><span class="subject-label">{esc(cat_title)}</span>{badge}</div>
@@ -51,12 +52,12 @@ def render_console(categories,games):
 <html lang="en">
 <head>
  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
- <meta name="theme-color" content="#f7f7f2">
+ <meta name="theme-color" content="#f8f8f5">
  <meta name="description" content="Your little library of learning adventures. Reading, spelling, maths and English games, all in one place.">
  <title>Dasha’s Games · Pick your next adventure</title>
- <link rel="icon" type="image/svg+xml" href="console-assets/favicon.svg">
- <link rel="stylesheet" href="console.css?v=20261101-shelf">
- <script src="console.js?v=20261101-shelf" defer></script>
+ <link rel="icon" type="image/svg+xml" href="console-assets/favicon.svg?v=cobalt">
+ <link rel="stylesheet" href="console.css?v=20261101-cobalt">
+ <script src="console.js?v=20261101-cobalt" defer></script>
 </head>
 <body>
  <a class="skip-link" href="#library">Skip to games</a>

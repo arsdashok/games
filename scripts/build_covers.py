@@ -4,15 +4,15 @@ import json
 from pathlib import Path
 from html import escape
 ROOT=Path(__file__).resolve().parents[1]
-INK='#20372f'
-PALETTES={'reading':('#eae5f6','#8f76bc','#b5a0d3'),'maths':('#e1eddc','#568474','#aad1ac'),'grammar':('#ffe8c9','#db8d4a','#f0c17d'),'speaking':('#f7ded7','#bc695c','#e8a795'),'puzzles':('#dce9f1','#537e9d','#a6c6d6'),'seasonal':('#e3e2f4','#6f6aaa','#b0a9dc')}
+INK='#252847'
+PALETTES={'reading':('#eee5ff','#7950db','#c9afff'),'maths':('#e4edff','#4369df','#a8c1ff'),'grammar':('#fff0bd','#dc9724','#ffd76c'),'speaking':('#ffdfd5','#d65b55','#ffad9a'),'puzzles':('#d9f0f2','#268c9b','#99d8df'),'seasonal':('#e7e5ff','#7967d7','#bbb2f4')}
 def rect(x,y,w,h,fill,r=12,stroke='none',sw=2):return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
 def circle(x,y,r,fill,stroke='none',sw=2):return f'<circle cx="{x}" cy="{y}" r="{r}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
 def text(x,y,s,size=44,color=INK,weight=800,anchor='middle'):return f'<text x="{x}" y="{y}" text-anchor="{anchor}" font-family="Arial, sans-serif" font-size="{size}" font-weight="{weight}" fill="{color}">{escape(s)}</text>'
 def path(d,fill='none',stroke=INK,sw=5):return f'<path d="{d}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round"/>'
 def group(s,x=0,y=0,rotate=0):return f'<g transform="translate({x} {y}) rotate({rotate})">{s}</g>'
 def card(label,x,y,fill='#fff9e9',angle=0,size=72):
- return group(rect(-59,-57,118,120,'#20372f18',16)+rect(-64,-64,118,120,fill,16,INK,3)+text(-5,17,label,size),x,y,angle)
+ return group(rect(-59,-57,118,120,'#25284718',16)+rect(-64,-64,118,120,fill,16,INK,3)+text(-5,17,label,size),x,y,angle)
 def ribbon(label,x=300,y=286,w=270):return rect(x-w/2,y-24,w,45,'#fffdf4',22)+text(x,y+4,label,20)
 def basic_frame(content,bg,accent):
  return f'<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360"><rect width="600" height="360" fill="{bg}"/>'+circle(590,5,140,accent+'20')+circle(18,352,120,accent+'18')+path('M40 60h20m-10-10v20 M537 274h22m-11-11v22',stroke=accent,sw=3)+content+'</svg>'
@@ -20,7 +20,7 @@ def cover(g):
  id=g['id']; bg,accent,soft=PALETTES[g['category']]
  s=''
  if id=='place-value-chart':
-  s=group(rect(78,43,450,254,'#20372f18',20)+rect(70,35,450,254,'#fffdf2',20,INK,3),0,0,-2)
+  s=group(rect(78,43,450,254,'#25284718',20)+rect(70,35,450,254,'#fffdf2',20,INK,3),0,0,-2)
   for i,(label,n,col) in enumerate([('H',2,'#d98762'),('T',4,'#7aa997'),('O',6,'#bd9fcf')]):
    x=130+i*145;s+=text(x,88,label,24)+path(f'M{x-57} 106h114',stroke='#d4dbcf',sw=2)
    for k in range(n):s+=circle(x-22+(k%2)*44,139+(k//2)*43,16,col)+circle(x-27+(k%2)*44,134+(k//2)*43,4,'#ffffff80')
@@ -39,7 +39,7 @@ def cover(g):
   s+=circle(437,72,14,'#8eae9a')+ribbon('A WORLD OF SHAPES',y=324,w=292)
  elif id in ['number-pop','number-explorer','math-master','intruder-hunt']:
   if id=='number-pop':
-   for x,y,r,n,col in [(185,126,64,'2','#edc175'),(319,192,80,'7','#aac5ae'),(439,100,54,'5','#c9b8db'),(153,276,42,'9','#e2a288')]:s+=circle(x+4,y+8,r,'#20372f18')+circle(x,y,r,col,INK,3)+circle(x-r/3,y-r/3,9,'#ffffff90')+text(x,y+20,n,56)
+   for x,y,r,n,col in [(185,126,64,'2','#edc175'),(319,192,80,'7','#aac5ae'),(439,100,54,'5','#c9b8db'),(153,276,42,'9','#e2a288')]:s+=circle(x+4,y+8,r,'#25284718')+circle(x,y,r,col,INK,3)+circle(x-r/3,y-r/3,9,'#ffffff90')+text(x,y+20,n,56)
   elif id=='number-explorer':
    for x,y,col in [(185,193,'#93bba8'),(292,150,'#7e9eae'),(401,207,'#c4a7d4')]:s+=path(f'M{x} {y-95}l50 55-18 92-64 0-18-92Z',col,INK,3)+path(f'M{x} {y-95}v147m-50-92h100',stroke=INK,sw=2)
    s+=ribbon('CRYSTAL EXPEDITION',y=325,w=286)
@@ -84,7 +84,7 @@ def cover(g):
  else:
   words={'word-jobs':['on','under','beside'],'apostrophes-quiz':["isn’t","Tom’s","it’s"],'verb-master':['go','went','gone'],'requests-and-get':['could','get','please'],'is-or-are':['is','or','are'],'goose-packs-a-bag':['hasn’t','got','a bag'],'gem-slots':['he','she','they'],'has-or-have':['has','or','have'],'he-she-or-they':['he','she','they'],'give-and-put':['give','&','put']}.get(id,['think','play','learn'])
   for i,w in enumerate(words):
-   s+=group(rect(-142,-34,284,76,'#20372f18',12)+rect(-148,-40,284,76,['#fff9e9',soft,'#fff9e9'][i],12,INK,3)+text(-6,10,w,43),300+[ -28,32,-6][i],83+i*93,[-7,5,-3][i])
+   s+=group(rect(-142,-34,284,76,'#25284718',12)+rect(-148,-40,284,76,['#fff9e9',soft,'#fff9e9'][i],12,INK,3)+text(-6,10,w,43),300+[ -28,32,-6][i],83+i*93,[-7,5,-3][i])
  return basic_frame(s,bg,accent)
 if __name__=='__main__':
  c=json.loads((ROOT/'catalog.json').read_text())
