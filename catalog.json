@@ -47,7 +47,8 @@
         }
       ],
       "badge": "Student login",
-      "keywords": "чтение этажи башня фониксы коала letters and sounds phase 2"
+      "keywords": "чтение этажи башня фониксы коала letters and sounds phase 2",
+      "cover": "console-assets/covers/reading-tower.png"
     },
     {
       "id": "monster-bakery",
@@ -61,7 +62,8 @@
           "href": "monster-bakery/"
         }
       ],
-      "keywords": "монстр пекарь пекарня spelling слова"
+      "keywords": "монстр пекарь пекарня spelling слова",
+      "cover": "console-assets/covers/monster-bakery.jpg"
     },
     {
       "id": "letter-tracer",
@@ -75,7 +77,8 @@
           "href": "letter-tracer/"
         }
       ],
-      "keywords": "early years alphabet handwriting буквы прописи"
+      "keywords": "early years alphabet handwriting буквы прописи",
+      "cover": "console-assets/covers/letter-tracer.svg"
     },
     {
       "id": "word-race",
@@ -89,7 +92,8 @@
           "href": "word-race/"
         }
       ],
-      "keywords": "early years reading чтение"
+      "keywords": "early years reading чтение",
+      "cover": "console-assets/covers/word-race.svg"
     },
     {
       "id": "this-or-is",
@@ -103,7 +107,8 @@
           "href": "this-or-is/"
         }
       ],
-      "keywords": "early years sight words чтение"
+      "keywords": "early years sight words чтение",
+      "cover": "console-assets/covers/this-or-is.svg"
     },
     {
       "id": "place-value-chart",
@@ -117,7 +122,8 @@
           "href": "place-value-chart/"
         }
       ],
-      "keywords": "разряды числа таблица units tens hundreds thousands decimals"
+      "keywords": "разряды числа таблица units tens hundreds thousands decimals",
+      "cover": "console-assets/covers/place-value-chart.svg"
     },
     {
       "id": "odometer",
@@ -131,7 +137,8 @@
           "href": "odometer/"
         }
       ],
-      "keywords": "одометр счётчик счетчик place value разряды"
+      "keywords": "одометр счётчик счетчик place value разряды",
+      "cover": "console-assets/covers/odometer.svg"
     },
     {
       "id": "block-maths",
@@ -145,7 +152,8 @@
           "href": "https://block-maths-practice.cebzur.chatgpt.site/"
         }
       ],
-      "keywords": "minecraft майнкрафт сложение вычитание"
+      "keywords": "minecraft майнкрафт сложение вычитание",
+      "cover": "console-assets/covers/block-maths.svg"
     },
     {
       "id": "shape-play",
@@ -159,7 +167,8 @@
           "href": "https://arsdashok.github.io/shape-play/"
         }
       ],
-      "keywords": "early years geometry фигуры"
+      "keywords": "early years geometry фигуры",
+      "cover": "console-assets/covers/shape-play.svg"
     },
     {
       "id": "dino-number-squad",
@@ -173,7 +182,8 @@
           "href": "dino-number-squad/"
         }
       ],
-      "keywords": "early years counting динозавры счет"
+      "keywords": "early years counting динозавры счет",
+      "cover": "console-assets/covers/dino-number-squad.svg"
     },
     {
       "id": "number-pop",
@@ -187,7 +197,8 @@
           "href": "number-pop/"
         }
       ],
-      "keywords": "early years alphabet числа буквы"
+      "keywords": "early years alphabet числа буквы",
+      "cover": "console-assets/covers/number-pop.svg"
     },
     {
       "id": "number-explorer",
@@ -201,7 +212,8 @@
           "href": "number-explorer/"
         }
       ],
-      "keywords": "numbers числа"
+      "keywords": "numbers числа",
+      "cover": "console-assets/covers/number-explorer.svg"
     },
     {
       "id": "math-master",
@@ -215,7 +227,8 @@
           "href": "math-master-multiplication-tables/"
         }
       ],
-      "keywords": "multiplication times tables таблица умножения"
+      "keywords": "multiplication times tables таблица умножения",
+      "cover": "console-assets/covers/math-master.svg"
     },
     {
       "id": "intruder-hunt",
@@ -229,7 +242,8 @@
           "href": "intruder-hunt/"
         }
       ],
-      "keywords": "subtraction exchange вычитание"
+      "keywords": "subtraction exchange вычитание",
+      "cover": "console-assets/covers/intruder-hunt.svg"
     },
     {
       "id": "emerald-shop",
@@ -243,7 +257,8 @@
           "href": "the-emerald-shop/"
         }
       ],
-      "keywords": "money minecraft майнкрафт магазин"
+      "keywords": "money minecraft майнкрафт магазин",
+      "cover": "console-assets/covers/emerald-shop.svg"
     },
     {
       "id": "word-jobs",
@@ -257,7 +272,8 @@
           "href": "https://word-jobs-interactive.cebzur.chatgpt.site/"
         }
       ],
-      "keywords": "prepositions предлоги small words"
+      "keywords": "prepositions предлоги small words",
+      "cover": "console-assets/covers/word-jobs.svg"
     },
     {
       "id": "apostrophes-quiz",
@@ -271,7 +287,8 @@
           "href": "https://arsdashok.github.io/apostrophes-quiz/"
         }
       ],
-      "keywords": "apostrophe possession punctuation апостроф"
+      "keywords": "apostrophe possession punctuation апостроф",
+      "cover": "console-assets/covers/apostrophes-quiz.svg"
     },
     {
       "id": "verb-master",
@@ -285,7 +302,8 @@
           "href": "verb-master-irregular-verbs/"
         }
       ],
-      "keywords": "past tense неправильные глаголы"
+      "keywords": "past tense неправильные глаголы",
+      "cover": "console-assets/covers/verb-master.svg"
     },
     {
       "id": "requests-and-get",
@@ -299,7 +317,8 @@
           "href": "requests-and-get/"
         }
       ],
-      "keywords": "speaking requests просьбы"
+      "keywords": "speaking requests просьбы",
+      "cover": "console-assets/covers/requests-and-get.svg"
     },
     {
       "id": "is-or-are",
@@ -313,7 +332,8 @@
           "href": "is-or-are/"
         }
       ],
-      "keywords": "to be singular plural грамматика"
+      "keywords": "to be singular plural грамматика",
+      "cover": "console-assets/covers/is-or-are.svg"
     },
     {
       "id": "goose-packs-a-bag",
@@ -327,7 +347,8 @@
           "href": "goose-packs-a-bag/"
         }
       ],
-      "keywords": "negative has got гусь"
+      "keywords": "negative has got гусь",
+      "cover": "console-assets/covers/goose-packs-a-bag.svg"
     },
     {
       "id": "gem-slots",
@@ -341,7 +362,8 @@
           "href": "gem-slots/"
         }
       ],
-      "keywords": "pronouns местоимения"
+      "keywords": "pronouns местоимения",
+      "cover": "console-assets/covers/gem-slots.svg"
     },
     {
       "id": "has-or-have",
@@ -355,7 +377,8 @@
           "href": "has-or-have/"
         }
       ],
-      "keywords": "he she it they pronouns местоимения"
+      "keywords": "he she it they pronouns местоимения",
+      "cover": "console-assets/covers/has-or-have.svg"
     },
     {
       "id": "he-she-or-they",
@@ -369,7 +392,8 @@
           "href": "he-she-or-they/"
         }
       ],
-      "keywords": "pronouns halloween местоимения хэллоуин"
+      "keywords": "pronouns halloween местоимения хэллоуин",
+      "cover": "console-assets/covers/he-she-or-they.svg"
     },
     {
       "id": "secret-character",
@@ -384,7 +408,8 @@
         }
       ],
       "badge": "Play together",
-      "keywords": "guess who describing people описание внешность"
+      "keywords": "guess who describing people описание внешность",
+      "cover": "console-assets/covers/secret-character.svg"
     },
     {
       "id": "99-nights-beginner",
@@ -398,7 +423,8 @@
           "href": "99-nights-in-the-forest-english-beginner/"
         }
       ],
-      "keywords": "99 ночей лес roblox vocabulary"
+      "keywords": "99 ночей лес roblox vocabulary",
+      "cover": "console-assets/covers/99-nights-beginner.svg"
     },
     {
       "id": "99-nights-a1",
@@ -412,7 +438,8 @@
           "href": "99-nights-in-the-forest-english-a1/"
         }
       ],
-      "keywords": "99 ночей лес roblox vocabulary"
+      "keywords": "99 ночей лес roblox vocabulary",
+      "cover": "console-assets/covers/99-nights-a1.svg"
     },
     {
       "id": "space-lotto",
@@ -426,7 +453,8 @@
           "href": "space-lotto/"
         }
       ],
-      "keywords": "bingo vocabulary бинго лото космос"
+      "keywords": "bingo vocabulary бинго лото космос",
+      "cover": "console-assets/covers/space-lotto.svg"
     },
     {
       "id": "give-and-put",
@@ -440,7 +468,8 @@
           "href": "give-and-put/"
         }
       ],
-      "keywords": "instructions objects дай положи"
+      "keywords": "instructions objects дай положи",
+      "cover": "console-assets/covers/give-and-put.svg"
     },
     {
       "id": "dark-forest",
@@ -454,7 +483,8 @@
           "href": "dark-forest-story-machine/"
         }
       ],
-      "keywords": "storytelling история лес"
+      "keywords": "storytelling история лес",
+      "cover": "console-assets/covers/dark-forest.svg"
     },
     {
       "id": "timmys-bag",
@@ -468,7 +498,8 @@
           "href": "timmy-s-bag-lock/"
         }
       ],
-      "keywords": "code puzzle код загадки"
+      "keywords": "code puzzle код загадки",
+      "cover": "console-assets/covers/timmys-bag.svg"
     },
     {
       "id": "town-trips",
@@ -482,7 +513,8 @@
           "href": "town-trips/"
         }
       ],
-      "keywords": "places transport город транспорт"
+      "keywords": "places transport город транспорт",
+      "cover": "console-assets/covers/town-trips.svg"
     },
     {
       "id": "christmas-quest",
@@ -496,7 +528,8 @@
           "href": "christmas-quest/"
         }
       ],
-      "keywords": "christmas рождество"
+      "keywords": "christmas рождество",
+      "cover": "console-assets/covers/christmas-quest.svg"
     },
     {
       "id": "shader-wallpapers",
@@ -510,7 +543,8 @@
           "href": "shader-wallpapers/"
         }
       ],
-      "keywords": "art patterns shaders узоры"
+      "keywords": "art patterns shaders узоры",
+      "cover": "console-assets/covers/shader-wallpapers.svg"
     }
   ]
 }
