@@ -1,90 +1,267 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dasha's Games</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Nunito',system-ui,sans-serif;color:#2b2340;
-    background:radial-gradient(circle at 25% 15%,#efeafc,#e3f2f6 65%);min-height:100vh;padding:30px 18px 60px}
-  header{text-align:center;margin-bottom:26px}
-  h1{font-family:'Baloo 2',cursive;font-size:40px;background:linear-gradient(120deg,#6c4bb6,#159aa8);
-    -webkit-background-clip:text;background-clip:text;color:transparent}
-  .wrap{max-width:1080px;margin:0 auto}
-  h2.cat{font-family:'Baloo 2',cursive;font-size:22px;color:#4a3a7a;margin:26px 0 12px;
-    border-left:5px solid #159aa8;padding-left:12px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
-  .card{background:#fff;border-radius:18px;padding:18px;display:flex;gap:14px;align-items:center;
-    box-shadow:0 8px 22px rgba(90,70,150,.14);transition:transform .12s,box-shadow .12s}
-  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(90,70,150,.22)}
-  .emoji{font-size:38px;line-height:1;flex:0 0 auto}
-  .ct{flex:1}
-  .ct h3{font-family:'Baloo 2',cursive;font-size:18px;margin-bottom:8px}
-  .play{display:inline-block;background:linear-gradient(135deg,#6c4bb6,#159aa8);color:#fff;font-weight:700;
-    text-decoration:none;padding:7px 16px;border-radius:999px;font-size:14px}
-  footer{text-align:center;color:#8a82a6;font-size:13px;margin-top:34px}
-</style></head>
+<!-- Generated from catalog.json by scripts/build_catalog.py. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dasha’s game console: reading, spelling, maths and English games for lessons. Find Reading Tower, Monster Bakery, Place Value Chart and more.">
+  <title>Dasha's Games · Game console</title>
+  <link rel="stylesheet" href="console.css?v=20261101">
+  <script src="console.js?v=20261101" defer></script>
+</head>
 <body>
-  <header>
-    <h1>🎮 Dasha's Games</h1>
-  </header>
+  <a class="skip-link" href="#games">Skip to games</a>
   <div class="wrap">
-
-    <h2 class="cat">Numbers &amp; Maths</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji" aria-hidden="true">🔶</div><div class="ct"><h3>Shape Play</h3><a class="play" href="https://arsdashok.github.io/shape-play/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🦕</div><div class="ct"><h3>Dino Number Squad</h3><a class="play" href="dino-number-squad/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🔢</div><div class="ct"><h3>Number Pop</h3><a class="play" href="number-pop/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🔭</div><div class="ct"><h3>Number Explorer</h3><a class="play" href="number-explorer/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">➗</div><div class="ct"><h3>Math Master · Multiplication Tables</h3><a class="play" href="math-master-multiplication-tables/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">👾</div><div class="ct"><h3>Intruder Hunt</h3><a class="play" href="intruder-hunt/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🛒</div><div class="ct"><h3>The Emerald Shop</h3><a class="play" href="the-emerald-shop/">▶ Play</a></div></div>
+    <header>
+      <div class="eyebrow"><span aria-hidden="true">🎮</span> THE GAME CONSOLE</div>
+      <h1>Dasha’s Games<span class="title-dot">.</span></h1>
+      <p class="intro">A little practice. A lot of play.</p>
+      <p class="library-count">34 games & activities · Pick your next adventure.</p>
+    </header>
+    <div id="filters" class="filters" hidden>
+      <div class="search-row">
+        <label class="search-box" for="search"><span aria-hidden="true">⌕</span><span class="sr-only">Find a game</span><input id="search" type="search" placeholder="Find a game or a skill…" autocomplete="off"></label>
+        <button id="reset" class="reset" type="button">Reset filters</button>
+      </div>
+      <div class="chips" role="group" aria-label="Filter by subject">
+        <button type="button" data-category="all" aria-pressed="true">All games</button>
+        <button type="button" data-category="reading" aria-pressed="false">Reading &amp; Spelling</button>
+<button type="button" data-category="maths" aria-pressed="false">Numbers &amp; Maths</button>
+<button type="button" data-category="grammar" aria-pressed="false">Grammar &amp; Verbs</button>
+<button type="button" data-category="speaking" aria-pressed="false">Vocabulary &amp; Speaking</button>
+<button type="button" data-category="puzzles" aria-pressed="false">Puzzles &amp; Stories</button>
+<button type="button" data-category="seasonal" aria-pressed="false">Seasonal &amp; Just for Fun</button>
+      </div>
+      <p id="results" role="status" aria-live="polite">Showing all 34 games & activities</p>
     </div>
-
-    <h2 class="cat">Grammar &amp; Verbs</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji">⚡</div><div class="ct"><h3>Verb Master · Irregular Verbs</h3><a class="play" href="verb-master-irregular-verbs/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🙏</div><div class="ct"><h3>Requests &amp; Get</h3><a class="play" href="requests-and-get/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">👖</div><div class="ct"><h3>Is or Are? &middot; There is / There are</h3><a class="play" href="is-or-are/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🪿</div><div class="ct"><h3>The Goose Packs a Bag &middot; hasn't got / it's not</h3><a class="play" href="goose-packs-a-bag/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">💎</div><div class="ct"><h3>Gem Slots &middot; he / she / it / they</h3><a class="play" href="gem-slots/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🦸</div><div class="ct"><h3>Has or Have? &middot; he / she / it / they first</h3><a class="play" href="has-or-have/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🎃</div><div class="ct"><h3>He, she or they? &middot; Halloween pictures</h3><a class="play" href="he-she-or-they/">▶ Play</a></div></div>
-    </div>
-
-    <h2 class="cat">Vocabulary &amp; Speaking</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji" aria-hidden="true">🧁</div><div class="ct"><h3>Monster Bakery · Spelling</h3><a class="play" href="monster-bakery/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🌲</div><div class="ct"><h3>99 Nights in the Forest · Beginner</h3><a class="play" href="99-nights-in-the-forest-english-beginner/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🔥</div><div class="ct"><h3>99 Nights in the Forest · A1</h3><a class="play" href="99-nights-in-the-forest-english-a1/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🚀</div><div class="ct"><h3>Space Lotto</h3><a class="play" href="space-lotto/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🎁</div><div class="ct"><h3>Give &amp; Put · objects and instructions</h3><a class="play" href="give-and-put/" target="_blank" rel="noopener">▶ Play</a></div></div>
-    </div>
-
-    <h2 class="cat">Puzzles &amp; Stories</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji">🌲</div><div class="ct"><h3>Dark Forest Story Machine</h3><a class="play" href="dark-forest-story-machine/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🔒</div><div class="ct"><h3>Timmy's Bag Lock</h3><a class="play" href="timmy-s-bag-lock/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🚌</div><div class="ct"><h3>Town Trips · places and transport</h3><a class="play" href="town-trips/">▶ Play</a></div></div>
-    </div>
-
-    <h2 class="cat">Early Years</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji">✏️</div><div class="ct"><h3>Letter Tracer</h3><a class="play" href="letter-tracer/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🤖</div><div class="ct"><h3>Word Race</h3><a class="play" href="word-race/">▶ Play</a></div></div>
-      <div class="card"><div class="emoji">🥚</div><div class="ct"><h3>this or is?</h3><a class="play" href="this-or-is/">▶ Play</a></div></div>
-    </div>
-
-    <h2 class="cat">Seasonal</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji">🎄</div><div class="ct"><h3>Christmas Quest</h3><a class="play" href="christmas-quest/">▶ Play</a></div></div>
-    </div>
-
-    <h2 class="cat">Just for Fun</h2>
-    <div class="grid">
-      <div class="card"><div class="emoji">🌈</div><div class="ct"><h3>Shader Wallpapers</h3><a class="play" href="shader-wallpapers/">▶ Play</a></div></div>
-    </div>
-
+    <main id="games">
+      <section class="category" data-group="reading" aria-labelledby="heading-reading">
+  <h2 id="heading-reading">Reading &amp; Spelling <span class="section-count">5</span></h2>
+  <div class="grid"><article class="card" id="reading-tower" data-search="Reading Tower Read the clues, crack the codes and climb 100 floors. CVC words, phonics and sight words. чтение этажи башня фониксы коала letters and sounds phase 2 Reading &amp; Spelling">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🏙️</span><span class="badge">Student login</span></div>
+  <h3>Reading Tower</h3>
+  <p>Read the clues, crack the codes and climb 100 floors. CVC words, phonics and sight words.</p>
+  <div class="actions"><a class="play" href="https://reading-tower-first-words.cebzur.chatgpt.site/koala/" target="_blank" rel="noopener" aria-label="Reading Tower: Play · Koala">Play · Koala <span aria-hidden="true">↗</span></a>
+<a class="play secondary" href="https://reading-tower-first-words.cebzur.chatgpt.site/first-person/" target="_blank" rel="noopener" aria-label="Reading Tower: 3D adventure">3D adventure <span aria-hidden="true">↗</span></a>
+<a class="play secondary" href="https://reading-tower-first-words.cebzur.chatgpt.site/" target="_blank" rel="noopener" aria-label="Reading Tower: Dollhouse">Dollhouse <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="monster-bakery" data-search="Monster Bakery Bake, spell and practise words with your monster baker. монстр пекарь пекарня spelling слова Reading &amp; Spelling">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🧁</span></div>
+  <h3>Monster Bakery</h3>
+  <p>Bake, spell and practise words with your monster baker.</p>
+  <div class="actions"><a class="play" href="monster-bakery/" target="_blank" rel="noopener" aria-label="Monster Bakery: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="letter-tracer" data-search="Letter Tracer Trace letters and practise how to write them. early years alphabet handwriting буквы прописи Reading &amp; Spelling">
+  <div class="card-top"><span class="emoji" aria-hidden="true">✏️</span></div>
+  <h3>Letter Tracer</h3>
+  <p>Trace letters and practise how to write them.</p>
+  <div class="actions"><a class="play" href="letter-tracer/" target="_blank" rel="noopener" aria-label="Letter Tracer: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="word-race" data-search="Word Race A robot-versus-zombie word race. early years reading чтение Reading &amp; Spelling">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🤖</span></div>
+  <h3>Word Race</h3>
+  <p>A robot-versus-zombie word race.</p>
+  <div class="actions"><a class="play" href="word-race/" target="_blank" rel="noopener" aria-label="Word Race: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="this-or-is" data-search="this or is? Read carefully and choose between two little words. early years sight words чтение Reading &amp; Spelling">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🥚</span></div>
+  <h3>this or is?</h3>
+  <p>Read carefully and choose between two little words.</p>
+  <div class="actions"><a class="play" href="this-or-is/" target="_blank" rel="noopener" aria-label="this or is?: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+<section class="category" data-group="maths" aria-labelledby="heading-maths">
+  <h2 id="heading-maths">Numbers &amp; Maths <span class="section-count">10</span></h2>
+  <div class="grid"><article class="card" id="place-value-chart" data-search="Place Value Chart Explore place value with counters and draw your thinking on the chart. разряды числа таблица units tens hundreds thousands decimals Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🧮</span></div>
+  <h3>Place Value Chart</h3>
+  <p>Explore place value with counters and draw your thinking on the chart.</p>
+  <div class="actions"><a class="play" href="place-value-chart/" target="_blank" rel="noopener" aria-label="Place Value Chart: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="odometer" data-search="Odometer · Number Counter Turn the number counter and explore how digits change. одометр счётчик счетчик place value разряды Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🔢</span></div>
+  <h3>Odometer · Number Counter</h3>
+  <p>Turn the number counter and explore how digits change.</p>
+  <div class="actions"><a class="play" href="odometer/" target="_blank" rel="noopener" aria-label="Odometer · Number Counter: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="block-maths" data-search="Block Maths Addition and subtraction within 100, one block at a time. minecraft майнкрафт сложение вычитание Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🧱</span></div>
+  <h3>Block Maths</h3>
+  <p>Addition and subtraction within 100, one block at a time.</p>
+  <div class="actions"><a class="play" href="https://block-maths-practice.cebzur.chatgpt.site/" target="_blank" rel="noopener" aria-label="Block Maths: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="shape-play" data-search="Shape Play Explore shapes through play. early years geometry фигуры Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🔶</span></div>
+  <h3>Shape Play</h3>
+  <p>Explore shapes through play.</p>
+  <div class="actions"><a class="play" href="https://arsdashok.github.io/shape-play/" target="_blank" rel="noopener" aria-label="Shape Play: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="dino-number-squad" data-search="Dino Number Squad Count and explore numbers with the dinosaur squad. early years counting динозавры счет Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🦕</span></div>
+  <h3>Dino Number Squad</h3>
+  <p>Count and explore numbers with the dinosaur squad.</p>
+  <div class="actions"><a class="play" href="dino-number-squad/" target="_blank" rel="noopener" aria-label="Dino Number Squad: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="number-pop" data-search="Number Pop Practise numbers and letters with a pop. early years alphabet числа буквы Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🫧</span></div>
+  <h3>Number Pop</h3>
+  <p>Practise numbers and letters with a pop.</p>
+  <div class="actions"><a class="play" href="number-pop/" target="_blank" rel="noopener" aria-label="Number Pop: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="number-explorer" data-search="Number Explorer Explore numbers on a crystal expedition. numbers числа Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🔭</span></div>
+  <h3>Number Explorer</h3>
+  <p>Explore numbers on a crystal expedition.</p>
+  <div class="actions"><a class="play" href="number-explorer/" target="_blank" rel="noopener" aria-label="Number Explorer: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="math-master" data-search="Math Master Build confidence with multiplication tables. multiplication times tables таблица умножения Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">✖️</span></div>
+  <h3>Math Master</h3>
+  <p>Build confidence with multiplication tables.</p>
+  <div class="actions"><a class="play" href="math-master-multiplication-tables/" target="_blank" rel="noopener" aria-label="Math Master: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="intruder-hunt" data-search="Intruder Hunt Spot the wrong answer and practise subtraction with exchange. subtraction exchange вычитание Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">👾</span></div>
+  <h3>Intruder Hunt</h3>
+  <p>Spot the wrong answer and practise subtraction with exchange.</p>
+  <div class="actions"><a class="play" href="intruder-hunt/" target="_blank" rel="noopener" aria-label="Intruder Hunt: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="emerald-shop" data-search="The Emerald Shop A shopping adventure for practising maths. money minecraft майнкрафт магазин Numbers &amp; Maths">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🛒</span></div>
+  <h3>The Emerald Shop</h3>
+  <p>A shopping adventure for practising maths.</p>
+  <div class="actions"><a class="play" href="the-emerald-shop/" target="_blank" rel="noopener" aria-label="The Emerald Shop: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+<section class="category" data-group="grammar" aria-labelledby="heading-grammar">
+  <h2 id="heading-grammar">Grammar &amp; Verbs <span class="section-count">9</span></h2>
+  <div class="grid"><article class="card" id="word-jobs" data-search="Word Jobs Explore prepositions with short challenges, explanations and sorting games. prepositions предлоги small words Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🧩</span></div>
+  <h3>Word Jobs</h3>
+  <p>Explore prepositions with short challenges, explanations and sorting games.</p>
+  <div class="actions"><a class="play" href="https://word-jobs-interactive.cebzur.chatgpt.site/" target="_blank" rel="noopener" aria-label="Word Jobs: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="apostrophes-quiz" data-search="Apostrophes Quiz Practise contractions and possessive ’s. apostrophe possession punctuation апостроф Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">💬</span></div>
+  <h3>Apostrophes Quiz</h3>
+  <p>Practise contractions and possessive ’s.</p>
+  <div class="actions"><a class="play" href="https://arsdashok.github.io/apostrophes-quiz/" target="_blank" rel="noopener" aria-label="Apostrophes Quiz: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="verb-master" data-search="Verb Master Practise irregular verbs. past tense неправильные глаголы Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">⚡</span></div>
+  <h3>Verb Master</h3>
+  <p>Practise irregular verbs.</p>
+  <div class="actions"><a class="play" href="verb-master-irregular-verbs/" target="_blank" rel="noopener" aria-label="Verb Master: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="requests-and-get" data-search="Requests &amp; Get Make requests and practise using get in conversation. speaking requests просьбы Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🙏</span></div>
+  <h3>Requests &amp; Get</h3>
+  <p>Make requests and practise using get in conversation.</p>
+  <div class="actions"><a class="play" href="requests-and-get/" target="_blank" rel="noopener" aria-label="Requests &amp; Get: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="is-or-are" data-search="Is or Are? Sort sentences with is, are, there is and there are. to be singular plural грамматика Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">👖</span></div>
+  <h3>Is or Are?</h3>
+  <p>Sort sentences with is, are, there is and there are.</p>
+  <div class="actions"><a class="play" href="is-or-are/" target="_blank" rel="noopener" aria-label="Is or Are?: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="goose-packs-a-bag" data-search="The Goose Packs a Bag Help the goose pack while practising hasn’t got and it’s not. negative has got гусь Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🪿</span></div>
+  <h3>The Goose Packs a Bag</h3>
+  <p>Help the goose pack while practising hasn’t got and it’s not.</p>
+  <div class="actions"><a class="play" href="goose-packs-a-bag/" target="_blank" rel="noopener" aria-label="The Goose Packs a Bag: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="gem-slots" data-search="Gem Slots Practise he, she, it and they. pronouns местоимения Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">💎</span></div>
+  <h3>Gem Slots</h3>
+  <p>Practise he, she, it and they.</p>
+  <div class="actions"><a class="play" href="gem-slots/" target="_blank" rel="noopener" aria-label="Gem Slots: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="has-or-have" data-search="Has or Have? Choose a pronoun, then find the right verb. he she it they pronouns местоимения Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🦸</span></div>
+  <h3>Has or Have?</h3>
+  <p>Choose a pronoun, then find the right verb.</p>
+  <div class="actions"><a class="play" href="has-or-have/" target="_blank" rel="noopener" aria-label="Has or Have?: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="he-she-or-they" data-search="He, She or They? Choose pronouns for Halloween pictures. pronouns halloween местоимения хэллоуин Grammar &amp; Verbs">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🎃</span></div>
+  <h3>He, She or They?</h3>
+  <p>Choose pronouns for Halloween pictures.</p>
+  <div class="actions"><a class="play" href="he-she-or-they/" target="_blank" rel="noopener" aria-label="He, She or They?: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+<section class="category" data-group="speaking" aria-labelledby="heading-speaking">
+  <h2 id="heading-speaking">Vocabulary &amp; Speaking <span class="section-count">5</span></h2>
+  <div class="grid"><article class="card" id="secret-character" data-search="Secret Character Ask yes/no questions about looks, personality and habits to guess a character. guess who describing people описание внешность Vocabulary &amp; Speaking">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🕵️</span><span class="badge">Play together</span></div>
+  <h3>Secret Character</h3>
+  <p>Ask yes/no questions about looks, personality and habits to guess a character.</p>
+  <div class="actions"><a class="play" href="secret-character/" target="_blank" rel="noopener" aria-label="Secret Character: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="99-nights-beginner" data-search="99 Nights in the Forest · Beginner Beginner English in a forest adventure. 99 ночей лес roblox vocabulary Vocabulary &amp; Speaking">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🌲</span></div>
+  <h3>99 Nights in the Forest · Beginner</h3>
+  <p>Beginner English in a forest adventure.</p>
+  <div class="actions"><a class="play" href="99-nights-in-the-forest-english-beginner/" target="_blank" rel="noopener" aria-label="99 Nights in the Forest · Beginner: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="99-nights-a1" data-search="99 Nights in the Forest · A1 More English practice in the forest, at A1 level. 99 ночей лес roblox vocabulary Vocabulary &amp; Speaking">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🔥</span></div>
+  <h3>99 Nights in the Forest · A1</h3>
+  <p>More English practice in the forest, at A1 level.</p>
+  <div class="actions"><a class="play" href="99-nights-in-the-forest-english-a1/" target="_blank" rel="noopener" aria-label="99 Nights in the Forest · A1: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="space-lotto" data-search="Space Lotto Practise vocabulary with a space-themed lotto game. bingo vocabulary бинго лото космос Vocabulary &amp; Speaking">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🚀</span></div>
+  <h3>Space Lotto</h3>
+  <p>Practise vocabulary with a space-themed lotto game.</p>
+  <div class="actions"><a class="play" href="space-lotto/" target="_blank" rel="noopener" aria-label="Space Lotto: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="give-and-put" data-search="Give &amp; Put Follow instructions and practise words for objects. instructions objects дай положи Vocabulary &amp; Speaking">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🎁</span></div>
+  <h3>Give &amp; Put</h3>
+  <p>Follow instructions and practise words for objects.</p>
+  <div class="actions"><a class="play" href="give-and-put/" target="_blank" rel="noopener" aria-label="Give &amp; Put: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+<section class="category" data-group="puzzles" aria-labelledby="heading-puzzles">
+  <h2 id="heading-puzzles">Puzzles &amp; Stories <span class="section-count">3</span></h2>
+  <div class="grid"><article class="card" id="dark-forest" data-search="Dark Forest Story Machine Build a story and find a path through the dark forest. storytelling история лес Puzzles &amp; Stories">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🌲</span></div>
+  <h3>Dark Forest Story Machine</h3>
+  <p>Build a story and find a path through the dark forest.</p>
+  <div class="actions"><a class="play" href="dark-forest-story-machine/" target="_blank" rel="noopener" aria-label="Dark Forest Story Machine: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="timmys-bag" data-search="Timmy’s Bag Lock Solve the clues to unlock the bag. code puzzle код загадки Puzzles &amp; Stories">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🔒</span></div>
+  <h3>Timmy’s Bag Lock</h3>
+  <p>Solve the clues to unlock the bag.</p>
+  <div class="actions"><a class="play" href="timmy-s-bag-lock/" target="_blank" rel="noopener" aria-label="Timmy’s Bag Lock: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="town-trips" data-search="Town Trips Explore places around town and ways to travel. places transport город транспорт Puzzles &amp; Stories">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🚌</span></div>
+  <h3>Town Trips</h3>
+  <p>Explore places around town and ways to travel.</p>
+  <div class="actions"><a class="play" href="town-trips/" target="_blank" rel="noopener" aria-label="Town Trips: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+<section class="category" data-group="seasonal" aria-labelledby="heading-seasonal">
+  <h2 id="heading-seasonal">Seasonal &amp; Just for Fun <span class="section-count">2</span></h2>
+  <div class="grid"><article class="card" id="christmas-quest" data-search="Christmas Quest English challenges around the Christmas tree. christmas рождество Seasonal &amp; Just for Fun">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🎄</span></div>
+  <h3>Christmas Quest</h3>
+  <p>English challenges around the Christmas tree.</p>
+  <div class="actions"><a class="play" href="christmas-quest/" target="_blank" rel="noopener" aria-label="Christmas Quest: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="card" id="shader-wallpapers" data-search="Shader Wallpapers Explore colourful animated patterns. art patterns shaders узоры Seasonal &amp; Just for Fun">
+  <div class="card-top"><span class="emoji" aria-hidden="true">🌈</span></div>
+  <h3>Shader Wallpapers</h3>
+  <p>Explore colourful animated patterns.</p>
+  <div class="actions"><a class="play" href="shader-wallpapers/" target="_blank" rel="noopener" aria-label="Shader Wallpapers: Play">Play <span aria-hidden="true">↗</span></a></div>
+</article></div>
+</section>
+      <div id="empty" class="empty" hidden><h2>No games found.</h2><p>Try another word, or reset the filters to see everything.</p></div>
+    </main>
+    <footer>Made for lessons. Have fun! <span aria-hidden="true">✨</span><br><small>Games open in a new tab. Reading Tower uses your learner login.</small></footer>
   </div>
-  <footer>Made for lessons. Have fun! ✨</footer>
-</body></html>
+</body>
+</html>

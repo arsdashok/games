@@ -1,0 +1,516 @@
+{
+  "categories": [
+    {
+      "id": "reading",
+      "title": "Reading & Spelling"
+    },
+    {
+      "id": "maths",
+      "title": "Numbers & Maths"
+    },
+    {
+      "id": "grammar",
+      "title": "Grammar & Verbs"
+    },
+    {
+      "id": "speaking",
+      "title": "Vocabulary & Speaking"
+    },
+    {
+      "id": "puzzles",
+      "title": "Puzzles & Stories"
+    },
+    {
+      "id": "seasonal",
+      "title": "Seasonal & Just for Fun"
+    }
+  ],
+  "games": [
+    {
+      "id": "reading-tower",
+      "title": "Reading Tower",
+      "category": "reading",
+      "icon": "🏙️",
+      "description": "Read the clues, crack the codes and climb 100 floors. CVC words, phonics and sight words.",
+      "links": [
+        {
+          "label": "Play · Koala",
+          "href": "https://reading-tower-first-words.cebzur.chatgpt.site/koala/"
+        },
+        {
+          "label": "3D adventure",
+          "href": "https://reading-tower-first-words.cebzur.chatgpt.site/first-person/"
+        },
+        {
+          "label": "Dollhouse",
+          "href": "https://reading-tower-first-words.cebzur.chatgpt.site/"
+        }
+      ],
+      "badge": "Student login",
+      "keywords": "чтение этажи башня фониксы коала letters and sounds phase 2"
+    },
+    {
+      "id": "monster-bakery",
+      "title": "Monster Bakery",
+      "category": "reading",
+      "icon": "🧁",
+      "description": "Bake, spell and practise words with your monster baker.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "monster-bakery/"
+        }
+      ],
+      "keywords": "монстр пекарь пекарня spelling слова"
+    },
+    {
+      "id": "letter-tracer",
+      "title": "Letter Tracer",
+      "category": "reading",
+      "icon": "✏️",
+      "description": "Trace letters and practise how to write them.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "letter-tracer/"
+        }
+      ],
+      "keywords": "early years alphabet handwriting буквы прописи"
+    },
+    {
+      "id": "word-race",
+      "title": "Word Race",
+      "category": "reading",
+      "icon": "🤖",
+      "description": "A robot-versus-zombie word race.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "word-race/"
+        }
+      ],
+      "keywords": "early years reading чтение"
+    },
+    {
+      "id": "this-or-is",
+      "title": "this or is?",
+      "category": "reading",
+      "icon": "🥚",
+      "description": "Read carefully and choose between two little words.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "this-or-is/"
+        }
+      ],
+      "keywords": "early years sight words чтение"
+    },
+    {
+      "id": "place-value-chart",
+      "title": "Place Value Chart",
+      "category": "maths",
+      "icon": "🧮",
+      "description": "Explore place value with counters and draw your thinking on the chart.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "place-value-chart/"
+        }
+      ],
+      "keywords": "разряды числа таблица units tens hundreds thousands decimals"
+    },
+    {
+      "id": "odometer",
+      "title": "Odometer · Number Counter",
+      "category": "maths",
+      "icon": "🔢",
+      "description": "Turn the number counter and explore how digits change.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "odometer/"
+        }
+      ],
+      "keywords": "одометр счётчик счетчик place value разряды"
+    },
+    {
+      "id": "block-maths",
+      "title": "Block Maths",
+      "category": "maths",
+      "icon": "🧱",
+      "description": "Addition and subtraction within 100, one block at a time.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "https://block-maths-practice.cebzur.chatgpt.site/"
+        }
+      ],
+      "keywords": "minecraft майнкрафт сложение вычитание"
+    },
+    {
+      "id": "shape-play",
+      "title": "Shape Play",
+      "category": "maths",
+      "icon": "🔶",
+      "description": "Explore shapes through play.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "https://arsdashok.github.io/shape-play/"
+        }
+      ],
+      "keywords": "early years geometry фигуры"
+    },
+    {
+      "id": "dino-number-squad",
+      "title": "Dino Number Squad",
+      "category": "maths",
+      "icon": "🦕",
+      "description": "Count and explore numbers with the dinosaur squad.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "dino-number-squad/"
+        }
+      ],
+      "keywords": "early years counting динозавры счет"
+    },
+    {
+      "id": "number-pop",
+      "title": "Number Pop",
+      "category": "maths",
+      "icon": "🫧",
+      "description": "Practise numbers and letters with a pop.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "number-pop/"
+        }
+      ],
+      "keywords": "early years alphabet числа буквы"
+    },
+    {
+      "id": "number-explorer",
+      "title": "Number Explorer",
+      "category": "maths",
+      "icon": "🔭",
+      "description": "Explore numbers on a crystal expedition.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "number-explorer/"
+        }
+      ],
+      "keywords": "numbers числа"
+    },
+    {
+      "id": "math-master",
+      "title": "Math Master",
+      "category": "maths",
+      "icon": "✖️",
+      "description": "Build confidence with multiplication tables.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "math-master-multiplication-tables/"
+        }
+      ],
+      "keywords": "multiplication times tables таблица умножения"
+    },
+    {
+      "id": "intruder-hunt",
+      "title": "Intruder Hunt",
+      "category": "maths",
+      "icon": "👾",
+      "description": "Spot the wrong answer and practise subtraction with exchange.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "intruder-hunt/"
+        }
+      ],
+      "keywords": "subtraction exchange вычитание"
+    },
+    {
+      "id": "emerald-shop",
+      "title": "The Emerald Shop",
+      "category": "maths",
+      "icon": "🛒",
+      "description": "A shopping adventure for practising maths.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "the-emerald-shop/"
+        }
+      ],
+      "keywords": "money minecraft майнкрафт магазин"
+    },
+    {
+      "id": "word-jobs",
+      "title": "Word Jobs",
+      "category": "grammar",
+      "icon": "🧩",
+      "description": "Explore prepositions with short challenges, explanations and sorting games.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "https://word-jobs-interactive.cebzur.chatgpt.site/"
+        }
+      ],
+      "keywords": "prepositions предлоги small words"
+    },
+    {
+      "id": "apostrophes-quiz",
+      "title": "Apostrophes Quiz",
+      "category": "grammar",
+      "icon": "💬",
+      "description": "Practise contractions and possessive ’s.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "https://arsdashok.github.io/apostrophes-quiz/"
+        }
+      ],
+      "keywords": "apostrophe possession punctuation апостроф"
+    },
+    {
+      "id": "verb-master",
+      "title": "Verb Master",
+      "category": "grammar",
+      "icon": "⚡",
+      "description": "Practise irregular verbs.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "verb-master-irregular-verbs/"
+        }
+      ],
+      "keywords": "past tense неправильные глаголы"
+    },
+    {
+      "id": "requests-and-get",
+      "title": "Requests & Get",
+      "category": "grammar",
+      "icon": "🙏",
+      "description": "Make requests and practise using get in conversation.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "requests-and-get/"
+        }
+      ],
+      "keywords": "speaking requests просьбы"
+    },
+    {
+      "id": "is-or-are",
+      "title": "Is or Are?",
+      "category": "grammar",
+      "icon": "👖",
+      "description": "Sort sentences with is, are, there is and there are.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "is-or-are/"
+        }
+      ],
+      "keywords": "to be singular plural грамматика"
+    },
+    {
+      "id": "goose-packs-a-bag",
+      "title": "The Goose Packs a Bag",
+      "category": "grammar",
+      "icon": "🪿",
+      "description": "Help the goose pack while practising hasn’t got and it’s not.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "goose-packs-a-bag/"
+        }
+      ],
+      "keywords": "negative has got гусь"
+    },
+    {
+      "id": "gem-slots",
+      "title": "Gem Slots",
+      "category": "grammar",
+      "icon": "💎",
+      "description": "Practise he, she, it and they.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "gem-slots/"
+        }
+      ],
+      "keywords": "pronouns местоимения"
+    },
+    {
+      "id": "has-or-have",
+      "title": "Has or Have?",
+      "category": "grammar",
+      "icon": "🦸",
+      "description": "Choose a pronoun, then find the right verb.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "has-or-have/"
+        }
+      ],
+      "keywords": "he she it they pronouns местоимения"
+    },
+    {
+      "id": "he-she-or-they",
+      "title": "He, She or They?",
+      "category": "grammar",
+      "icon": "🎃",
+      "description": "Choose pronouns for Halloween pictures.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "he-she-or-they/"
+        }
+      ],
+      "keywords": "pronouns halloween местоимения хэллоуин"
+    },
+    {
+      "id": "secret-character",
+      "title": "Secret Character",
+      "category": "speaking",
+      "icon": "🕵️",
+      "description": "Ask yes/no questions about looks, personality and habits to guess a character.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "secret-character/"
+        }
+      ],
+      "badge": "Play together",
+      "keywords": "guess who describing people описание внешность"
+    },
+    {
+      "id": "99-nights-beginner",
+      "title": "99 Nights in the Forest · Beginner",
+      "category": "speaking",
+      "icon": "🌲",
+      "description": "Beginner English in a forest adventure.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "99-nights-in-the-forest-english-beginner/"
+        }
+      ],
+      "keywords": "99 ночей лес roblox vocabulary"
+    },
+    {
+      "id": "99-nights-a1",
+      "title": "99 Nights in the Forest · A1",
+      "category": "speaking",
+      "icon": "🔥",
+      "description": "More English practice in the forest, at A1 level.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "99-nights-in-the-forest-english-a1/"
+        }
+      ],
+      "keywords": "99 ночей лес roblox vocabulary"
+    },
+    {
+      "id": "space-lotto",
+      "title": "Space Lotto",
+      "category": "speaking",
+      "icon": "🚀",
+      "description": "Practise vocabulary with a space-themed lotto game.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "space-lotto/"
+        }
+      ],
+      "keywords": "bingo vocabulary бинго лото космос"
+    },
+    {
+      "id": "give-and-put",
+      "title": "Give & Put",
+      "category": "speaking",
+      "icon": "🎁",
+      "description": "Follow instructions and practise words for objects.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "give-and-put/"
+        }
+      ],
+      "keywords": "instructions objects дай положи"
+    },
+    {
+      "id": "dark-forest",
+      "title": "Dark Forest Story Machine",
+      "category": "puzzles",
+      "icon": "🌲",
+      "description": "Build a story and find a path through the dark forest.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "dark-forest-story-machine/"
+        }
+      ],
+      "keywords": "storytelling история лес"
+    },
+    {
+      "id": "timmys-bag",
+      "title": "Timmy’s Bag Lock",
+      "category": "puzzles",
+      "icon": "🔒",
+      "description": "Solve the clues to unlock the bag.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "timmy-s-bag-lock/"
+        }
+      ],
+      "keywords": "code puzzle код загадки"
+    },
+    {
+      "id": "town-trips",
+      "title": "Town Trips",
+      "category": "puzzles",
+      "icon": "🚌",
+      "description": "Explore places around town and ways to travel.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "town-trips/"
+        }
+      ],
+      "keywords": "places transport город транспорт"
+    },
+    {
+      "id": "christmas-quest",
+      "title": "Christmas Quest",
+      "category": "seasonal",
+      "icon": "🎄",
+      "description": "English challenges around the Christmas tree.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "christmas-quest/"
+        }
+      ],
+      "keywords": "christmas рождество"
+    },
+    {
+      "id": "shader-wallpapers",
+      "title": "Shader Wallpapers",
+      "category": "seasonal",
+      "icon": "🌈",
+      "description": "Explore colourful animated patterns.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "shader-wallpapers/"
+        }
+      ],
+      "keywords": "art patterns shaders узоры"
+    }
+  ]
+}

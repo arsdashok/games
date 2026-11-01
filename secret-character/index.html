@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secret Character</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#000; --paper:#fff; --fog:#f2f2f2; --steel:#6b6b6b;
+  --lime:#a3e635; --pink:#f5d1fe; --butter:#fef3c8;
+  --you:#a3e635; --me:#f5d1fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:'Inter','Helvetica Neue',Arial,sans-serif;font-weight:500;letter-spacing:-.01em;height:100vh;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{width:100%;max-width:1240px;margin:0 auto;padding:14px 24px;display:flex;flex-direction:column;gap:14px;flex:1;min-height:0}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.status{display:flex;align-items:center;gap:18px;min-width:0}
+.badge{flex:none;border:2px solid var(--ink);border-radius:100px;padding:8px 18px;font-size:22px;font-weight:800;letter-spacing:.02em;box-shadow:3px 3px 0 var(--ink);background:var(--butter)}
+.badge.you{background:var(--you)} .badge.me{background:var(--me)}
+.instr{font-size:clamp(34px,2.2vw,44px);line-height:1.1;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.score{flex:none;display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700}
+.score b{font-size:46px;font-weight:800;line-height:1;min-width:30px;text-align:center}
+.score .sep{font-size:40px;color:#bbb}
+.score .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink)}
+.score .dot.you{background:var(--you)} .score .dot.me{background:var(--me)}
+
+/* board */
+.board{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:14px}
+.tile{position:relative;border:2px solid var(--ink);border-radius:16px;background:var(--paper);box-shadow:4px 4px 0 var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px 14px;transition:background .12s,transform .08s}
+.tile:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.tile .nm{font-size:clamp(36px,2.6vw,52px);line-height:1.08;font-weight:700;letter-spacing:-.02em}
+.tile.down{background:var(--fog);border-color:#b5b5b5;box-shadow:none;color:#a8a8a8}
+.tile.down .nm{text-decoration:line-through;text-decoration-thickness:4px}
+.tile.cut{background:var(--fog);border-style:dashed;border-color:#b5b5b5;box-shadow:none;color:#a8a8a8}
+.board.guess .tile:not(.down){background:#f1fbe0}
+
+/* bottom bar */
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tools{display:flex;gap:10px}
+.tool{border:2px solid var(--ink);border-radius:100px;padding:8px 18px;font-size:19px;font-weight:700}
+.tool:hover{background:var(--fog)}
+.acts{display:flex;gap:12px}
+.btn{border:2px solid var(--ink);border-radius:100px;padding:12px 26px;font-size:22px;font-weight:800;background:var(--paper);box-shadow:3px 3px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.go{background:var(--lime)}
+.btn.soft{background:var(--paper);box-shadow:none}
+
+/* overlay */
+.ov{position:fixed;inset:0;background:rgba(255,255,255,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.ov.show{display:flex}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);padding:30px 34px;width:min(820px,100%);max-height:94vh;overflow:auto}
+.card .src{font-size:22px;color:var(--steel);font-weight:700}
+.card h2{font-size:64px;line-height:1;font-weight:800;letter-spacing:-.03em;margin:6px 0 22px}
+.card h3{font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-.02em;margin-bottom:18px;text-wrap:balance}
+.card .qs{list-style:none;display:grid;gap:12px;margin-bottom:26px}
+.card .qs li{font-size:36px;line-height:1.15;font-weight:700;border-left:8px solid var(--lime);padding-left:16px}
+.card .row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.card .row .btn{flex:1;min-width:200px}
+.card .list{list-style:none;display:grid;gap:8px;margin-bottom:18px}
+.card .list li{font-size:24px;line-height:1.22;padding-left:30px;position:relative;text-wrap:pretty}
+.card .list li::before{content:"";position:absolute;left:4px;top:.45em;width:13px;height:13px;border-radius:50%;background:var(--lime);border:2px solid var(--ink)}
+.card .lbl{font-size:18px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--steel);margin:16px 0 6px}
+.card .big{font-size:30px;line-height:1.3;font-weight:700}
+.card .big .s{color:#bbb}
+.card.wide{width:min(1060px,100%)}
+.nw{white-space:nowrap}
+.seg{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.seg button{border:2px solid var(--ink);border-radius:100px;padding:10px 22px;font-size:24px;font-weight:700}
+.seg button.on{background:var(--lime);box-shadow:3px 3px 0 var(--ink)}
+.small{font-size:20px;color:var(--steel);margin-top:4px}
+.newgame{margin-top:18px;font-size:16px;color:var(--steel);text-decoration:underline}
+
+@media (max-width:760px){
+  body{height:auto}
+  .wrap{padding:14px 16px}
+  .top{flex-direction:column;align-items:flex-start;gap:12px}
+  .status{flex-direction:column;align-items:flex-start;gap:10px}
+  .instr{font-size:26px}
+  .board{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:96px}
+  .tile .nm{font-size:26px}
+  .bottom{flex-direction:column;align-items:stretch}
+  .tools,.acts{flex-wrap:wrap}
+  .acts .btn{flex:1}
+  .card{padding:22px 20px}
+  .card h2{font-size:44px} .card h3{font-size:30px}
+  .card .qs li{font-size:26px} .card .list li{font-size:22px} .card .big{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="status"><span class="badge" id="badge"></span><div class="instr" id="instr"></div></div>
+    <div class="score" aria-label="Score"><span class="dot you"></span>You <b id="sYou">0</b><span class="sep">:</span><b id="sMe">0</b> Me<span class="dot me"></span></div>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="bottom">
+    <div class="tools">
+      <button class="tool" data-a="rules">Rules</button>
+      <button class="tool" data-a="words">Words</button>
+      <button class="tool" data-a="help">Question help</button>
+    </div>
+    <div class="acts" id="acts"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="card" id="ovCard"></div></div>
+
+<script>
+const CAST = [
+  {n:'Homer Simpson', s:'The Simpsons', p:'he'},
+  {n:'Marge Simpson', s:'The Simpsons', p:'she'},
+  {n:'Mr Bean', s:'Mr Bean', p:'he'},
+  {n:'Shrek', s:'Shrek', p:'he'},
+  {n:'Princess Fiona', s:'Shrek', p:'she'},
+  {n:'Hermione Granger', s:'Harry Potter', p:'she'},
+  {n:'Hagrid', s:'Harry Potter', p:'he'},
+  {n:'Jack Sparrow', s:'Pirates of the Caribbean', p:'he'},
+  {n:'James Bond', s:'the Bond films · Daniel Craig', p:'he'},
+  {n:'Walter White', s:'Breaking Bad', p:'he'},
+  {n:'Wednesday Addams', s:'Wednesday', p:'she'},
+  {n:'Elsa', s:'Frozen', p:'she'}
+];
+
+const LOOKS = [
+  ['Hair', 'long · short · curly · straight · red · blonde · dark · grey'],
+  ['Face and eyes', 'a beard · a moustache · bald · glasses · big blue eyes'],
+  ['Height and body', 'tall · medium height · short · thin · slim · a bit overweight']
+];
+const PERSONALITY = 'friendly · lazy · quiet · clever · mean · shy · funny · kind · talkative · stupid · hard-working · unkind · serious · extrovert · generous · unfriendly';
+
+const MODES = {
+  words:{name:'Words', d:'Yes/no questions with the words from the page.'},
+  habits:{name:'Habits', d:'Every question: Does he / Does she + a verb.'}
+};
+
+const KEY = 'secret-character-v2';
+const fresh = () => ({
+  phase:'cast', order:shuffle(CAST.map((_,i)=>i)), cut:[],
+  round:1, mode:'words', starter:'you', turn:'you',
+  down:{you:[],me:[]}, score:{you:0,me:0}, guessing:false
+});
+let S = load() || fresh();
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const t=localStorage.getItem(KEY);if(!t)return null;const o=JSON.parse(t);return o&&o.order&&o.order.length===CAST.length?o:null}catch(e){return null}}
+const other = w => w==='you'?'me':'you';
+const $ = id => document.getElementById(id);
+const inGame = () => S.order.filter(i=>!S.cut.includes(i));
+
+/* ---------- render ---------- */
+function render(){
+  $('sYou').textContent = S.score.you;
+  $('sMe').textContent = S.score.me;
+  const b = $('badge'), ins = $('instr'), acts = $('acts');
+  b.className = 'badge';
+  if(S.phase==='cast'){
+    b.textContent = 'FIRST';
+    ins.innerHTML = 'Do we both know them? Tap a&nbsp;name.';
+    acts.innerHTML = `<button class="btn go" data-a="toSetup">Start the game</button>`;
+  } else if(S.phase==='setup'){
+    b.textContent = 'ROUND '+S.round;
+    ins.innerHTML = 'Think of one character. Don\'t say&nbsp;it!';
+    acts.innerHTML = `<button class="btn go" data-a="toSetup">Ready?</button>`;
+  } else if(S.guessing){
+    b.classList.add(S.turn); b.textContent = S.turn==='you'?'YOUR GUESS':'MY GUESS';
+    ins.innerHTML = 'Tap the character.';
+    acts.innerHTML = `<button class="btn soft" data-a="cancelGuess">Not yet</button>`;
+  } else {
+    b.classList.add(S.turn); b.textContent = S.turn==='you'?'YOUR TURN':'MY TURN';
+    ins.innerHTML = S.turn==='you'
+      ? (S.mode==='habits' ? 'Ask me: Does he / Does she + a&nbsp;verb?' : 'Ask me a yes/no&nbsp;question.')
+      : 'I ask, you answer in two&nbsp;sentences.';
+    acts.innerHTML = `<button class="btn" data-a="guess">I know who it is!</button><button class="btn go" data-a="next">Next turn</button>`;
+  }
+  renderBoard(); save();
+}
+
+function renderBoard(){
+  const b = $('board');
+  b.classList.toggle('guess', S.phase==='play' && S.guessing);
+  const ids = S.phase==='cast' ? S.order : inGame();
+  b.innerHTML = ids.map(i=>{
+    let cls = 'tile';
+    if(S.phase==='cast' && S.cut.includes(i)) cls+=' cut';
+    if(S.phase==='play' && S.down[S.turn].includes(i)) cls+=' down';
+    return `<button class="${cls}" data-i="${i}"><span class="nm">${CAST[i].n}</span></button>`;
+  }).join('');
+  const rows = Math.ceil(ids.length/4);
+  b.style.gridTemplateRows = window.innerWidth>760 ? `repeat(${rows},minmax(0,1fr))` : '';
+}
+
+/* ---------- overlays ---------- */
+function openOv(html, wide){ const c=$('ovCard'); c.className='card'+(wide?' wide':''); c.innerHTML = html; $('ov').classList.add('show'); }
+function closeOv(){ $('ov').classList.remove('show'); }
+const locked = () => !!$('ovCard').querySelector('[data-lock]');
+
+function castCard(i){
+  const c = CAST[i], P = c.p, isCut = S.cut.includes(i);
+  openOv(`
+    <div class="src">${c.s}</div>
+    <h2>${c.n}</h2>
+    <ul class="qs">
+      <li>What does ${P} look like?</li>
+      <li>What is ${P} like?</li>
+    </ul>
+    <div class="row">
+      ${isCut ? `<button class="btn go" data-a="uncut" data-i="${i}">Bring back</button>`
+              : `<button class="btn" data-a="cut" data-i="${i}">Cut: we don't know ${P==='he'?'him':'her'}</button>`}
+      <button class="btn soft" data-a="close">Back</button>
+    </div>`);
+}
+
+function setupCard(){
+  openOv(`
+    <div class="src">Round ${S.round}</div>
+    <h3>Think of one character. Don't say&nbsp;it!</h3>
+    <div class="lbl">This round</div>
+    <div class="seg">${Object.keys(MODES).map(m=>`<button data-mode="${m}" class="${S.mode===m?'on':''}">${MODES[m].name}</button>`).join('')}</div>
+    <div class="small">${MODES[S.mode].d}</div>
+    <div class="lbl">Who asks first?</div>
+    <div class="seg"><button data-start="you" class="${S.starter==='you'?'on':''}">You</button><button data-start="me" class="${S.starter==='me'?'on':''}">Me</button></div>
+    <div class="row" style="margin-top:22px">
+      <button class="btn go" data-a="start">We're ready</button>
+      <button class="btn soft" data-a="toCast">Back to the names</button>
+    </div>`);
+}
+
+function rulesCard(){
+  const habits = S.mode==='habits';
+  const r = habits ? [
+    'Every question: <b>Does he / Does she + a verb</b>, not <i>have</i>. <q>Is it a man?</q> is fine too.',
+    'Looks and personality words: only in answers. Not about the film or the name.'
+  ] : [
+    'A yes/no question about looks, personality or what the person does. <q>Is it a man?</q> is fine. Not about the film or the name.'
+  ];
+  r.push(
+    'Wrong form? I say it right, you say it again. No answer, and the turn passes.',
+    'Answer in two sentences. After <q>No</q>, say the opposite: <q>No, he isn\'t. He\'s quite mean.</q>',
+    'A one-word answer? The asker asks one more.',
+    'Joker, once a round: <q>What does he look like?</q> or <q>What is she like?</q>',
+    'A wrong guess loses the round.'
+  );
+  openOv(`
+    <div class="src">Round ${S.round} · ${MODES[S.mode].name}</div>
+    <h3>Rules</h3>
+    <ul class="list">${r.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="row"><button class="btn soft" data-a="close">Back to the game</button></div>
+    <button class="newgame" data-a="newGame">New game (score back to 0)</button>`);
+}
+
+function wordsCard(){
+  const habits = S.mode==='habits' && S.phase==='play';
+  const fmt = w => { const a = w.split(' · '); const last = a.splice(-2).join(' <span class="s">·</span> ');
+    return a.concat(last).map(x=>`<span class="nw">${x}</span>`).join(' <span class="s">·</span> '); };
+  openOv(`
+    <h3>Words${habits?': only in answers this round':''}</h3>
+    ${LOOKS.map(([g,w])=>`<div class="lbl">${g}</div><p class="big">${fmt(w)}</p>`).join('')}
+    <div class="lbl">Personality</div>
+    <p class="big">${fmt(PERSONALITY)}</p>
+    <div class="row" style="margin-top:18px"><button class="btn soft" data-a="close">Back to the game</button></div>`, true);
+}
+
+function helpCard(){
+  const habits = S.mode==='habits';
+  openOv(`
+    <h3>Question help</h3>
+    <div class="lbl">Start</div>
+    <p class="big">Is it a man? <span class="s">·</span> Is it a woman?</p>
+    ${habits ? `
+    <div class="lbl">Does + a verb</div>
+    <p class="big">Does he wear a suit?<br>Does she work at night?<br>Does he live in a big house?</p>
+    <div class="lbl">Answers</div>
+    <p class="big">Does he tell jokes?<br><span class="s">→</span> No, he doesn't. He's quite serious.</p>` : `
+    <div class="lbl">Looks</div>
+    <p class="big">Is he tall? <span class="s">·</span> Does she have curly hair?</p>
+    <div class="lbl">Personality</div>
+    <p class="big">Is he friendly? <span class="s">·</span> Does she work hard?</p>
+    <div class="lbl">Answers</div>
+    <p class="big">Is he generous?<br><span class="s">→</span> No, he isn't. He's quite mean.</p>`}
+    <div class="row" style="margin-top:20px"><button class="btn soft" data-a="close">Back to the game</button></div>`);
+}
+
+function confirmGuess(i){
+  const t = S.turn;
+  openOv(`
+    <div class="src" data-lock>${t==='you'?'Your guess':'My guess'}</div>
+    <h2>Is it ${CAST[i].n}?</h2>
+    <div class="row">
+      <button class="btn go" data-a="right">Yes, it is!</button>
+      <button class="btn" data-a="wrongGuess">No, it isn't.</button>
+    </div>`);
+}
+
+function roundEnd(winner, guessRight){
+  S.score[winner]++;
+  S.guessing = false;
+  const how = guessRight
+    ? `${winner==='you'?'You found my':'I found your'} character!`
+    : `Wrong guess, so the round is ${winner==='you'?'yours':'mine'}.`;
+  render();
+  openOv(`
+    <h2 data-lock>${winner==='you'?'You win!':'I win!'}</h2>
+    <p class="big" style="margin-bottom:22px">${how} Now tell each other who your characters&nbsp;were.</p>
+    <div class="row"><button class="btn go" data-a="nextRound">Next round</button></div>`);
+}
+
+/* ---------- actions ---------- */
+function act(a, el){
+  switch(a){
+    case 'toSetup': if(inGame().length<6){alert('Keep at least 6 characters in the game.');return} S.phase='setup'; render(); setupCard(); return;
+    case 'toCast': closeOv(); S.phase='cast'; break;
+    case 'start':
+      closeOv(); S.phase='play'; S.turn=S.starter; S.guessing=false; S.down={you:[],me:[]}; break;
+    case 'next': S.turn=other(S.turn); break;
+    case 'guess': S.guessing=true; break;
+    case 'cancelGuess': S.guessing=false; break;
+    case 'rules': rulesCard(); return;
+    case 'words': wordsCard(); return;
+    case 'help': helpCard(); return;
+    case 'close': closeOv(); break;
+    case 'cut': S.cut.push(+el.dataset.i); closeOv(); break;
+    case 'uncut': S.cut=S.cut.filter(x=>x!==+el.dataset.i); closeOv(); break;
+    case 'right': closeOv(); roundEnd(S.turn,true); return;
+    case 'wrongGuess': closeOv(); roundEnd(other(S.turn),false); return;
+    case 'nextRound':
+      S.round++; S.starter=other(S.starter);
+      if(S.round===2) S.mode='habits';
+      S.phase='setup'; render(); setupCard(); return;
+    case 'newGame': if(confirm('Start a new game? The score goes back to 0.')){ S=fresh(); closeOv(); } break;
+  }
+  render();
+}
+
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-a],[data-i],[data-mode],[data-start]');
+  if(!t) return;
+  if(t.dataset.a){ act(t.dataset.a, t); return; }
+  if(t.dataset.mode){ S.mode=t.dataset.mode; save(); setupCard(); return; }
+  if(t.dataset.start){ S.starter=t.dataset.start; save(); setupCard(); return; }
+  if(t.classList.contains('tile')){
+    const i = +t.dataset.i;
+    if(S.phase==='cast'){ castCard(i); return; }
+    if(S.phase==='play'){
+      if(S.guessing){ if(!S.down[S.turn].includes(i)) confirmGuess(i); return; }
+      const d = S.down[S.turn];
+      S.down[S.turn] = d.includes(i) ? d.filter(x=>x!==i) : d.concat(i);
+      render();
+    }
+  }
+});
+$('ov').addEventListener('click', e=>{ if(e.target.id==='ov' && !locked() && S.phase!=='setup') closeOv(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('ov').classList.contains('show') && !locked() && S.phase!=='setup') closeOv(); });
+window.addEventListener('resize', renderBoard);
+
+render();
+if(S.phase==='setup') setupCard();
+</script>
+</body>
+</html>
