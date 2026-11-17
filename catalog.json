@@ -545,6 +545,21 @@
       ],
       "keywords": "art patterns shaders узоры",
       "cover": "console-assets/covers/shader-wallpapers.svg"
+    },
+    {
+      "id": "dino-campout",
+      "title": "Dino Campout",
+      "category": "seasonal",
+      "icon": "🦕",
+      "description": "Hop across three woodland trails with Pip, collect camping gear and set up a campsite under the stars.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "dino-campout/"
+        }
+      ],
+      "keywords": "dinosaur camping jump runner no fail поход динозавр прыжки лагерь",
+      "cover": "console-assets/covers/dino-campout.webp"
     }
   ]
 }

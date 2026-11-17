@@ -89,7 +89,7 @@ def cover(g):
 if __name__=='__main__':
  c=json.loads((ROOT/'catalog.json').read_text())
  for g in c['games']:
-  ext='png' if g['id']=='reading-tower' else 'jpg' if g['id']=='monster-bakery' else 'svg'
+  ext=Path(g.get('cover', '')).suffix.lstrip('.') or 'svg'
   g['cover']=f'console-assets/covers/{g["id"]}.{ext}'
   if ext=='svg':(ROOT/g['cover']).write_text(cover(g))
  (ROOT/'catalog.json').write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#163e37"><title>Dino Campout · Dasha’s Games</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<header><a href="../" class="back">← <span>Game library</span></a><span class="wordmark"><i aria-hidden="true">▲</i> Dino Campout</span></header>
+<section id="start" class="poster" aria-labelledby="title">
+ <div class="poster-copy"><h1 id="title">Dino<br><em>Campout</em></h1>
+ <p>Run with Pip, hop over logs and bring everything you need for a night under the stars.</p>
+ <button class="primary" id="play">Hit the trail <b aria-hidden="true">→</b></button></div>
+</section>
+<section id="game" hidden aria-label="Pip’s campsite adventure">
+ <div class="trailbar"><div><span class="caption" id="stage"></span><h2 id="place"></h2></div><div class="route" aria-label="Trail progress"><div id="meter" role="progressbar" aria-label="Distance to camp" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div><span aria-hidden="true">⚑</span></div><button id="pause" class="small">Pause</button></div>
+ <div id="view"><canvas id="scene" aria-label="Pip on the trail. Use the Jump button to clear obstacles."></canvas><span id="cue" hidden></span>
+ <div id="paused" class="veil" hidden><div><h2>Trail break</h2><button id="resume" class="primary">Keep going →</button></div></div></div>
+ <div class="deck"><div><span class="caption">Camp kit</span><ul id="kit"></ul></div><div id="actions"><button id="jump" class="primary">Jump <b aria-hidden="true">↑</b></button><small>Space, ↑ or tap the trail</small></div></div>
+ <div id="unpack" hidden><h2>Set up camp</h2><p>Choose something to unpack.</p><div id="gear"></div></div>
+ <div id="finish" hidden><h2>Home under the stars.</h2><p>Pip’s camp is ready for the night.</p><button id="again" class="primary">Hike again <b aria-hidden="true">↻</b></button></div>
+</section>
+<p class="live" role="status" id="notice"></p>
+</main>
+<script src="trail.js"></script><script src="art.js"></script><script src="game.js"></script>
+</body></html>
