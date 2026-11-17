@@ -560,6 +560,21 @@
       ],
       "keywords": "dinosaur camping jump runner no fail поход динозавр прыжки лагерь",
       "cover": "console-assets/covers/dino-campout.webp"
+    },
+    {
+      "id": "dino-jump",
+      "title": "Dino Jump",
+      "category": "seasonal",
+      "icon": "🦖",
+      "description": "Run with a dino and jump over logs, rocks and puddles. Nobody can lose: the dino waits for your jump.",
+      "links": [
+        {
+          "label": "Play",
+          "href": "dino-jump/"
+        }
+      ],
+      "keywords": "dinosaur runner jump no fail early years динозавр бег прыжки нельзя проиграть",
+      "cover": "console-assets/covers/dino-jump.jpg"
     }
   ]
 }
