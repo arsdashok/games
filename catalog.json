@@ -265,14 +265,18 @@
       "title": "Word Jobs",
       "category": "grammar",
       "icon": "🧩",
-      "description": "Explore prepositions with short challenges, explanations and sorting games.",
+      "description": "Find the subject, choose a verb and repair the script, or revisit the preposition games.",
       "links": [
         {
-          "label": "Play",
+          "label": "Subject–verb agreement",
           "href": "https://word-jobs-interactive.cebzur.chatgpt.site/"
+        },
+        {
+          "label": "Prepositions",
+          "href": "https://word-jobs-interactive.cebzur.chatgpt.site/prepositions.html"
         }
       ],
-      "keywords": "prepositions предлоги small words",
+      "keywords": "subject verb agreement subjects verbs согласование prepositions предлоги small words",
       "cover": "console-assets/covers/word-jobs.svg"
     },
     {
